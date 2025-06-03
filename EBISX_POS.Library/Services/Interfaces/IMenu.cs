@@ -8,6 +8,7 @@ namespace EBISX_POS.API.Services.Interfaces
         Task<List<Category>> Categories();
         Task<List<Menu>> Menus(int ctgryId);
         Task<Menu?> GetProduct(int prodId);
+        Task<(bool isSuccess, string message)> GetProductBarcodes(string folderPath);
         Task<(List<DrinkTypeWithDrinksDTO>, List<string>)> Drinks(int menuId);
         Task<List<AddOnTypeWithAddOnsDTO>> AddOns(int menuId);
 

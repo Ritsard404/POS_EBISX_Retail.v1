@@ -25,8 +25,9 @@
 		<PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.2" />
 		<PackageReference Include="RestSharp" Version="112.1.0" />
 		<PackageReference Include="PDFsharp-MigraDoc-GDI" Version="1.50.5147" />
-		<PackageReference Include="System.Drawing.Common" Version="8.0.2" />
+		<PackageReference Include="System.Drawing.Common" Version="9.0.5" />
 		<PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
+		<PackageReference Include="ZXing.Net" Version="0.16.10" />
 	</ItemGroup>
 
 

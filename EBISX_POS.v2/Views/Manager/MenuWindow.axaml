@@ -12,7 +12,7 @@
         CornerRadius="10">
 	<Border BorderThickness="15" CornerRadius="10" BorderBrush="Orange">
 
-		<Grid RowDefinitions="Auto,*">
+		<Grid RowDefinitions="Auto,*, Auto">
 			<!-- Top Bar with Search, Add Button and X Button -->
 			<Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto,Auto" Margin="10,10,10,0">
 				<TextBox Grid.Column="0"
@@ -106,6 +106,10 @@
 				</DataGrid>
 
 			</Grid>
+
+			<Button Command="{Binding PrintBarcodeListCommand}" Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,10" Content="Print Product Barcodes" />
+
+
 			<!-- Loading Overlay -->
 			<Grid Grid.Row="0" Grid.RowSpan="3"
                   Background="#80000000"

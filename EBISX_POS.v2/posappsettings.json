@@ -19,7 +19,8 @@
     "CashTrackReport": "Cashtrack",
     "TransactionLogs": "TransactionLogs",
     "TransactionLogsFolder": "C:\\Logs\\TransactionLogs",
-    "AuditTrailFolder": "C:\\Logs\\AuditTrail"
+    "AuditTrailFolder": "C:\\Logs\\AuditTrail",
+    "ProductBarcodesFolder": "C:\\Logs\\ProductBarcodes"
   },
   "Database": {
     "PosConnectionString": "Data Source=ebisx_pos.db",

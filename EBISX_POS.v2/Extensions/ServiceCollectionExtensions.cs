@@ -87,6 +87,7 @@ namespace EBISX_POS.API.Extensions
             // Register PDF services
             services.AddScoped<AuditTrailPDFService>();
             services.AddScoped<TransactionListPDFService>();
+            services.AddScoped<MenuBarcodePDFService>();
 
             services.AddScoped<IAuth, AuthRepository>();
             services.AddScoped<IMenu, MenuRepository>();

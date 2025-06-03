@@ -10,6 +10,9 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.Input;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using EBISX_POS.API.Services.PDF;
 
 namespace EBISX_POS.ViewModels.Manager
 {
@@ -203,6 +206,31 @@ namespace EBISX_POS.ViewModels.Manager
                 Icon = Icon.Success
             });
             await successBox.ShowAsPopupAsync(_window);
+        }
+        
+        [RelayCommand]
+        private async Task PrintBarcodeList()
+        {
+            IsLoading = true;
+
+            var reportOptions = App.Current.Services.GetRequiredService<IOptions<SalesReport>>();
+
+            var barcodesPath = reportOptions.Value.ProductBarcodesFolder;
+
+            await _menuService.GetProductBarcodes(barcodesPath);
+
+            var msgBox = MessageBoxManager
+                .GetMessageBoxStandard(new MessageBoxStandardParams
+                {
+                    ButtonDefinitions = ButtonEnum.Ok,
+                    ContentTitle = "Product Barcodes List Saved",
+                    ContentMessage = $"Your barcode list was saved to:\n{barcodesPath}",
+                    Icon = Icon.Success
+                });
+
+            await msgBox.ShowAsPopupAsync(_window);
+
+            IsLoading = false;
         }
     }
 }

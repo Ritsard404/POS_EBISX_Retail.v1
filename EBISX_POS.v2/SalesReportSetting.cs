@@ -40,6 +40,7 @@
         /// </summary>
         public required string TransactionLogs { get; set; }
         public required string TransactionLogsFolder { get; set; }
+        public required string ProductBarcodesFolder { get; set; }
         public required string AuditTrailFolder { get; set; }
     }
 }

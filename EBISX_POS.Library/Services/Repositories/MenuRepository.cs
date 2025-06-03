@@ -3,11 +3,12 @@ using EBISX_POS.API.Models;
 using EBISX_POS.API.Models.Utils;
 using EBISX_POS.API.Services.DTO.Menu;
 using EBISX_POS.API.Services.Interfaces;
+using EBISX_POS.API.Services.PDF;
 using Microsoft.EntityFrameworkCore;
 
 namespace EBISX_POS.API.Services.Repositories
 {
-    public class MenuRepository(DataContext _dataContext) : IMenu
+    public class MenuRepository(DataContext _dataContext, MenuBarcodePDFService _menuBarcode) : IMenu
     {
         public async Task<List<AddOnTypeWithAddOnsDTO>> AddOns(int menuId)
         {
@@ -873,6 +874,11 @@ namespace EBISX_POS.API.Services.Repositories
                     return (false, "Menu not found");
                 }
 
+                if (menu.Qty > 0)
+                {
+                    return (false, "Cannot delete menu that has stock");
+                }
+
                 // Delete menu
                 _dataContext.Menu.Remove(menu);
 
@@ -1140,6 +1146,27 @@ namespace EBISX_POS.API.Services.Repositories
             return await _dataContext.Menu
                 .Where(c => c.Id == prodId && c.MenuIsAvailable && c.Qty > 0)
                 .FirstOrDefaultAsync();
+        }
+
+        public async Task<(bool isSuccess, string message)> GetProductBarcodes(string folderPath)
+        {
+            var menus = await _dataContext.Menu
+                .Where(m => m.MenuIsAvailable && m.Qty > 0)
+                .ToListAsync();
+
+            var barcodePdf = _menuBarcode.GenerateMenuBarcodeLabels(menus);
+
+            var fileName = $"Barcodes_{DateTime.UtcNow:yyyyMMdd_HHmmss}.pdf";
+
+            // Ensure directory exists
+            if (!Directory.Exists(folderPath))
+                Directory.CreateDirectory(folderPath);
+
+            var filePath = Path.Combine(folderPath, fileName);
+            // Save PDF file
+            await File.WriteAllBytesAsync(filePath, barcodePdf);
+
+            return (true, $"Barcodes generated successfully: {filePath}");
         }
         #endregion
     }
