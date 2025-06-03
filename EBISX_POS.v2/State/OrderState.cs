@@ -164,8 +164,6 @@ namespace EBISX_POS.State
             };
 
 
-            // Add the current order item to the collection
-            CurrentOrder.Add(CurrentOrderItem);
 
             var newOrderItem = new AddOrderDTO
             {
@@ -179,11 +177,6 @@ namespace EBISX_POS.State
                 cashierEmail = CashierState.CashierEmail ?? ""
             };
 
-            // Reset the current order item to a new instance for the next order\
-            CurrentOrderItem = new OrderItemState();
-
-            // Optionally, notify any subscribers that the current order item has changed
-            CurrentOrderItem.RefreshDisplaySubOrders(true);
 
             // Call the AddOrderItem method.
             var (isSuccess, message) = await orderService.AddOrderItem(newOrderItem);
@@ -191,6 +184,14 @@ namespace EBISX_POS.State
 
             if (isSuccess)
             {
+                // Add the current order item to the collection
+                CurrentOrder.Add(CurrentOrderItem);
+
+                // Reset the current order item to a new instance for the next order\
+                CurrentOrderItem = new OrderItemState();
+
+                // Optionally, notify any subscribers that the current order item has changed
+                CurrentOrderItem.RefreshDisplaySubOrders(true);
                 // Reset the current order item to a new instance for the next order\
                 //CurrentOrderItem = new OrderItemState();
 
@@ -204,6 +205,22 @@ namespace EBISX_POS.State
             else
             {
                 Debug.WriteLine($"Error: {message}");
+
+                await MessageBoxManager.GetMessageBoxStandard(
+                    new MessageBoxStandardParams
+                    {
+                        ContentHeader = "Insufficient Product Quantity!",
+                        ContentMessage = message,
+                        ButtonDefinitions = ButtonEnum.Ok, // Defines the available buttons
+                        WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                        CanResize = false,
+                        SizeToContent = SizeToContent.WidthAndHeight,
+                        Width = 400,
+                        ShowInCenter = true,
+                        Icon = Icon.Error,
+                        SystemDecorations = SystemDecorations.None,
+                    }).ShowAsPopupAsync(owner);
+
                 return false;
             }
         }
