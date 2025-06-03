@@ -1,0 +1,45 @@
+{
+  "OnlineAPI": {
+    "BaseUrl": ""
+  },
+  "LocalAPI": {
+    "BaseUrl": "http://localhost:5166/api",
+    "AuthEndpoint": "Auth",
+    "MenuEndpoint": "Menu",
+    "OrderEndpoint": "Order",
+    "PaymentEndpoint": "Payment",
+    "ReportEndpoint": "Report"
+  },
+  "SalesReport": {
+    "Receipts": "Receipts",
+    "SearchedInvoice": "SearchedInvoice",
+    "DailySalesReport": "SalesReport",
+    "XInvoiceReport": "XInvoiceReport",
+    "ZInvoiceReport": "ZInvoiceReport",
+    "CashTrackReport": "Cashtrack",
+    "TransactionLogs": "TransactionLogs",
+    "TransactionLogsFolder": "C:\\Logs\\TransactionLogs",
+    "AuditTrailFolder": "C:\\Logs\\AuditTrail"
+  },
+  "Database": {
+    "PosConnectionString": "Data Source=ebisx_pos.db",
+    "JournalConnectionString": "Data Source=ebisx_journal.db",
+    "EnableDetailedErrors": true,
+    "EnableSensitiveDataLogging": true,
+    "CommandTimeout": 30,
+    "BackupDirectory": "Backups",
+    "EnableAutomaticBackup": true,
+    "BackupRetentionDays": 7
+  },
+  "FilePaths": {
+    "ImagePath": "Images",
+    "BackUp": "Backups"
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft": "Warning",
+      "Microsoft.Hosting.Lifetime": "Information"
+    }
+  }
+}

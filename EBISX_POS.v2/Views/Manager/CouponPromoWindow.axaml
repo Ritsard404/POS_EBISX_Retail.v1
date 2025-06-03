@@ -1,0 +1,104 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="EBISX_POS.CouponPromoWindow"
+        xmlns:vm="using:EBISX_POS.ViewModels.Manager"
+        x:DataType="vm:CouponPromoViewModel"
+        Title="Coupon/Promo Management"
+        WindowStartupLocation="CenterScreen"
+        SystemDecorations="BorderOnly"
+        CornerRadius="10">
+    <Border BorderThickness="15" CornerRadius="10" BorderBrush="Orange">
+        <Grid RowDefinitions="Auto,*">
+            <!-- Top Bar with Add Button and X Button -->
+            <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="10,10,10,0">
+                <Button Content="X"
+                        Grid.Row="0"
+                        Padding="10,5"
+                        CornerRadius="5"
+                        HorizontalAlignment="Right"
+                        Command="{Binding CloseWindowCommand}"/>
+                <Button Content="Add New Coupon/Promo"
+                        Grid.Row="0"
+                        Padding="10,5"
+                        CornerRadius="5"
+                        HorizontalAlignment="Left"
+                        Command="{Binding AddNewCouponPromoCommand}"/>
+            </Grid>
+
+            <Grid Grid.Row="1">
+                <DataGrid Margin="20"
+                         ItemsSource="{Binding CouponPromos}"
+                         SelectedItem="{Binding SelectedCouponPromo}"
+                         AutoGenerateColumns="False"
+                         CanUserResizeColumns="True"
+                         CanUserSortColumns="True"
+                         GridLinesVisibility="All"
+                         HorizontalAlignment="Center"
+                         VerticalScrollBarVisibility="Auto"
+                         HorizontalScrollBarVisibility="Auto"
+                         BorderThickness="1"
+                         BorderBrush="Gray"
+                         CornerRadius="10"
+                         IsReadOnly="True">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Description"
+                                          Binding="{Binding Description}" />
+
+                        <DataGridTextColumn Header="Promo Code"
+                                          Binding="{Binding PromoCode}" />
+
+                        <DataGridTextColumn Header="Coupon Code"
+                                          Binding="{Binding CouponCode}" />
+
+                        <DataGridTextColumn Header="Amount"
+                                          Binding="{Binding PromoAmount, StringFormat='₱{0:F2}'}" />
+
+                        <DataGridTextColumn Header="Quantity"
+                                          Binding="{Binding CouponItemQuantity}" />
+
+                        <DataGridCheckBoxColumn Header="Available"
+                                              Binding="{Binding IsAvailable}" />
+
+                        <DataGridTextColumn Header="Expiration"
+                                          Binding="{Binding ExpirationTime, StringFormat='{}{0:MM/dd/yyyy}'}" />
+
+                        <!-- Action column -->
+                        <DataGridTemplateColumn Header="Action">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" Spacing="5">
+                                        <Button Content="Edit" 
+                                                Tag="{Binding}"
+                                                Click="EditButton_Click"
+                                                Background="Blue"/>
+                                        <Button Content="Delete" 
+                                                Tag="{Binding}"
+                                                Click="DeleteButton_Click"
+                                                Background="Red"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+
+            <!-- Loading Overlay -->
+            <Grid Grid.Row="0" Grid.RowSpan="3"
+                  Background="#80000000"
+                  IsVisible="{Binding IsLoading}">
+                <StackPanel VerticalAlignment="Center"
+                          HorizontalAlignment="Center"
+                          Spacing="10">
+                    <ProgressBar IsIndeterminate="True"/>
+                    <TextBlock Text="Loading..."
+                             Foreground="White"
+                             HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Border>
+</Window> 

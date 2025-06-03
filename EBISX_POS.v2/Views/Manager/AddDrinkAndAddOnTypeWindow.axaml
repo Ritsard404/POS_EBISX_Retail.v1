@@ -1,0 +1,43 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:EBISX_POS.ViewModels.Manager"
+        x:DataType="vm:AddDrinkAndAddOnTypeViewModel"
+        x:Class="EBISX_POS.AddDrinkAndAddOnTypeWindow"
+        Width="300" Height="200"
+        WindowStartupLocation="CenterOwner"
+        SystemDecorations="None"
+        CornerRadius="10">
+
+	<Border BorderThickness="15" CornerRadius="10" BorderBrush="Orange">
+		<Grid Margin="20" RowDefinitions="Auto,*,Auto" >
+
+			<!-- Dynamic Title -->
+			<TextBlock Grid.Row="0"
+					   Text="{Binding DialogTitle}"
+					   FontSize="20"
+					   FontWeight="Bold"
+					   Margin="0,0,0,20"/>
+
+			<!-- Single Input -->
+			<StackPanel Grid.Row="1" Spacing="15">
+				<TextBox Watermark="{Binding InputWatermark}"
+						 Text="{Binding InputText, Mode=TwoWay}"/>
+			</StackPanel>
+
+			<!-- Buttons -->
+			<StackPanel Grid.Row="2"
+						Orientation="Horizontal"
+						HorizontalAlignment="Right"
+						Spacing="10"
+						Margin="0,20,0,0">
+				<Button Content="Cancel"
+						Command="{Binding CancelCommand}"
+						Padding="20,5"/>
+				<Button Content="Add Type"
+						Command="{Binding AddMenuTypeCommand}"
+						Padding="20,5"/>
+			</StackPanel>
+
+		</Grid>
+	</Border>
+</Window>

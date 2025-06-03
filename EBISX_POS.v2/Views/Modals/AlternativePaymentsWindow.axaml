@@ -1,0 +1,50 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:views="clr-namespace:EBISX_POS.Views"
+        mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="600"
+        x:Class="EBISX_POS.Views.AlternativePaymentsWindow"
+        x:DataType="views:SelectDiscountPwdScWindow"
+        Title="AlternativePaymentsWindow"
+        WindowStartupLocation="CenterScreen"
+        ExtendClientAreaToDecorationsHint="True"
+        SystemDecorations="None"
+        Width="500" Height="600"
+        CornerRadius="10">
+	<Border BorderThickness="15" CornerRadius="10" BorderBrush="Orange">
+		<Grid>
+			<Grid Margin="10" x:Name="Fields">
+				<Grid.RowDefinitions>
+					<RowDefinition Height="*"/>
+					<!-- Takes available space -->
+					<RowDefinition Height="Auto"/>
+					<!-- Button row -->
+				</Grid.RowDefinitions>
+
+				<ScrollViewer Grid.Row="0" Margin="10">
+					<StackPanel x:Name="InputStackPanel" Spacing="10"/>
+				</ScrollViewer>
+
+				<Button Grid.Row="1"
+						Content="Save"
+						Width="130" Height="40"
+						FontWeight="SemiBold"
+						FontFamily="{StaticResource NunitoFont}"
+						FontSize="16"
+						Margin="0,0,10,10"
+						VerticalContentAlignment="Center"
+						HorizontalContentAlignment="Center"
+						HorizontalAlignment="Right"
+						VerticalAlignment="Bottom"
+						Click="Save_Click"/>
+			</Grid>
+			<!-- Overlay Loading Indicator -->
+			<ProgressBar x:Name="IsLoadMenu"
+						IsIndeterminate="True"
+						Width="200" Height="10"
+						HorizontalAlignment="Center"
+						VerticalAlignment="Center"/>
+		</Grid>
+	</Border>
+</Window>

@@ -1,0 +1,195 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+        x:Class="EBISX_POS.AddCouponPromoWindow"
+        xmlns:vm="using:EBISX_POS.ViewModels.Manager"
+        x:DataType="vm:AddCouponPromoViewModel"
+        WindowStartupLocation="CenterScreen"
+        SystemDecorations="None"
+        CornerRadius="10">
+
+    <Border BorderThickness="15" CornerRadius="10" BorderBrush="Orange">
+        <Grid RowDefinitions="Auto,*,Auto" Margin="20">
+            <!-- Header -->
+            <TextBlock Grid.Row="0"
+                      Text="Header"
+                      FontSize="20"
+                      FontWeight="Bold"
+                      Margin="0,0,0,20"/>
+
+            <!-- Main Content -->
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                <StackPanel Spacing="20" Margin="0,10">
+                    <!-- Basic Information Section -->
+                    <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="5" Padding="15">
+                        <StackPanel Spacing="15">
+                            <TextBlock Text="Basic Information" 
+                                     FontWeight="Bold" 
+                                     FontSize="16"
+                                     Margin="0,0,0,10"/>
+
+                            <!-- Description -->
+                            <StackPanel Spacing="5">
+                                <TextBlock Text="Description *" FontWeight="SemiBold"/>
+                                <TextBox Text="{Binding Description}"
+                                       Watermark="Enter description"
+                                       Padding="5"/>
+                            </StackPanel>
+
+                            <!-- Amount and Quantity Row -->
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="15">
+                                <!-- Amount -->
+                                <StackPanel Grid.Column="0" Spacing="5">
+                                    <TextBlock Text="Amount *" FontWeight="SemiBold"/>
+                                    <TextBox Text="{Binding PromoAmount}"
+                                           Watermark="Enter amount"
+                                           Padding="5"/>
+                                </StackPanel>
+
+                                <!-- Quantity -->
+                                <StackPanel Grid.Column="1" Spacing="5">
+                                    <TextBlock Text="Quantity" FontWeight="SemiBold"/>
+                                    <TextBox Text="{Binding CouponItemQuantity}"
+                                           Watermark="Enter quantity"
+                                           Padding="5"/>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Codes Section -->
+                    <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="5" Padding="15">
+                        <StackPanel Spacing="15">
+                            <TextBlock Text="Codes" 
+                                     FontWeight="Bold" 
+                                     FontSize="16"
+                                     Margin="0,0,0,10"/>
+
+                            <!-- Promo Code -->
+                            <StackPanel Spacing="5">
+                                <TextBlock Text="Promo Code" FontWeight="SemiBold"/>
+                                <TextBox Text="{Binding PromoCode}"
+                                       Watermark="Enter promo code"
+                                       Padding="5"/>
+                            </StackPanel>
+
+                            <!-- Coupon Code -->
+                            <StackPanel Spacing="5">
+                                <TextBlock Text="Coupon Code" FontWeight="SemiBold"/>
+                                <TextBox Text="{Binding CouponCode}"
+                                       Watermark="Enter coupon code"
+                                       Padding="5"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Settings Section -->
+                    <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="5" Padding="15">
+                        <StackPanel Spacing="15">
+                            <TextBlock Text="Settings" 
+                                     FontWeight="Bold" 
+                                     FontSize="16"
+                                     Margin="0,0,0,10"/>
+
+                            <!-- Available -->
+                            <CheckBox Content="Available"
+                                     IsChecked="{Binding IsAvailable}"
+                                     FontWeight="SemiBold"/>
+
+                            <!-- Expiration Time -->
+                            <StackPanel Spacing="5">
+                                <TextBlock Text="Expiration Time *" FontWeight="SemiBold"/>
+                                <DatePicker SelectedDate="{Binding ExpirationTime}"
+                                          Padding="5"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Menu Selection Section -->
+                    <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="5" Padding="15">
+                        <StackPanel Spacing="15">
+                            <TextBlock Text="Menu Selection" 
+                                     FontWeight="Bold" 
+                                     FontSize="16"
+                                     Margin="0,0,0,10"/>
+
+                            <Grid ColumnDefinitions="*,Auto,*" ColumnSpacing="15">
+                                <!-- Available Menus -->
+                                <StackPanel Grid.Column="0" Spacing="5">
+                                    <TextBlock Text="Available Menus" FontWeight="SemiBold"/>
+                                    <ListBox x:Name="AvailableMenusList"
+                                            ItemsSource="{Binding AvailableMenus}"
+                                            Height="200"
+                                            SelectionMode="Single">
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding MenuName}"/>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
+                                </StackPanel>
+
+                                <!-- Add/Remove Buttons -->
+                                <StackPanel Grid.Column="1" 
+                                          VerticalAlignment="Center" 
+                                          Spacing="10">
+                                    <Button Content="&gt;&gt;"
+                                            Command="{Binding AddMenuCommand}"
+                                            CommandParameter="{Binding SelectedItem, ElementName=AvailableMenusList}"/>
+                                    <Button Content="&lt;&lt;"
+                                            Command="{Binding RemoveMenuCommand}"
+                                            CommandParameter="{Binding SelectedItem, ElementName=SelectedMenusList}"/>
+                                </StackPanel>
+
+                                <!-- Selected Menus -->
+                                <StackPanel Grid.Column="2" Spacing="5">
+                                    <TextBlock Text="Selected Menus" FontWeight="SemiBold"/>
+                                    <ListBox x:Name="SelectedMenusList"
+                                            ItemsSource="{Binding SelectedMenus}"
+                                            Height="200"
+                                            SelectionMode="Single">
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding MenuName}"/>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- Buttons -->
+            <StackPanel Grid.Row="2"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        Spacing="10"
+                        Margin="0,20,0,0">
+                <Button Content="Cancel"
+                        Padding="20,5"
+                        Command="{Binding CancelCommand}"/>
+                <Button Content="{Binding IsEditMode, Converter={StaticResource BoolToTextConverter}, ConverterParameter='Save Changes|Add Coupon/Promo'}"
+                        Padding="20,5"
+                        Command="{Binding SaveCouponPromoCommand}"/>
+            </StackPanel>
+
+            <!-- Loading Overlay -->
+            <Grid Grid.Row="0" Grid.RowSpan="3"
+                  Background="#80000000"
+                  IsVisible="{Binding IsLoading}">
+                <StackPanel VerticalAlignment="Center"
+                          HorizontalAlignment="Center"
+                          Spacing="10">
+                    <ProgressBar IsIndeterminate="True"/>
+                    <TextBlock Text="Loading..."
+                             Foreground="White"
+                             HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Border>
+</Window> 

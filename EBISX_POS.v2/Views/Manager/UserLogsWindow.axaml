@@ -1,0 +1,120 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="500"
+        Width="900" Height="500"
+        x:Class="EBISX_POS.UserLogsWindow"
+	    xmlns:vm="using:EBISX_POS.ViewModels.Manager"
+		x:DataType="vm:UserLogsViewModel"
+        Title="UserLogsWindow"
+		WindowStartupLocation="CenterScreen"
+		SystemDecorations="None"
+		CornerRadius="10">
+	<Border BorderThickness="15"  CornerRadius="10" BorderBrush="Orange" Padding="10">
+		<Grid HorizontalAlignment="Center" RowDefinitions="Auto, Auto, Auto, Auto, *, Auto, Auto" ColumnDefinitions="Auto, *">
+			<!-- Header Section -->
+			<Grid Grid.Row="0" ColumnDefinitions="*, Auto" Grid.Column="0" Margin="10,0,0,6">
+
+				<TextBlock
+					Grid.Column="0"
+					VerticalAlignment="Center"
+					FontSize="20"
+					FontWeight="Bold"
+					Text="{Binding UserLogName}"/>
+
+				<Button
+					Grid.Column="1"
+					Content="X"
+					HorizontalAlignment="Right"
+					VerticalAlignment="Top"
+					Click="CloseButton_Click"/>
+			</Grid>
+
+
+			<!-- Filter Section -->
+			<StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="0" Margin="10,0,0,10" Spacing="10">
+				<TextBlock Text="From:" VerticalAlignment="Center"/>
+				<DatePicker SelectedDate="{Binding FromDate, Mode=TwoWay}"/>
+
+				<TextBlock Text="To:" VerticalAlignment="Center" Margin="5,0,0,0"/>
+				<DatePicker SelectedDate="{Binding ToDate, Mode=TwoWay}"/>
+
+				<Button Content="Filter" Command="{Binding FilterCommand}" VerticalAlignment="Center" />
+			</StackPanel>
+
+			<!-- DataGrid Section -->
+			<DataGrid
+				GridLinesVisibility="All"
+				BorderBrush="Gray"
+				BorderThickness="1"
+				Grid.Column="0"
+				Grid.Row="4"
+				Height="300"
+				Width="800"
+				AutoGenerateColumns="False"
+				IsReadOnly="True"
+				HorizontalAlignment="Center"
+				VerticalAlignment="Center"
+				VerticalScrollBarVisibility="Auto"
+				HorizontalScrollBarVisibility="Auto"
+				ItemsSource="{Binding PaginatedLogsList}"
+				SelectionMode="Single">
+
+				<!-- Columns -->
+				<DataGrid.Columns>
+
+					<DataGridTemplateColumn Header="Manager">
+						<DataGridTemplateColumn.CellTemplate>
+							<DataTemplate>
+								<StackPanel Spacing="5" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Center">
+									<TextBlock Text="{Binding Name}"></TextBlock>
+									<TextBlock Text="{Binding ManagerEmail}"></TextBlock>
+								</StackPanel>
+							</DataTemplate>
+						</DataGridTemplateColumn.CellTemplate>
+					</DataGridTemplateColumn>
+
+					<DataGridTemplateColumn Header="Cashier">
+						<DataGridTemplateColumn.CellTemplate>
+							<DataTemplate>
+								<StackPanel Spacing="5" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Center">
+									<TextBlock Text="{Binding CashierName}"></TextBlock>
+									<TextBlock Text="{Binding CashierEmail}"></TextBlock>
+								</StackPanel>
+							</DataTemplate>
+						</DataGridTemplateColumn.CellTemplate>
+					</DataGridTemplateColumn>
+
+					<DataGridTextColumn Binding="{Binding Amount}" Header="Amount" />
+					<DataGridTextColumn Binding="{Binding Action}" Header="Action" />
+					<DataGridTextColumn Binding="{Binding ActionDate}" Header="TimeStamp" />
+
+				</DataGrid.Columns>
+			</DataGrid>
+
+			<!-- Loading Overlay -->
+			<Grid
+				Grid.Column="0"
+				Grid.Row="4"
+				x:Name="LoadingOverlay"
+				IsVisible="{Binding IsLoading}">
+				<ProgressBar Width="100"
+							  IsIndeterminate="True"
+							  HorizontalAlignment="Center"
+							  VerticalAlignment="Center"/>
+			</Grid>
+			<StackPanel Grid.Row="5" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0" Spacing="10">
+				<Button Content="&lt; Prev" Command="{Binding PreviousPageCommand}" />
+				<TextBlock Text="{Binding CurrentPage}" VerticalAlignment="Center"/>
+				<TextBlock Text=" / " VerticalAlignment="Center"/>
+				<TextBlock Text="{Binding TotalPages}" VerticalAlignment="Center"/>
+				<Button Content="Next &gt;" Command="{Binding NextPageCommand}" />
+			</StackPanel>
+
+			<!-- Print Transaction List Button -->
+			<Button Command="{Binding PrintCommand}" IsVisible="{Binding IsManagerLogs}" Grid.Row="6" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,10" Content="Print AUDIT TRAIL LIST" />
+
+		</Grid>
+	</Border>
+</Window>

@@ -1,0 +1,337 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="" d:DesignHeight=""
+        x:Class="EBISX_POS.Views.ManagerWindow"
+        xmlns:vm="using:EBISX_POS.ViewModels"
+        Title="ManagerWindow"
+        WindowState="FullScreen"
+        Icon="/Assets/Images/logo.jpg"
+        SystemDecorations="None">
+
+	<Window.Styles>
+		<!-- Your existing Button.myButton -->
+		<Style Selector="Button.myButton">
+			<Setter Property="Width"                 Value="170"/>
+			<Setter Property="Height"                Value="120"/>
+			<Setter Property="BorderThickness"       Value="2"/>
+			<Setter Property="CornerRadius"          Value="10"/>
+			<Setter Property="Padding"               Value="10"/>
+			<Setter Property="Margin"                Value="5"/>
+			<Setter Property="HorizontalContentAlignment" Value="Center"/>
+			<Setter Property="VerticalContentAlignment"   Value="Center"/>
+			<Setter Property="FontFamily"            Value="{StaticResource NunitoFont}"/>
+		</Style>
+
+		<!-- ToggleButton: default unchecked -->
+		<Style Selector="ToggleButton TextBlock.training">
+			<Setter Property="IsVisible" Value="False"/>
+		</Style>
+		<Style Selector="ToggleButton TextBlock.live">
+			<Setter Property="IsVisible" Value="True"/>
+		</Style>
+
+		<!-- ToggleButton: checked -->
+		<Style Selector="ToggleButton:checked TextBlock.training">
+			<Setter Property="IsVisible" Value="True"/>
+		</Style>
+		<Style Selector="ToggleButton:checked TextBlock.live">
+			<Setter Property="IsVisible" Value="False"/>
+		</Style>
+	</Window.Styles>
+
+
+	<Grid RowDefinitions="Auto, *">
+		<!-- Header -->
+		<Border BorderBrush="Orange" BorderThickness="0,0,0,3">
+			<Grid Grid.Row="0" Height="70" ColumnDefinitions="Auto, *, Auto">
+				<!-- Title -->
+				<StackPanel Grid.Column="0" Orientation="Horizontal">
+
+					<Button x:Name="BackButton"
+							VerticalContentAlignment="Center"
+							HorizontalContentAlignment="Center"
+							Margin="20"
+							Height="35"
+							Click="Back_Click">
+						<StackPanel Orientation="Horizontal" Spacing="5">
+							<Path Data="{StaticResource arrow_reply_regular}"
+								  Width="20"
+								  Height="20"
+								  Fill="Black"
+								  Stretch="Uniform"
+								  Stroke="Black"
+								  StrokeThickness="2"/>
+							<TextBlock Text="Back"
+									   VerticalAlignment="Center"
+									   FontFamily="{StaticResource NunitoFont}"
+									   FontWeight="Black"
+									   FontSize="18"
+									   Margin="5,0,0,0"/>
+						</StackPanel>
+					</Button>
+					<TextBlock VerticalAlignment="Center"
+						   FontSize="20"
+						   FontWeight="Bold"
+						   Grid.Column="0"
+						   Margin="20,0,0,0" >
+						<Run Text="Powered by " />
+						<Run Text="EBISX" Foreground="SkyBlue"/>
+					</TextBlock>
+				</StackPanel>
+				<!-- User Name -->
+				<TextBlock Grid.Column="2"
+                           Text="Manager"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Right"
+                           FontSize="15" FontWeight="SemiBold"
+                           Margin="0,0,20,0"/>
+			</Grid>
+		</Border>
+
+		<!-- Main Content -->
+		<Grid Grid.Row="1" ColumnDefinitions="Auto, *, Auto">
+			<!-- Menu Area -->
+			<Border BorderBrush="Orange" BorderThickness="0,0,3,0">
+				<Grid Width="150">
+					<!-- Menu content here -->
+				</Grid>
+			</Border>
+
+			<!-- Content Area -->
+			<Grid Grid.Column="1" RowDefinitions="*, Auto">
+				<Border Grid.Row="0" BorderBrush="Orange" BorderThickness="0,0,3,3">
+					<Grid HorizontalAlignment="Center"
+                          VerticalAlignment="Center"
+                          ColumnDefinitions="Auto,Auto,Auto,Auto"
+                          RowDefinitions="Auto,Auto,Auto">
+						<!-- Sales Report Button -->
+						<Button Classes="myButton"
+                                Click="SalesReport_Button"
+                                Grid.Row="0" Grid.Column="0"
+                                VerticalContentAlignment="Center"
+								x:Name="SalesReport">
+							<StackPanel VerticalAlignment="Center" Orientation="Vertical">
+								<TextBlock FontSize="30" Text="Sales"/>
+								<TextBlock FontSize="30" Text="Report"/>
+							</StackPanel>
+						</Button>
+
+						<!-- Transaction Log Button -->
+						<Button Classes="myButton"
+                                Click="TransactionLog"
+                                Grid.Row="0" Grid.Column="1">
+							<StackPanel VerticalAlignment="Center" Orientation="Vertical">
+								<TextBlock FontSize="30" Text="Transact"/>
+								<TextBlock FontSize="30" HorizontalAlignment="Center" Text="Log"/>
+							</StackPanel>
+						</Button>
+
+						<!-- Refund Button -->
+						<Button Classes="myButton"
+                                Grid.Row="0" Grid.Column="2"
+								Click="Refund_Click">
+							<StackPanel VerticalAlignment="Center" Orientation="Vertical">
+								<TextBlock FontSize="30" Text="Refund"/>
+							</StackPanel>
+						</Button>
+						<!-- Cash Track Button -->
+						<Button Classes="myButton"
+                                Click="Cash_Track_Button"
+                                Grid.Row="0" Grid.Column="3">
+							<StackPanel VerticalAlignment="Center" Orientation="Vertical">
+								<TextBlock FontSize="30" Text="Cash"/>
+								<TextBlock FontSize="30" Text="Track"/>
+							</StackPanel>
+						</Button>
+
+						<!-- BIR Summary Report Button -->
+						<Button Classes="myButton"
+                                Grid.Row="1" Grid.Column="0"
+								Click="CashPullOut_Click"
+								x:Name="CashPullOut">
+							<StackPanel VerticalAlignment="Center"  Orientation="Vertical">
+								<TextBlock FontSize="30" Text="Cash" HorizontalAlignment="Center"/>
+								<TextBlock FontSize="30" Text="Pull-Out" HorizontalAlignment="Center"/>
+							</StackPanel>
+						</Button>
+
+						<!-- Manager Logs Button -->
+						<Button Classes="myButton"
+                                Grid.Row="1" Grid.Column="1"
+								Click="ManagerLog_Click">
+							<StackPanel VerticalAlignment="Center"  Orientation="Vertical">
+								<TextBlock FontSize="30" Text="Manager" HorizontalAlignment="Center"/>
+								<TextBlock FontSize="30" Text="Logs" HorizontalAlignment="Center"/>
+							</StackPanel>
+						</Button>
+
+						<!-- Cashier Logs Button -->
+						<Button Classes="myButton"
+                                Grid.Row="1" Grid.Column="2"
+								Click="CashierLog_Click">
+							<StackPanel VerticalAlignment="Center"  Orientation="Vertical">
+								<TextBlock FontSize="30" Text="Cashier" HorizontalAlignment="Center"/>
+								<TextBlock FontSize="30" Text="Logs" HorizontalAlignment="Center"/>
+							</StackPanel>
+						</Button>
+
+						<!-- Log Out Button -->
+						<Button Classes="myButton"
+                                Grid.Row="1" Grid.Column="3"
+                                Click="LogOut_Button"
+								x:Name="LogOut">
+							<StackPanel VerticalAlignment="Center" Orientation="Vertical">
+								<TextBlock FontSize="30" Text="Log Out"/>
+								<TextBlock FontSize="30" Text="Cashier"/>
+							</StackPanel>
+						</Button>
+
+
+					</Grid>
+				</Border>
+
+				<Grid Grid.Row="0"
+					  x:Name="ButtonOverlay"
+							  IsVisible="False"
+							  Background="#80000000"
+				  >
+
+				</Grid>
+
+				<!-- Bottom Keyboard -->
+				<Border Grid.Row="1" BorderBrush="Orange" Height="150" BorderThickness="0,0,3,0">
+					<!-- Keyboard content here -->
+					<StackPanel Orientation="Vertical" HorizontalAlignment="Center"  VerticalAlignment="Center">
+						<ToggleButton Classes="myButton"
+										   Height="70"
+										   Width="170"
+										   FontSize="18"
+									  x:Name="Mode"
+									  Click="ChangeMode_Button">
+							<Grid>
+								<TextBlock Classes="training"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"
+										   FontWeight="Bold"
+										   Text="Training Mode"
+										   Foreground="Blue"/>
+								<TextBlock Classes="live"
+										   HorizontalAlignment="Center"
+										   VerticalAlignment="Center"
+										   FontWeight="Bold"
+										   Text="Live Mode"/>
+							</Grid>
+						</ToggleButton>
+					</StackPanel>
+				</Border>
+			</Grid>
+
+			<!-- Receipt Area -->
+			<Grid Grid.Column="2" Width="380" RowDefinitions="*, Auto">
+				<!-- Content Area Inside Menu -->
+				<Border Grid.Row="0" BorderBrush="Orange" BorderThickness="0,0,0,3">
+					<ScrollViewer VerticalScrollBarVisibility="Auto">
+						<StackPanel Margin="10" x:Name="DataLayout" Spacing="10">
+							<TextBlock FontSize="30"
+									 Text="Data Management"
+									 HorizontalAlignment="Center"
+									 Margin="0,0,0,10"
+									 FontWeight="Bold"/>
+
+							<!-- First Pair -->
+							<Grid ColumnDefinitions="*,*" Margin="0,0,0,10">
+								<Button Classes="myButton"
+										Click="LoadData_Click"
+										Grid.Column="0"
+										IsVisible="False">
+									<StackPanel VerticalAlignment="Center"
+												Orientation="Vertical"
+												Spacing="5">
+										<TextBlock FontSize="30" Text="Load Data"/>
+									</StackPanel>
+								</Button>
+
+								<Button Classes="myButton"
+										Grid.Column="0"
+										x:Name="PosInfo"
+												Tag="PosTerminalInfo" Click="OnBtnClick">
+									<StackPanel VerticalAlignment="Center"
+												Orientation="Vertical"
+												Spacing="5">
+										<TextBlock FontSize="30" Text="POS Info"/>
+									</StackPanel>
+								</Button>
+
+								<Button Classes="myButton"
+										Grid.Column="1"
+												Tag="User" Click="OnBtnClick">
+									<StackPanel VerticalAlignment="Center"
+												Orientation="Vertical"
+												Spacing="5">
+										<TextBlock FontSize="30" Text="User"/>
+									</StackPanel>
+								</Button>
+							</Grid>
+
+
+							<!-- Second Pair -->
+							<Grid ColumnDefinitions="*,*" Margin="0,0,0,10">
+								<!--<Button Classes="myButton" Grid.Column="0" Tag="MenuTypes" Click="OnBtnClick">
+									<StackPanel VerticalAlignment="Center" Orientation="Vertical" Spacing="5">
+										<TextBlock FontSize="30" Text="Menu Types"/>
+									</StackPanel>
+								</Button>-->
+								<Button Classes="myButton" Grid.Column="0" Tag="Category" Click="OnBtnClick">
+									<StackPanel VerticalAlignment="Center" Orientation="Vertical" Spacing="5">
+										<TextBlock FontSize="30" Text="Category"/>
+									</StackPanel>
+								</Button>
+								<Button Classes="myButton" Grid.Column="1" Tag="Menu" Click="OnBtnClick">
+									<StackPanel VerticalAlignment="Center" Orientation="Vertical" Spacing="5">
+										<TextBlock FontSize="30" Text="Product"/>
+									</StackPanel>
+								</Button>
+							</Grid>
+
+							<!-- Third Pair -->
+							<Grid ColumnDefinitions="*,*" Margin="0,0,0,10">
+								<!--<Button Classes="myButton" Grid.Column="0" Tag="Menu" Click="OnBtnClick">
+									<StackPanel VerticalAlignment="Center" Orientation="Vertical" Spacing="5">
+										<TextBlock FontSize="30" Text="Menu"/>
+									</StackPanel>
+								</Button>-->
+								<!--<Button Classes="myButton" Grid.Column="1" Tag="CouponAndPromo" Click="OnBtnClick">
+									<StackPanel VerticalAlignment="Center" Orientation="Vertical" Spacing="5">
+										<TextBlock FontSize="26" Text="Coupon"/>
+										<TextBlock FontSize="26" Text="And Promo"/>
+									</StackPanel>
+								</Button>-->
+							</Grid>
+						</StackPanel>
+					</ScrollViewer>
+				</Border>
+
+				<!-- Bottom Keyboard -->
+				<Border Grid.Row="1" BorderBrush="Orange" Height="150" BorderThickness="0,0,0,0">
+					<!-- Keyboard content here -->
+				</Border>
+			</Grid>
+
+
+		</Grid>
+		<Grid Grid.Row="1"
+			  x:Name="LoadingOverlay"
+					  IsVisible="False"
+					  Background="#80000000"
+			  
+				  >
+			<ProgressBar Width="100"
+					  IsIndeterminate="True"
+						  Foreground="White"
+						  HorizontalAlignment="Center"
+						  VerticalAlignment="Center"/>
+		</Grid>
+	</Grid>
+</Window>

@@ -1,0 +1,101 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:EBISX_POS.ViewModels"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="EBISX_POS.Views.OrderSummaryView"
+             x:DataType="vm:OrderSummaryViewModel">
+	<Grid>
+		<!-- Headers -->
+		<Grid ColumnDefinitions="80,*,Auto" Margin="5,5,5,20">
+			<TextBlock Text="QTY" Grid.Column="0" FontWeight="Bold" HorizontalAlignment="Center"/>
+			<TextBlock Text="NAME" Grid.Column="1" FontWeight="Bold" HorizontalAlignment="Left"/>
+			<TextBlock Text="PRICE" Grid.Column="2" FontWeight="Bold" Margin="0,0,20,0" HorizontalAlignment="Right"/>
+		</Grid>
+
+		<!-- Order Items -->
+		<ScrollViewer Margin="5,30,5,20">
+			<Grid RowDefinitions="Auto,*,Auto">
+				<ItemsControl Grid.Row="0" ItemsSource="{Binding CurrentOrder}">
+					<ItemsControl.ItemTemplate>
+						<DataTemplate>
+							<Button
+								Click="EditOrder_Button"
+								HorizontalAlignment="Stretch"
+								Classes.HasDiscount="{Binding HasPwdScDiscount}"
+								Classes.NotDiscount="{Binding !HasPwdScDiscount}">
+								<Button.Styles>
+									<Style Selector="Button.HasDiscount">
+										<Setter Property="Background" Value="#80FFFF00"/>
+										<Setter Property="BorderBrush" Value="Gold"/>
+										<Setter Property="BorderThickness" Value="2"/>
+									</Style>
+									<Style Selector="Button.NotDiscount">
+										<Setter Property="Background" Value="Transparent"/>
+									</Style>
+								</Button.Styles>
+								<StackPanel>
+									<ItemsControl ItemsSource="{Binding DisplaySubOrders}">
+										<ItemsControl.ItemTemplate>
+											<DataTemplate>
+												<Grid ColumnDefinitions="80,*,Auto">
+													<TextBlock Text="{Binding Quantity}"
+															   Grid.Column="0"
+															   HorizontalAlignment="Center"
+															   Opacity="{Binding Opacity}"/>
+													<TextBlock Text="{Binding DisplayName}"
+															   Grid.Column="1"
+															   HorizontalAlignment="Left"/>
+													<TextBlock Text="{Binding ItemPriceString}"
+															   Grid.Column="2"
+															   Margin="0,0,10,0"
+															   HorizontalAlignment="Right"
+															   IsVisible="{Binding IsUpgradeMeal}"/>
+												</Grid>
+											</DataTemplate>
+										</ItemsControl.ItemTemplate>
+									</ItemsControl>
+								</StackPanel>
+							</Button>
+						</DataTemplate>
+					</ItemsControl.ItemTemplate>
+				</ItemsControl>
+
+
+				<StackPanel Grid.Row="1" Margin="0,0,0,20">
+					<Button
+						Background="Transparent"
+						Click="VoidCurrentOrder_Button"
+						HorizontalAlignment="Stretch"
+						IsVisible="{Binding CurrentOrderItem.HasCurrentOrder}">
+						<ItemsControl Background="Orange" ItemsSource="{Binding CurrentOrderItem.DisplaySubOrders}">
+							<ItemsControl.ItemTemplate>
+								<DataTemplate>
+									<Grid ColumnDefinitions="80,*,Auto">
+										<TextBlock Text="{Binding Quantity}"
+												   Grid.Column="0"
+												   HorizontalAlignment="Center"
+												   Opacity="{Binding Opacity}"/>
+										<TextBlock Text="{Binding DisplayName}"
+												   Grid.Column="1"
+												   HorizontalAlignment="Left"/>
+										<TextBlock Text="{Binding ItemPriceString}"
+												   Grid.Column="2"
+												   Margin="0,0,10,0"
+												   HorizontalAlignment="Right"
+												   IsVisible="{Binding IsUpgradeMeal}"/>
+									</Grid>
+								</DataTemplate>
+							</ItemsControl.ItemTemplate>
+						</ItemsControl>
+					</Button>
+				</StackPanel>
+				<Grid Grid.Row="2" ColumnDefinitions="Auto, *, Auto">
+					<TextBlock FontWeight="Bold" HorizontalAlignment="Center" Grid.Column="0">Amount Due: </TextBlock>
+					<TextBlock Grid.Column="2" Text="{Binding TotalDue}" HorizontalAlignment="Right" Margin="0,0,10,0" FontWeight="Bold"/>
+				</Grid>
+			</Grid>
+		</ScrollViewer>
+	</Grid>
+</UserControl>

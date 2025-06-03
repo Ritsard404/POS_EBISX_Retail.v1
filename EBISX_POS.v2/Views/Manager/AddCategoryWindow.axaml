@@ -1,0 +1,41 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="200"        
+		x:Class="EBISX_POS.AddCategoryWindow"
+        xmlns:vm="using:EBISX_POS.ViewModels.Manager"
+        x:DataType="vm:AddCategoryViewModel"
+        Title="Add New Category"
+        WindowStartupLocation="CenterOwner"
+        Width="300" Height="200"
+        SystemDecorations="None"
+        CornerRadius="10">
+    <Border BorderThickness="15" CornerRadius="10" BorderBrush="Orange">
+        <Grid RowDefinitions="Auto,*,Auto" Margin="20">
+            <TextBlock Grid.Row="0" 
+                      Text="Add New Category" 
+                      FontSize="20" 
+                      FontWeight="Bold"
+                      Margin="0,0,0,20"/>
+
+            <StackPanel Grid.Row="1" Spacing="15">
+                <TextBox Watermark="Category"
+                         Text="{Binding CategoryName, Mode=TwoWay}"/>
+            </StackPanel>
+
+            <StackPanel Grid.Row="2" 
+                        Orientation="Horizontal" 
+                        HorizontalAlignment="Right" 
+                        Spacing="10"
+                        Margin="0,20,0,0">
+                <Button Content="Cancel" 
+                        Command="{Binding CancelCommand}"
+                        Padding="20,5"/>
+                <Button Content="Add Category" 
+                        Command="{Binding AddCategoryCommand}"
+                        Padding="20,5"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window> 

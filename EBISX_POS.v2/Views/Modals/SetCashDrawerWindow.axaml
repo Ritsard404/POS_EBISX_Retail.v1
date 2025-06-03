@@ -1,0 +1,43 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="300"
+        x:Class="EBISX_POS.Views.SetCashDrawerWindow"
+        Title="SetCashDrawerWindow"
+		WindowStartupLocation="CenterScreen"
+		ExtendClientAreaToDecorationsHint="True"
+		SystemDecorations="None"
+		Width="400" Height="300"
+		Background="Transparent"
+		TransparencyLevelHint="AcrylicBlur">
+	<Border BorderThickness="15" CornerRadius="10" BorderBrush="Orange">
+		<StackPanel Orientation="Vertical" Margin="10" HorizontalAlignment="Center" VerticalAlignment="Center">
+			<TextBox x:Name="CashInDrawer"
+                 Watermark="Cash Drawer Amount"
+                 UseFloatingWatermark="True"
+					 Height="40"
+				 Margin="0,0,0, 40"/>
+			<TextBox x:Name="ManagerEmail"
+                 Watermark="Manager Email"
+                 UseFloatingWatermark="True"
+					 Height="40"
+					 PasswordChar="*"
+					 RevealPassword="False"
+				 Margin="0,0,0, 40"/>
+
+			<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
+				<Button Content="Start"
+						x:Name="StartButton"
+						Width="130" Height="40"
+						FontWeight="SemiBold"
+						FontFamily="{StaticResource NunitoFont}"
+						FontSize="16"
+						Margin="0,0,0,20"
+						VerticalContentAlignment="Center"
+						HorizontalContentAlignment="Center"
+						Click="Start_Click"/>
+			</StackPanel>
+		</StackPanel>
+	</Border>
+</Window>

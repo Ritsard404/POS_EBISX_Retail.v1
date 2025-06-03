@@ -1,0 +1,73 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:EBISX_POS.ViewModels"
+        xmlns:views="using:EBISX_POS.Views"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="600"
+        x:Class="EBISX_POS.Views.OrderItemEditWindow"
+		x:DataType="vm:OrderItemEditWindowViewModel"
+        Title="Edit Order Item"
+		WindowStartupLocation="CenterScreen"
+		ExtendClientAreaToDecorationsHint="True"
+		SystemDecorations="None"
+		Width="500" Height="600"
+		CornerRadius="10">
+	<Border BorderThickness="15" CornerRadius="10" BorderBrush="Orange">
+		<Grid RowDefinitions="*,Auto">
+			<StackPanel Grid.Row="0" Orientation="Vertical"  VerticalAlignment="Stretch" Margin="20">
+				<Grid RowDefinitions="Auto, *, Auto">
+					<Button Content="Void"
+							Click="VoidButton_Click"
+							Width="130" Height="40"
+							FontWeight="SemiBold"
+							FontSize="16"
+							Grid.Row="0"
+							Background="DarkGray"
+							HorizontalAlignment="Center"
+							VerticalAlignment="Top"
+							VerticalContentAlignment="Center"
+							HorizontalContentAlignment="Center"
+							Margin="0, 0, 0, 200"/>
+
+					<StackPanel IsVisible="{Binding OrderItem.IsEnableEdit}" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom">
+						<Button Width="40"
+								FontSize="20"
+								VerticalContentAlignment="Center"
+								HorizontalContentAlignment="Center"
+								FontWeight="Bold"
+								Content="-"
+								Command="{Binding EditQuantityCommand}"
+								CommandParameter="-1" />
+						<TextBox Text="{Binding OrderItem.Quantity}"
+								 VerticalContentAlignment="Center"
+								 HorizontalContentAlignment="Center"
+								 Margin="10, 0, 10, 0"
+								 IsReadOnly="True" />
+						<Button Width="40"
+								FontSize="20"
+								VerticalContentAlignment="Center"
+								HorizontalContentAlignment="Center"
+								FontWeight="Bold"
+								Content="+"
+								Command="{Binding EditQuantityCommand}"
+								CommandParameter="1" />
+					</StackPanel>
+
+				</Grid>
+			</StackPanel>
+
+			<Button Content="Save"
+					Click="SaveButton_Click"
+					Width="130" Height="40"
+					FontWeight="SemiBold"
+					FontSize="16"
+					Grid.Row="1"
+					Background="Green"
+					Margin="0 ,0, 10, 10"
+					HorizontalAlignment="Right"
+					VerticalContentAlignment="Center"
+					HorizontalContentAlignment="Center"/>
+		</Grid>
+	</Border>
+</Window>

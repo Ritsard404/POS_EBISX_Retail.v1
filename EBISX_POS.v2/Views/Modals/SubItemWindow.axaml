@@ -1,0 +1,61 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:EBISX_POS.ViewModels"
+        xmlns:views="using:EBISX_POS.Views"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="1500" d:DesignHeight="1800" Height="600"
+        x:Class="EBISX_POS.Views.SubItemWindow"
+		x:DataType="vm:SubItemWindowViewModel"
+		ExtendClientAreaToDecorationsHint="True"
+		SystemDecorations="None"
+        WindowStartupLocation="CenterOwner">
+
+	<Border BorderThickness="15" CornerRadius="10" BorderBrush="Orange">
+		<Grid RowDefinitions="*, Auto">
+			<!-- Content Area with loader overlay -->
+			<Grid Grid.Row="0">
+				<!-- Content: scrollable options -->
+				<ScrollViewer IsVisible="{Binding HasOptions}"
+							  HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+					<StackPanel Margin="10">
+						<StackPanel IsVisible="{Binding HasOptions}">
+							<TextBlock x:Name="QuantityDisp" Text="{Binding ItemNameAndQuantity}"
+									   FontSize="20" FontWeight="Bold" Margin="0,0,0,10"/>
+							<views:OptionsView />
+						</StackPanel>
+					</StackPanel>
+				</ScrollViewer>
+				<!-- Loader: overlaid and centered -->
+				<ProgressBar IsVisible="{Binding IsLoading}"
+							 IsIndeterminate="True"
+							 HorizontalAlignment="Center"
+							 VerticalAlignment="Center"
+							 ZIndex="1"/>
+			</Grid>
+
+			<!-- Footer -->
+			<Border Grid.Row="1" BorderBrush="Orange" BorderThickness="0,3,0,0">
+				<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
+					<Button Content="Close"
+							Click="CloseButton_Click"
+							Width="130" Height="40"
+							FontWeight="SemiBold"
+							FontSize="16"
+							Background="Red"
+							VerticalContentAlignment="Center"
+							HorizontalContentAlignment="Center"/>
+					<Button Content="Add Order"
+							Click="AddOrderButton_Click"
+							Margin="20,0,0,0"
+							Width="130" Height="40"
+							FontWeight="SemiBold"
+							FontSize="16"
+							Background="Green"
+							VerticalContentAlignment="Center"
+							HorizontalContentAlignment="Center"/>
+				</StackPanel>
+			</Border>
+		</Grid>
+	</Border>
+</Window>

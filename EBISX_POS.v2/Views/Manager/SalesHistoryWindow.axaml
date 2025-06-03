@@ -1,0 +1,137 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="EBISX_POS.Views.Manager.SalesHistoryWindow"
+	    xmlns:vm="using:EBISX_POS.ViewModels.Manager"
+		x:DataType="vm:SalesHistoryViewModel"
+        Title="Invoice  History  Window"
+        Width="900" Height="500"
+		WindowStartupLocation="CenterScreen"
+		SystemDecorations="None"
+		CornerRadius="10">
+	
+	<Border BorderThickness="15"  CornerRadius="10" BorderBrush="Orange" Padding="10">
+		<Grid HorizontalAlignment="Center">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="*" />
+			</Grid.ColumnDefinitions>
+
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto"/>
+				<!-- Header -->
+				<RowDefinition Height="Auto"/>
+				<!-- Filter Section -->
+				<RowDefinition Height="Auto"/>
+				<!-- DatePicker Filter -->
+				<RowDefinition Height="Auto"/>
+				<!-- Search Button -->
+				<RowDefinition Height="*" />
+				<RowDefinition Height="Auto"/>
+				<RowDefinition Height="Auto"/>
+				<!-- DataGrid -->
+			</Grid.RowDefinitions>
+
+			<!-- Header Section -->
+			<Grid Grid.Row="0" Grid.Column="0" Margin="10,0,10,6">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*" />
+					<ColumnDefinition Width="Auto" />
+				</Grid.ColumnDefinitions>
+
+				<TextBlock
+					Grid.Column="0"
+					VerticalAlignment="Center"
+					FontSize="20"
+					FontWeight="Bold"
+					Text="Sales History"/>
+
+				<Button
+					Grid.Column="1"
+					Content="X"
+					HorizontalAlignment="Right"
+					VerticalAlignment="Top"
+					Click="CloseButton_Click"/>
+			</Grid>
+
+
+			<!-- Filter Section -->
+			<StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="0" Margin="10,0,0,10" Spacing="10">
+				<TextBlock Text="From:" VerticalAlignment="Center"/>
+				<DatePicker SelectedDate="{Binding FromDate, Mode=TwoWay}"/>
+
+				<TextBlock Text="To:" VerticalAlignment="Center" Margin="5,0,0,0"/>
+				<DatePicker SelectedDate="{Binding ToDate, Mode=TwoWay}"/>
+
+				<Button Content="Filter" Command="{Binding FilterCommand}" VerticalAlignment="Center" />
+			</StackPanel>
+
+			<!-- DataGrid Section -->
+			<DataGrid
+				GridLinesVisibility="All"
+				BorderBrush="Gray"
+				BorderThickness="1"
+				Grid.Column="0"
+				Grid.Row="4"
+				Height="300"
+				AutoGenerateColumns="False"
+				IsReadOnly="True"
+				HorizontalAlignment="Center"
+				VerticalAlignment="Center"
+				VerticalScrollBarVisibility="Auto"
+				ItemsSource="{Binding PaginatedSalesHistoryList}"
+				SelectedItem="{Binding SelectedInvoice, Mode=TwoWay}"
+				SelectionMode="Single">
+
+				<!-- Columns -->
+				<DataGrid.Columns>
+					<DataGridTextColumn Binding="{Binding InvoiceNumString}" Header="Invoice No." />
+					<DataGridTextColumn Binding="{Binding Date}" Header="Date" />
+					<DataGridTextColumn Binding="{Binding Time}" Header="Time" />
+					<DataGridTextColumn Binding="{Binding CashierName}" Header="Cashier" />
+					<DataGridTextColumn Binding="{Binding InvoiceStatus}" Header="Status" />
+
+					<!-- Action Button -->
+					<DataGridTemplateColumn Width="100" Header="Action">
+						<DataGridTemplateColumn.CellTemplate>
+							<DataTemplate>
+								<Button
+									HorizontalAlignment="Center"
+									Content="Print"
+									Click="Button_Click"
+									Tag="{Binding}"/>
+							</DataTemplate>
+						</DataGridTemplateColumn.CellTemplate>
+					</DataGridTemplateColumn>
+				</DataGrid.Columns>
+			</DataGrid>
+
+			<!-- Loading Overlay -->
+			<Grid
+				Grid.Column="0"
+				Grid.Row="6"
+				x:Name="LoadingOverlay"
+				IsVisible="{Binding IsLoading}">
+				<ProgressBar Width="100"
+							  IsIndeterminate="True"
+							  HorizontalAlignment="Center"
+							  VerticalAlignment="Center"/>
+			</Grid>
+			<StackPanel Grid.Row="5" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0" Spacing="10">
+				<Button Content="&lt; Prev" Command="{Binding PreviousPageCommand}" />
+				<TextBlock Text="{Binding CurrentPage}" VerticalAlignment="Center"/>
+				<TextBlock Text=" / " VerticalAlignment="Center"/>
+				<TextBlock Text="{Binding TotalPages}" VerticalAlignment="Center"/>
+				<Button Content="Next &gt;" Command="{Binding NextPageCommand}" />
+			</StackPanel>
+			
+			<!-- Print Transaction List Button -->
+			<Button Command="{Binding PrintCommand}" Grid.Row="6" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,10" Content="Print TRANSACTION LIST" />
+
+
+		</Grid>
+	</Border>
+
+</Window>

@@ -1,0 +1,48 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="300"
+        x:Class="EBISX_POS.AddUserWindow"
+        xmlns:vm="using:EBISX_POS.ViewModels.Manager"
+        x:DataType="vm:AddUserViewModel"
+        Title="Add New User"
+        WindowStartupLocation="CenterOwner"
+        Width="400" Height="300"
+        SystemDecorations="None"
+        CornerRadius="10">
+    <Border BorderThickness="15" CornerRadius="10" BorderBrush="Orange">
+        <Grid RowDefinitions="Auto,*,Auto" Margin="20">
+            <TextBlock Grid.Row="0" 
+                      Text="Add New User" 
+                      FontSize="20" 
+                      FontWeight="Bold"
+                      Margin="0,0,0,20"/>
+
+            <StackPanel Grid.Row="1" Spacing="15">
+                <TextBox Watermark="Email"
+                         Text="{Binding Email, Mode=TwoWay}"/>
+                <TextBox Watermark="First Name"
+                         Text="{Binding FirstName, Mode=TwoWay}"/>
+                <TextBox Watermark="Last Name"
+                         Text="{Binding LastName, Mode=TwoWay}"/>
+				<ComboBox PlaceholderText="Role" ItemsSource="{Binding AvailableRoles}" SelectedValue="{Binding Role, Mode=TwoWay}"
+                         />
+            </StackPanel>
+
+            <StackPanel Grid.Row="2" 
+                        Orientation="Horizontal" 
+                        HorizontalAlignment="Right" 
+                        Spacing="10"
+                        Margin="0,20,0,0">
+                <Button Content="Cancel" 
+                        Command="{Binding CancelCommand}"
+                        Padding="20,5"/>
+                <Button Content="Add User" 
+                        Command="{Binding AddUserCommand}"
+                        Padding="20,5"/>
+            </StackPanel>
+
+        </Grid>
+    </Border>
+</Window> 

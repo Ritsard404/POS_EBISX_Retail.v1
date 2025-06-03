@@ -1,0 +1,35 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:EBISX_POS.ViewModels"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:views="clr-namespace:EBISX_POS.Views"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="EBISX_POS.Views.ItemListView"
+             x:DataType="vm:ItemListViewModel">
+
+    <Grid VerticalAlignment="Stretch">
+        <!-- Center Content -->
+        <ScrollViewer HorizontalAlignment="Left" VerticalAlignment="Stretch">
+            <ItemsControl x:Name="ItemsList" ItemsSource="{Binding MenuItems}" IsVisible="{Binding HasMenus}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Button Click="OnItemClicked"
+                                Margin="5"
+                                Padding="0"
+                                Width="150"
+                                Background="Transparent"
+                                CornerRadius="10">
+                            <views:ItemCardView DataContext="{Binding}" />
+                        </Button>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

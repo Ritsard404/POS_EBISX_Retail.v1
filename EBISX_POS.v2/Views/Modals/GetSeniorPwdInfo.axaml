@@ -1,0 +1,41 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="600"
+        x:Class="EBISX_POS.Views.GetSeniorPwdInfo"
+        Title="Get Senior Pwd Info"
+        WindowStartupLocation="CenterScreen"
+        ExtendClientAreaToDecorationsHint="True"
+        SystemDecorations="None"
+        Width="500" Height="650"
+        CornerRadius="10">
+	<Border BorderThickness="15" CornerRadius="10" BorderBrush="Orange">
+		<Grid Margin="10">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="*"/>
+				<!-- Takes available space -->
+				<RowDefinition Height="Auto"/>
+				<!-- Button row -->
+			</Grid.RowDefinitions>
+
+			<ScrollViewer Grid.Row="0" Margin="10">
+				<StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" x:Name="InputStackPanel" Spacing="10"/>
+			</ScrollViewer>
+
+			<Button x:Name="Submit_Button"
+				    Grid.Row="1"
+					Content="Submit"
+					Width="130" Height="40"
+					FontWeight="SemiBold"
+					FontFamily="{StaticResource NunitoFont}"
+					FontSize="16"
+					Margin="0,0,10,10"
+					VerticalContentAlignment="Center"
+					HorizontalContentAlignment="Center"
+					HorizontalAlignment="Right"
+					VerticalAlignment="Bottom"
+					Click="SubmitButton_Click"/>
+		</Grid>
+	</Border>
+</Window>

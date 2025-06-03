@@ -1,0 +1,124 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="EBISX_POS.MenuWindow"
+        xmlns:vm="using:EBISX_POS.ViewModels.Manager"
+        x:DataType="vm:MenuViewModel"
+        Title="MenuWindow"
+        WindowStartupLocation="CenterScreen"
+        SystemDecorations="BorderOnly"
+        CornerRadius="10">
+	<Border BorderThickness="15" CornerRadius="10" BorderBrush="Orange">
+
+		<Grid RowDefinitions="Auto,*">
+			<!-- Top Bar with Search, Add Button and X Button -->
+			<Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto,Auto" Margin="10,10,10,0">
+				<TextBox Grid.Column="0"
+						Watermark="Search product..."
+						Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+						Margin="0,0,10,0"
+						Padding="5"
+						CornerRadius="5"
+						HorizontalAlignment="Stretch"
+						 Width="300"/>
+				
+				<Button Grid.Column="2"
+						Content="Add New Product"
+						Padding="10,5"
+						CornerRadius="5"
+						Margin="0,0,10,0"
+						Command="{Binding AddNewMenuCommand}"/>
+
+				<Button Grid.Column="3"
+						Content="X"
+						Padding="10,5"
+						CornerRadius="5"
+						Command="{Binding CloseWindowCommand}"/>
+			</Grid>
+
+			<Grid Grid.Row="1">
+				<DataGrid Margin="20"
+          ItemsSource="{Binding Menus}"
+			SelectedItem="{Binding SelectedMenu}"
+          AutoGenerateColumns="False"
+          CanUserResizeColumns="True"
+          CanUserSortColumns="True"
+          GridLinesVisibility="All"
+          HorizontalAlignment="Center"
+          VerticalScrollBarVisibility="Auto"
+          HorizontalScrollBarVisibility="Auto"
+          BorderThickness="1"
+          BorderBrush="Gray"
+          CornerRadius="10"
+          IsReadOnly="True">
+
+					<DataGrid.Columns>
+						<DataGridTextColumn Header="ID"
+											Binding="{Binding Id}" />
+						<DataGridTextColumn Header="Name"
+											Binding="{Binding MenuName}" />
+
+						<DataGridTextColumn Header="Price (₱)"
+											Binding="{Binding MenuPrice, StringFormat='₱{0:F2}'}" />
+
+						<!--<DataGridTextColumn Header="Size"
+											Binding="{Binding Size}" />-->
+
+						<DataGridTextColumn Header="Category"
+											Binding="{Binding Category.CtgryName}" />
+
+						<!--<DataGridCheckBoxColumn Header="Has Drink"
+												Binding="{Binding HasDrink}" />
+
+						<DataGridCheckBoxColumn Header="Has Add-On"
+												Binding="{Binding HasAddOn}" />
+
+						<DataGridCheckBoxColumn Header="Is Add-On"
+												Binding="{Binding IsAddOn}" />-->
+
+						<DataGridTextColumn Header="Quantity"
+												Binding="{Binding Qty}" />
+						
+						<DataGridCheckBoxColumn Header="Available"
+												Binding="{Binding MenuIsAvailable}" />
+
+						<!-- Optional Action column (if needed for buttons) -->
+						<DataGridTemplateColumn Header="Action">
+							<DataGridTemplateColumn.CellTemplate>
+								<DataTemplate>
+									<StackPanel Orientation="Horizontal" Spacing="5">
+										<Button Content="Edit" 
+												Tag="{Binding}"
+												Click="EditButton_Click"
+												Background="Blue"/>
+										<Button Content="Delete" 
+                                                Tag="{Binding}"
+                                                Click="DeleteButton_Click"
+                                                Background="Red"/>
+									</StackPanel>
+								</DataTemplate>
+							</DataGridTemplateColumn.CellTemplate>
+						</DataGridTemplateColumn>
+
+					</DataGrid.Columns>
+				</DataGrid>
+
+			</Grid>
+			<!-- Loading Overlay -->
+			<Grid Grid.Row="0" Grid.RowSpan="3"
+                  Background="#80000000"
+                  IsVisible="{Binding IsLoading}">
+				<StackPanel VerticalAlignment="Center"
+                          HorizontalAlignment="Center"
+                          Spacing="10">
+					<ProgressBar IsIndeterminate="True"/>
+					<TextBlock Text="Loading..."
+                             Foreground="White"
+                             HorizontalAlignment="Center"/>
+				</StackPanel>
+			</Grid>
+		</Grid>
+	</Border>
+</Window>

@@ -1,0 +1,64 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="300"
+        x:Class="EBISX_POS.OtherDiscountWindow"
+        Title="OtherDiscountWindow"
+        WindowStartupLocation="CenterScreen"
+        ExtendClientAreaToDecorationsHint="True"
+        SystemDecorations="None"
+        Width="500" Height="300"
+        CornerRadius="10">
+	<Border BorderThickness="15" CornerRadius="10" BorderBrush="Orange">
+		<Grid>
+			<Grid Margin="10" RowDefinitions="Auto, *, Auto">
+				<TextBlock Grid.Row="0" Text="Other Discount"
+						   FontFamily="{StaticResource NunitoFont}"
+						   FontSize="18"
+						   FontWeight="Bold"
+					   />
+
+				<StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center" x:Name="InputStackPanel" Spacing="10">
+					<TextBox x:Name="Name"
+							 Width="200"
+							 Watermark="Name"
+							 UseFloatingWatermark="True"
+							 Height="40"/>
+					<TextBox x:Name="PercentDiscountTextBox"
+							 Width="200"
+							 Watermark="Percent Discount"
+							 UseFloatingWatermark="True"
+							 Height="40"
+							 TextInput="PercentDiscountTextBox_OnTextInput"/>
+				</StackPanel>
+				<Button x:Name="Submit_Button"
+						Grid.Row="2"
+						Content="Apply"
+						Width="130" Height="40"
+						FontWeight="SemiBold"
+						FontFamily="{StaticResource NunitoFont}"
+						FontSize="16"
+						Margin="0,0,10,10"
+						VerticalContentAlignment="Center"
+						HorizontalContentAlignment="Center"
+						HorizontalAlignment="Right"
+						VerticalAlignment="Bottom"
+						Click="Apply_Click"/>
+			</Grid>
+
+
+			<Grid 
+				  x:Name="LoadingOverlay"
+						  IsVisible="False"
+						  Background="#80000000"
+				  >
+				<ProgressBar Width="100"
+						  IsIndeterminate="True"
+							  Foreground="White"
+							  HorizontalAlignment="Center"
+							  VerticalAlignment="Center"/>
+			</Grid>
+		</Grid>
+	</Border>
+</Window>

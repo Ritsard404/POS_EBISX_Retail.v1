@@ -1,0 +1,141 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="400"
+		Width="600" Height="400"
+        x:Class="EBISX_POS.DrinkAndAddOnTypeWindow"
+        xmlns:vm="using:EBISX_POS.ViewModels.Manager"
+        x:DataType="vm:DrinkAndAddOnTypeViewModel"
+        WindowStartupLocation="CenterScreen"
+        SystemDecorations="None"
+        CornerRadius="10">
+	<Border BorderThickness="15" CornerRadius="10" BorderBrush="Orange">
+		<Grid ColumnDefinitions="Auto, *, Auto">
+			<Grid Grid.Column="0" RowDefinitions="Auto,*">
+				<!-- Top Bar with Add Button and X Button -->
+				<Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="10,10,10,0">
+					<!-- Left-aligned Add Button -->
+					<Button Content="Add New Add On Type"
+							Grid.Column="0"
+							Padding="10,5"
+							CornerRadius="5"
+							Command="{Binding NewAddOnTypeCommand}"
+							HorizontalAlignment="Left"/>
+				</Grid>
+
+				<!-- Main Content -->
+				<Grid Grid.Row="1">
+					<DataGrid Margin="20"
+							  CanUserReorderColumns="True"
+							  ItemsSource="{Binding AddOnTypes}"
+							  SelectedItem="{Binding SelectedAddOnType}"
+							  CanUserResizeColumns="True"
+							  CanUserSortColumns="True"
+							  GridLinesVisibility="All"
+							  HorizontalAlignment="Center"
+							  VerticalScrollBarVisibility="Auto"
+							  HorizontalScrollBarVisibility="Auto"
+							  BorderThickness="1" BorderBrush="Gray"
+							  CornerRadius="10"
+							  IsReadOnly="False">
+						<DataGrid.Columns>
+							<DataGridTextColumn
+								 Header="Add On Types"
+								 Binding="{Binding AddOnTypeName}"/>
+
+							<!-- Action Button -->
+							<DataGridTemplateColumn Width="100" Header="Action">
+								<DataGridTemplateColumn.CellTemplate>
+									<DataTemplate>
+										<Button
+											HorizontalAlignment="Center"
+											Content="Remove"
+											Tag="{Binding}"
+											Background="Red"
+											Click="RemoveAddOnTypeButton_Click"/>
+									</DataTemplate>
+								</DataGridTemplateColumn.CellTemplate>
+							</DataGridTemplateColumn>
+						</DataGrid.Columns>
+					</DataGrid>
+
+					<!--Loading Overlay-->
+					<Grid Background="#80000000" IsVisible="{Binding IsLoading}">
+						<ProgressBar IsIndeterminate="True"
+								   Width="100"
+								   Height="2"
+								   VerticalAlignment="Center"/>
+					</Grid>
+
+				</Grid>
+			</Grid>
+			<Grid Grid.Column="2" RowDefinitions="Auto,*">
+				<!-- Top Bar with Add Button and X Button -->
+				<Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="10,10,10,0">
+					<!-- Left-aligned Add Button -->
+					<Button Content="Add New Drink Type"
+							Grid.Column="0"
+							Padding="10,5"
+							CornerRadius="5"
+							Command="{Binding NewDrinkTypeCommand}"
+							HorizontalAlignment="Left"/>
+
+					<!-- Right-aligned X Button -->
+					<Button Content="X"
+							Grid.Column="1"
+							Command="{Binding CloseWindowCommand}"
+							Padding="10,5"
+							CornerRadius="5"
+							HorizontalAlignment="Right"/>
+				</Grid>
+
+				<!-- Main Content -->
+				<Grid Grid.Row="1">
+					<DataGrid Margin="20"
+							  CanUserReorderColumns="True"
+							  ItemsSource="{Binding DrinkTypes}"
+							  SelectedItem="{Binding SelectedDrinkType}"
+							  CanUserResizeColumns="True"
+							  CanUserSortColumns="True"
+							  GridLinesVisibility="All"
+							  HorizontalAlignment="Center"
+							  VerticalScrollBarVisibility="Auto"
+							  HorizontalScrollBarVisibility="Auto"
+							  BorderThickness="1" BorderBrush="Gray"
+							  CornerRadius="10"
+							  IsReadOnly="False">
+						<DataGrid.Columns>
+							<DataGridTextColumn
+								 Header="Drink Types"
+								 Binding="{Binding DrinkTypeName}"/>
+
+							<!-- Action Button -->
+							<DataGridTemplateColumn Width="100" Header="Action">
+								<DataGridTemplateColumn.CellTemplate>
+									<DataTemplate>
+										<Button
+											HorizontalAlignment="Center"
+											Content="Remove"
+											Tag="{Binding}"
+											Background="Red"
+											Click="RemoveDrinkTypeButton_Click"/>
+									</DataTemplate>
+								</DataGridTemplateColumn.CellTemplate>
+							</DataGridTemplateColumn>
+						</DataGrid.Columns>
+					</DataGrid>
+
+					<!--Loading Overlay-->
+					<Grid Background="#80000000" IsVisible="{Binding IsLoading}">
+						<ProgressBar IsIndeterminate="True"
+								   Width="100"
+								   Height="2"
+								   VerticalAlignment="Center"/>
+					</Grid>
+
+				</Grid>
+			</Grid>
+		</Grid>
+	</Border>
+</Window>

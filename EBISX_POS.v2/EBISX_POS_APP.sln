@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35728.132
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EBISX_POS", "EBISX_POS.csproj", "{995DB0AB-0229-4CE9-A8DF-08124B54A7B7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EBISX_POS.Library", "..\EBISX_POS.Library\EBISX_POS.Library.csproj", "{D0509422-7BEA-43D9-93EE-C2A0DED778A5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{995DB0AB-0229-4CE9-A8DF-08124B54A7B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{995DB0AB-0229-4CE9-A8DF-08124B54A7B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{995DB0AB-0229-4CE9-A8DF-08124B54A7B7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{995DB0AB-0229-4CE9-A8DF-08124B54A7B7}.Debug|x86.Build.0 = Debug|Any CPU
+		{995DB0AB-0229-4CE9-A8DF-08124B54A7B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{995DB0AB-0229-4CE9-A8DF-08124B54A7B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{995DB0AB-0229-4CE9-A8DF-08124B54A7B7}.Release|x86.ActiveCfg = Release|Any CPU
+		{995DB0AB-0229-4CE9-A8DF-08124B54A7B7}.Release|x86.Build.0 = Release|Any CPU
+		{D0509422-7BEA-43D9-93EE-C2A0DED778A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0509422-7BEA-43D9-93EE-C2A0DED778A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0509422-7BEA-43D9-93EE-C2A0DED778A5}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D0509422-7BEA-43D9-93EE-C2A0DED778A5}.Debug|x86.Build.0 = Debug|Any CPU
+		{D0509422-7BEA-43D9-93EE-C2A0DED778A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0509422-7BEA-43D9-93EE-C2A0DED778A5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0509422-7BEA-43D9-93EE-C2A0DED778A5}.Release|x86.ActiveCfg = Release|Any CPU
+		{D0509422-7BEA-43D9-93EE-C2A0DED778A5}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

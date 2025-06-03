@@ -1,0 +1,117 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="EBISX_POS.AppUsersWindow"
+        xmlns:vm="using:EBISX_POS.ViewModels.Manager"
+        x:DataType="vm:AppUsersViewModel"
+        Title="AppUsersWindow"
+        WindowStartupLocation="CenterScreen"
+        SystemDecorations="None"
+        CornerRadius="10">
+    <Border BorderThickness="15" CornerRadius="10" BorderBrush="Orange">
+        <Grid RowDefinitions="Auto,*">
+    <!-- Top Bar with Add Button and X Button -->
+    <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="20,20,20,0">
+        <!-- Left-aligned Add Button -->
+        <Button Content="Add New User"
+                Grid.Column="0"
+                Command="{Binding AddUserCommand}"
+                Padding="10,5"
+                CornerRadius="5"
+                HorizontalAlignment="Left"/>
+
+        <!-- Right-aligned X Button -->
+        <Button Content="X"
+                Grid.Column="1"
+                Command="{Binding CloseWindowCommand}" 
+                Padding="10,5"
+                CornerRadius="5"
+                HorizontalAlignment="Right"/>
+    </Grid>
+
+            <!-- Main Content -->
+            <Grid Grid.Row="1">
+                <DataGrid Margin="20"
+                          ItemsSource="{Binding Users}"
+                          SelectedItem="{Binding SelectedUser}"
+                          CanUserReorderColumns="True"
+                          CanUserResizeColumns="True"
+                          CanUserSortColumns="True"
+                          GridLinesVisibility="All"
+                          HorizontalAlignment="Stretch"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Auto"
+                          BorderThickness="1" BorderBrush="Gray"
+                          CornerRadius="10"
+						  IsReadOnly="False">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn IsReadOnly="True" 
+                                          Header="Email" 
+                                          Binding="{Binding UserEmail}"
+                                          Width="2*"/>
+                        <DataGridTextColumn Header="First Name" 
+                                          Binding="{Binding UserFName}"
+                                          Width="*"/>
+                        <DataGridTextColumn Header="Last Name" 
+                                          Binding="{Binding UserLName}"
+                                          Width="*"/>
+                        <DataGridTemplateColumn Width="*" Header="Role">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Margin="10,0,0,0" Text="{Binding UserRole}" 
+                                             VerticalAlignment="Center"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                            <DataGridTemplateColumn.CellEditingTemplate>
+                                <DataTemplate>
+									<ComboBox  Margin="10,0,0,0"
+										Loaded="OnRoleComboLoaded"
+										SelectedValue="{Binding UserRole, Mode=TwoWay}"
+                                            MaxDropDownHeight="100">
+                                    </ComboBox>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellEditingTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Width="*" Header="Status">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock  Margin="10,0,0,0" Text="{Binding IsActive, Converter={StaticResource BoolToStatusConverter}}"
+                                             VerticalAlignment="Center"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                            <DataGridTemplateColumn.CellEditingTemplate>
+                                <DataTemplate>
+                                    <ComboBox  Margin="10,0,0,0"
+										Loaded="OnStatusComboLoaded"
+										SelectedValue="{Binding Status, Mode=TwoWay}"
+                                            MaxDropDownHeight="100">
+                                    </ComboBox>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellEditingTemplate>
+							
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn IsReadOnly="True" 
+                                          Header="Created" 
+                                          Binding="{Binding CreatedAt, StringFormat='{}{0:g}'}"
+                                          Width="*"/>
+                        <DataGridTextColumn IsReadOnly="True" 
+                                          Header="Updated" 
+                                          Binding="{Binding UpdatedAt, StringFormat='{}{0:g}'}"
+                                          Width="*"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                 <!--Loading Overlay--> 
+                <Grid Background="#80000000" IsVisible="{Binding IsLoading}">
+                    <ProgressBar IsIndeterminate="True" 
+                               Width="100" 
+                               Height="2"
+                               VerticalAlignment="Center"/>
+                </Grid>
+
+            </Grid>
+        </Grid>
+    </Border>
+</Window>

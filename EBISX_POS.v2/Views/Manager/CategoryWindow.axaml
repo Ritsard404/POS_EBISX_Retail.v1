@@ -1,0 +1,83 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="400"
+		Width="300" Height="400"
+        xmlns:vm="using:EBISX_POS.ViewModels.Manager"
+        x:DataType="vm:CategoryViewModel"
+        x:Class="EBISX_POS.CategoryWindow"
+        Title="CategoryWindow"
+        WindowStartupLocation="CenterScreen"
+        SystemDecorations="None"
+        CornerRadius="10">
+	<Border BorderThickness="15" CornerRadius="10" BorderBrush="Orange">
+
+		<Grid RowDefinitions="Auto,*">
+			<!-- Top Bar with Add Button and X Button -->
+			<Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="10,10,10,0">
+				<!-- Left-aligned Add Button -->
+				<Button Content="Add New Category"
+						Grid.Column="0"
+						Padding="10,5"
+						Command="{Binding AddCategoryCommand}"
+						CornerRadius="5"
+						HorizontalAlignment="Left"/>
+
+				<!-- Right-aligned X Button -->
+				<Button Content="X"
+						Grid.Column="1"
+						Command="{Binding CloseWindowCommand}"
+						Padding="10,5"
+						CornerRadius="5"
+						HorizontalAlignment="Right"/>
+			</Grid>
+
+			<!-- Main Content -->
+			<Grid Grid.Row="1">
+				<DataGrid Margin="20"
+                          CanUserReorderColumns="True"
+						  ItemsSource="{Binding Categories}"
+						  SelectedItem="{Binding SelectedCategory}"
+                          CanUserResizeColumns="True"
+                          CanUserSortColumns="True"
+                          GridLinesVisibility="All"
+                          HorizontalAlignment="Center"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Auto"
+                          BorderThickness="1" BorderBrush="Gray"
+                          CornerRadius="10"
+						  IsReadOnly="False">
+					<DataGrid.Columns>
+							<DataGridTextColumn
+								 Header="Category"
+								 Binding="{Binding CtgryName}"/>
+
+						<!-- Action Button -->
+						<DataGridTemplateColumn Width="100" Header="Action">
+							<DataGridTemplateColumn.CellTemplate>
+								<DataTemplate>
+									<Button
+										HorizontalAlignment="Center"
+										Content="Remove"
+										Background="Red"
+										Tag="{Binding}"
+										Click="Button_Click"/>
+								</DataTemplate>
+							</DataGridTemplateColumn.CellTemplate>
+						</DataGridTemplateColumn>
+					</DataGrid.Columns>
+				</DataGrid>
+
+				<!--Loading Overlay-->
+				<Grid Background="#80000000" IsVisible="{Binding IsLoading}">
+					<ProgressBar IsIndeterminate="True"
+                               Width="100"
+                               Height="2"
+                               VerticalAlignment="Center"/>
+				</Grid>
+
+			</Grid>
+		</Grid>
+	</Border>
+</Window>

@@ -1,0 +1,286 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:EBISX_POS.ViewModels"
+        xmlns:views="using:EBISX_POS.Views"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="EBISX_POS.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/Images/logo.jpg"
+        Title="EBISX POS"
+        WindowState="FullScreen"
+		SystemDecorations="None"
+		KeyDown="OnGlobalKeyDown">
+
+	<x:Arguments>
+		<vm:MainWindowViewModel/>
+	</x:Arguments>
+
+	<!--<Design.DataContext>
+		-->
+	<!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+	<!--
+		<vm:MainWindowViewModel/>
+	</Design.DataContext>-->
+
+	<Grid RowDefinitions="Auto, *">
+		<!-- Header -->
+		<Border BorderBrush="Orange" BorderThickness="0,0,0,3">
+			<Grid Grid.Row="0" Height="70" ColumnDefinitions="Auto, Auto, *, Auto">
+				<!-- Title -->
+				<TextBlock VerticalAlignment="Center"
+					   FontSize="20"
+					   FontWeight="Bold"
+					   Grid.Column="0"
+					   Margin="20,0,0,0" >
+					<Run Text="Powered by " />
+					<Run Text="EBISX" Foreground="SkyBlue"/>
+				</TextBlock>
+
+				<!-- Connection Status -->
+				<TextBlock Grid.Column="1"
+						   Text="{Binding IsOnline, Converter={StaticResource BoolToOnlineOfflineText}}"
+						   Foreground="{Binding IsOnline, Converter={StaticResource BoolToBrush}}"
+						   VerticalAlignment="Center"
+						   FontSize="14"
+						   FontWeight="SemiBold"
+						   Margin="10,0,0,0" />
+
+				<!-- Filler Column -->
+				<TextBlock Grid.Column="2"
+						   VerticalAlignment="Center"
+						   HorizontalAlignment="Center"
+						   FontFamily="{StaticResource NunitoFont}"
+						   FontWeight="Black"
+						   FontSize="18"
+						   Foreground="Blue"
+						   IsVisible="{Binding IsTrainMode}">Training Mode</TextBlock>
+
+				<!-- User Name -->
+				<TextBlock Grid.Column="3"
+						   Text="{Binding CashierName}"
+						   VerticalAlignment="Center"
+						   HorizontalAlignment="Right"
+						   FontSize="15"
+						   FontWeight="SemiBold"
+						   Margin="0,0,20,0"/>
+			</Grid>
+
+		</Border>
+
+		<!-- Main Content -->
+		<Grid Grid.Row="1" ColumnDefinitions="Auto, *, Auto">
+
+			<!-- Menu Area -->
+			<Border BorderBrush="Orange" BorderThickness="0,0,3,0">
+				<Grid>
+					<!-- Underlying menu content -->
+					<Grid Width="150" Name="IsCtgryAvail">
+						<ScrollViewer>
+							<Grid>
+								<Grid.RowDefinitions>
+									<RowDefinition Height="*"/>
+									<RowDefinition Height="Auto"/>
+									<RowDefinition Height="*"/>
+								</Grid.RowDefinitions>
+								<StackPanel Grid.Row="1"
+											VerticalAlignment="Center"
+											Margin="5"
+											HorizontalAlignment="Stretch">
+									<ItemsControl x:Name="MenuGroup" ItemsSource="{Binding ButtonList}">
+										<ItemsControl.ItemTemplate>
+											<DataTemplate>
+												<ToggleButton FontSize="18"
+															  HorizontalAlignment="Stretch"
+															  VerticalContentAlignment="Center"
+															  FontWeight="SemiBold"
+															  Padding="10"
+															  Margin="7"
+															  Height="60"
+															  Click="ToggleButton_Click">
+													<TextBlock Text="{Binding CtgryName}"
+															   TextWrapping="Wrap"
+															   TextAlignment="Center"
+															   HorizontalAlignment="Center"/>
+												</ToggleButton>
+											</DataTemplate>
+										</ItemsControl.ItemTemplate>
+									</ItemsControl>
+								</StackPanel>
+							</Grid>
+						</ScrollViewer>
+					</Grid>
+
+					<!-- Loader overlay: centered both vertically and horizontally -->
+					<ProgressBar Name="IsLoadCtgry"
+								 IsIndeterminate="True"
+								 HorizontalAlignment="Center"
+								 Width="100"
+								 VerticalAlignment="Center"/>
+				</Grid>
+			</Border>
+
+			<!-- Content Area -->
+			<Grid Grid.Column="1" RowDefinitions="*, Auto">
+				<Border Grid.Row="0" BorderBrush="Orange" BorderThickness="0,0,3,3">
+					<Grid RowDefinitions="Auto,*">
+						<!-- Barcode Scanner Input (Hidden but functional) -->
+						<TextBox Name="SearchBar_TextBox"
+								Watermark=""
+								Margin="0,10,10,0"
+								Padding="5"
+								CornerRadius="5"
+								HorizontalAlignment="Right"
+								VerticalAlignment="Top"
+								Width="1"
+								Height="1"
+								Opacity="0"
+								IsHitTestVisible="False"
+								IsReadOnly="True"/>
+						<!-- ContentControl will be centered -->
+						<ContentControl x:Name="ItemListViewContainer"
+										Grid.Row="1"
+										HorizontalAlignment="Center"
+										VerticalAlignment="Top"
+										Name="IsMenuAvail"/>
+						<!-- ProgressBar overlay -->
+						<ProgressBar Name="IsLoadMenu"
+									 Grid.Row="1"
+									 IsIndeterminate="True"
+									 HorizontalAlignment="Center"
+									 VerticalAlignment="Center"/>
+					</Grid>
+				</Border>
+
+				<!-- Bottom Keyboard -->
+				<Border Grid.Row="1" BorderBrush="Orange" Height="150" BorderThickness="0,0,3,0">
+					<Grid RowDefinitions="*, *">
+						<!-- First Row: 7 Buttons -->
+						<Grid Grid.Row="0" ColumnDefinitions="*, *, *, *, *, *, *">
+							<Button FontSize="18" Click="NumberButton_Click" Content="1" Grid.Column="0" FontWeight="SemiBold" Margin="10" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+							<Button FontSize="18" Click="NumberButton_Click" Content="2" Grid.Column="1" FontWeight="SemiBold" Margin="10" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+							<Button FontSize="18" Click="NumberButton_Click" Content="3" Grid.Column="2" FontWeight="SemiBold" Margin="10" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+							<Button FontSize="18" Click="NumberButton_Click" Content="4" Grid.Column="3" FontWeight="SemiBold" Margin="10" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+							<Button FontSize="18" Click="NumberButton_Click" Content="5" Grid.Column="4" FontWeight="SemiBold" Margin="10" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+							<Button FontSize="18" Click="NumberButton_Click" Content="6" Grid.Column="5" FontWeight="SemiBold" Margin="10" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+							<Button FontSize="18" Click="NumberButton_Click" Content="7" Grid.Column="6" FontWeight="SemiBold" Margin="10" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+						</Grid>
+
+						<!-- Second Row: 4 Buttons (Left) and 2 Buttons (Right) -->
+						<Grid Grid.Row="1" ColumnDefinitions="Auto, Auto, Auto, Auto, *, Auto,  Auto">
+							<!-- Left side -->
+							<Button FontSize="18" Click="NumberButton_Click" Content="8" Grid.Column="0" FontWeight="SemiBold" Margin="10" Width="85" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+							<Button FontSize="18" Click="NumberButton_Click" Content="9" Grid.Column="1" FontWeight="SemiBold" Margin="10" Width="85" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+							<Button FontSize="18" Click="NumberButton_Click" Content="0" Grid.Column="2" FontWeight="SemiBold" Margin="10" Width="85" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+							<Button FontSize="18" Click="ClearNumber_Click" FontWeight="Bold" Grid.Column="3" Margin="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  VerticalContentAlignment="Center" HorizontalContentAlignment="Center">
+								<TextBlock Text="CLEAR" LetterSpacing="2" />
+							</Button>
+
+							<!-- Right side -->
+							<Button FontSize="18" FontWeight="Bold" Click="CancelOrder_Click" Grid.Column="5" Margin="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  VerticalContentAlignment="Center" HorizontalContentAlignment="Center">
+								<TextBlock Text="CANCEL ORDER" LetterSpacing="2" />
+
+							</Button>
+							<Button FontSize="18" FontWeight="Bold" Click="Manager_Click" Grid.Column="6" Margin="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  VerticalContentAlignment="Center" HorizontalContentAlignment="Center">
+								<TextBlock Text="MANAGER" LetterSpacing="2" />
+
+							</Button>
+						</Grid>
+
+					</Grid>
+				</Border>
+			</Grid>
+
+			<!-- Receipt Area -->
+			<Grid Grid.Column="2" Width="380" RowDefinitions="*, Auto">
+				<!-- Content Area Inside Menu -->
+				<Border Grid.Row="0" BorderBrush="Orange" BorderThickness="0,0,0,3">
+					<views:OrderSummaryView DataContext="{Binding OrderSummaryViewModel}"/>
+
+				</Border>
+
+				<!-- Bottom Keyboard -->
+				<Border Grid.Row="1" BorderBrush="Orange" Height="150" BorderThickness="0,0,0,0">
+					<Grid RowDefinitions="*,*">
+						<Grid Grid.Row="0" ColumnDefinitions="Auto, *, Auto">
+							<Button Width="130" Grid.Column="0" FontWeight="ExtraBold" Margin="10"
+                                    HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                    HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+									Click="DiscountPwdSc_Click">
+								<StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+									<TextBlock Text="DISCOUNT"
+											   FontSize="18"
+											   HorizontalAlignment="Center"
+											   FontFamily="{StaticResource NunitoFont}"
+											   FontWeight="Black"/>
+									<TextBlock Text="PWD/SC"
+											   FontSize="18"
+											   HorizontalAlignment="Center"
+											   FontFamily="{StaticResource NunitoFont}"
+											   FontWeight="Black"/>
+								</StackPanel>
+							</Button>
+
+							<Button FontSize="18" Width="130" Grid.Column="2" FontWeight="ExtraBold" Margin="10"
+                                    HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                    VerticalContentAlignment="Center" Click="OrderType_Click"  HorizontalContentAlignment="Center">
+								<TextBlock Text="TENDER" LetterSpacing="2" />
+
+							</Button>
+						</Grid>
+
+						<Grid Grid.Row="1" ColumnDefinitions="Auto, *, Auto">
+							<Button Width="130" Grid.Column="0" FontWeight="ExtraBold" Margin="10"
+                                    HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                    HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+									Click="OtherDiscount_Click">
+								<StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+									<TextBlock Text="OTHER"
+											   FontSize="18"
+											   HorizontalAlignment="Center"
+											   FontFamily="{StaticResource NunitoFont}"
+											   FontWeight="Black"/>
+									<TextBlock Text="DISCOUNT"
+											   FontSize="18"
+											   HorizontalAlignment="Center"
+											   FontFamily="{StaticResource NunitoFont}"
+											   FontWeight="Black"/>
+								</StackPanel>
+							</Button>
+							<!--<Button FontSize="18" Width="130" Grid.Column="2" Click="OrderType_Click" FontWeight="ExtraBold" Margin="0,10,10,10" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center">
+								<TextBlock Text="TAKE OUT" LetterSpacing="2" />
+
+							</Button>-->
+							<ToggleButton Name="BarcodeModeToggle"
+                                        FontSize="18" 
+                                        Grid.Column="2" 
+                                        Click="BarcodeModeToggle_Click" 
+                                        FontWeight="ExtraBold" 
+                                        Margin="0,10,10,10" 
+										  Width="130"
+                                        HorizontalAlignment="Stretch" 
+                                        VerticalAlignment="Stretch" 
+                                        VerticalContentAlignment="Center" 
+                                        HorizontalContentAlignment="Center">
+								<StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+									<TextBlock Text="BARCODE"
+											   FontSize="18"
+											   HorizontalAlignment="Center"
+											   FontFamily="{StaticResource NunitoFont}"
+											   FontWeight="Black"/>
+									<TextBlock Text="MODE"
+											   FontSize="18"
+											   HorizontalAlignment="Center"
+											   FontFamily="{StaticResource NunitoFont}"
+											   FontWeight="Black"/>
+								</StackPanel>
+							</ToggleButton>
+						</Grid>
+					</Grid>
+				</Border>
+			</Grid>
+		</Grid>
+	</Grid>
+</Window>

@@ -1,0 +1,286 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:vm="using:EBISX_POS.ViewModels"
+             xmlns:views="clr-namespace:EBISX_POS.Views"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="EBISX_POS.Views.OptionsView"
+             x:DataType="vm:OptionsViewModel">
+	<StackPanel>
+
+		<Border BorderBrush="Orange" BorderThickness="0,3,0,0" IsVisible="{Binding HasDrinks}">
+			<Grid RowDefinitions="Auto, *, Auto">
+
+				<!-- Drink Types -->
+				<StackPanel Spacing="10">
+					<Grid ColumnDefinitions="Auto, *" Margin="0,10,0,0">
+						<StackPanel Orientation="Horizontal" Spacing="5" Grid.Column="0" VerticalAlignment="Center">
+							<Border Background="Orange" CornerRadius="90" Padding="5">
+								<TextBlock Text="1. " FontWeight="Bold" FontSize="18" Foreground="White"/>
+							</Border>
+							<TextBlock Text="Drinks" FontWeight="Bold" VerticalAlignment="Center" FontSize="18"/>
+						</StackPanel>
+
+						<!-- Wrap StackPanel in ScrollViewer -->
+						<ScrollViewer Grid.Column="1" HorizontalScrollBarVisibility="Auto" HorizontalAlignment="Right" VerticalAlignment="Center" VerticalScrollBarVisibility="Disabled">
+							<ItemsControl ItemsSource="{Binding DrinkTypes}">
+								<ItemsControl.ItemsPanel>
+									<ItemsPanelTemplate>
+										<StackPanel Orientation="Horizontal" Spacing="10"/>
+									</ItemsPanelTemplate>
+								</ItemsControl.ItemsPanel>
+								<ItemsControl.ItemTemplate>
+									<DataTemplate>
+										<ToggleButton Content="{Binding DrinkTypeName}"
+													  Width="130" Height="30"
+													  FontWeight="SemiBold"
+													  FontSize="16"
+													  VerticalContentAlignment="Center"
+													  HorizontalContentAlignment="Center"
+													  Click="ToggleButton_Click"/>
+									</DataTemplate>
+								</ItemsControl.ItemTemplate>
+							</ItemsControl>
+						</ScrollViewer>
+					</Grid>
+				</StackPanel>
+
+				<!-- Drink Items -->
+				<ScrollViewer Grid.Row="1" Margin="0,10,0,10" HorizontalAlignment="Left" VerticalAlignment="Center">
+
+					<ItemsControl ItemsSource="{Binding Drinks}">
+						<ItemsControl.ItemsPanel>
+							<ItemsPanelTemplate>
+								<WrapPanel HorizontalAlignment="Center" VerticalAlignment="Center"/>
+							</ItemsPanelTemplate>
+						</ItemsControl.ItemsPanel>
+						<ItemsControl.ItemTemplate>
+							<DataTemplate>
+								<ToggleButton
+									Margin="5"
+									Padding="0"
+									Width="135"
+									Background="Transparent"
+									Click="ToggleButton_Click"
+									CornerRadius="10">
+
+									<Border BorderBrush="Orange" BorderThickness="3" IsHitTestVisible="False" CornerRadius="10">
+										<Grid>
+											<!--Image-->
+											<Image Source="{Binding ItemImage}" Width="100"/>
+											<!--<Image Source="avares://EBISX_POS/Assets/Images/Burgers/burger.png" MaxWidth="100" />-->
+
+
+											<!--Price Overlay (Top-Right Corner)-->
+											<Border Background="Red"
+												CornerRadius="10"
+												Padding="5"
+												HorizontalAlignment="Right"
+												VerticalAlignment="Top"
+												Margin="5"
+												Opacity="0.8"
+												IsVisible="{Binding IsUpgradeMeal}">
+												<TextBlock Text="{Binding MenuPrice, StringFormat='+ ₱{0:F2}'}"
+														   Foreground="White"
+														   FontWeight="Bold"
+														   FontSize="18"/>
+											</Border>
+
+											<!-- "Size" Label -->
+											<Border Background="Beige"
+													CornerRadius="10"
+													Padding="5"
+													HorizontalAlignment="Left"
+													VerticalAlignment="Bottom"
+													Margin="5,5,5,45">
+												<TextBlock Text="{Binding Size}"
+														   FontWeight="Bold"
+														   FontSize="14"
+														   Foreground="BlueViolet"/>
+											</Border>
+
+											<!--Middle Border-->
+											<Border BorderBrush="Orange" BorderThickness="0,3,0,0"
+													HorizontalAlignment="Stretch"
+													VerticalAlignment="Bottom"
+													Height="3"
+													Margin="0,125,0,30"/>
+											<!--Adjust margin to control spacing-->
+
+											<!--Item Name (Below the Middle Border)-->
+											<TextBlock Text="{Binding MenuName}"
+													  HorizontalAlignment="Center"
+													  VerticalAlignment="Bottom"
+													  Margin="5,40,5,5"
+													  FontWeight="Bold"
+													  FontSize="16" />
+										</Grid>
+									</Border>
+
+								</ToggleButton>
+							</DataTemplate>
+						</ItemsControl.ItemTemplate>
+					</ItemsControl>
+				</ScrollViewer>
+
+				<!-- Sizes -->
+				<StackPanel Grid.Row="2" Spacing="10">
+					<Grid ColumnDefinitions="*, *" Margin="0,0,0,10">
+						<!-- Title -->
+						<TextBlock Grid.Column="0" Text="Size:" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="18"/>
+
+						<!-- Scrollable Dynamic Toggle Buttons for Sizes -->
+						<ScrollViewer Grid.Column="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+							<ItemsControl x:Name="SizeItemsControl" ItemsSource="{Binding DrinkSizes}">
+								<ItemsControl.ItemsPanel>
+									<ItemsPanelTemplate>
+										<StackPanel Orientation="Horizontal" Spacing="10"/>
+									</ItemsPanelTemplate>
+								</ItemsControl.ItemsPanel>
+								<ItemsControl.ItemTemplate>
+									<DataTemplate>
+										<ToggleButton Content="{Binding}"
+													  Width="130" Height="40"
+													  FontWeight="SemiBold"
+													  FontSize="16"
+													  VerticalContentAlignment="Center"
+													  HorizontalContentAlignment="Center"
+													  Click="ToggleButton_Click"/>
+									</DataTemplate>
+								</ItemsControl.ItemTemplate>
+							</ItemsControl>
+						</ScrollViewer>
+					</Grid>
+				</StackPanel>
+
+
+			</Grid>
+		</Border>
+
+		<Border BorderBrush="Orange" BorderThickness="0,3,0,0" IsVisible="{Binding HasAddOns}">
+			<Grid RowDefinitions="Auto, *">
+				<!-- AddOns Types -->
+				<StackPanel Spacing="10">
+					<Grid ColumnDefinitions="Auto, *" Margin="0,10,0,0">
+						<StackPanel Orientation="Horizontal" Spacing="5" Grid.Column="0" VerticalAlignment="Center">
+							<Border Background="Orange" CornerRadius="90" Padding="5">
+								<TextBlock Text="2. " FontWeight="Bold" FontSize="18" Foreground="White"/>
+							</Border>
+							<TextBlock Text="Add-Ons" FontWeight="Bold" VerticalAlignment="Center" FontSize="18"/>
+						</StackPanel>
+
+						<!-- Wrap StackPanel in ScrollViewer -->
+						<ScrollViewer Grid.Column="1" HorizontalScrollBarVisibility="Auto" HorizontalAlignment="Right" VerticalAlignment="Center" VerticalScrollBarVisibility="Disabled">
+							<ItemsControl ItemsSource="{Binding AddOnsType}">
+								<ItemsControl.ItemsPanel>
+									<ItemsPanelTemplate>
+										<StackPanel Orientation="Horizontal" Spacing="10"/>
+									</ItemsPanelTemplate>
+								</ItemsControl.ItemsPanel>
+								<ItemsControl.ItemTemplate>
+									<DataTemplate>
+										<ToggleButton Content="{Binding AddOnTypeName}"
+													  Width="130" Height="30"
+													  FontWeight="SemiBold"
+													  FontSize="16"
+													  VerticalContentAlignment="Center"
+													  HorizontalContentAlignment="Center"
+													  Click="ToggleButton_Click"/>
+									</DataTemplate>
+								</ItemsControl.ItemTemplate>
+							</ItemsControl>
+						</ScrollViewer>
+					</Grid>
+				</StackPanel>
+
+
+				<!-- Add-Ons Items-->
+				<ScrollViewer
+					Grid.Row="1"
+					Margin="0,10,0,10"
+					HorizontalAlignment="Left"
+					VerticalAlignment="Center"
+					VerticalScrollBarVisibility="Auto">
+
+					<ItemsControl ItemsSource="{Binding AddOns}">
+						<ItemsControl.ItemsPanel>
+							<ItemsPanelTemplate>
+								<WrapPanel HorizontalAlignment="Center" VerticalAlignment="Center"/>
+							</ItemsPanelTemplate>
+						</ItemsControl.ItemsPanel>
+						<ItemsControl.ItemTemplate>
+							<DataTemplate>
+								<ToggleButton
+									Margin="5"
+									Padding="0"
+									Width="135"
+									Background="Transparent"
+									Click="ToggleButton_Click"
+									CornerRadius="10">
+
+									<Border BorderBrush="Orange" BorderThickness="3" IsHitTestVisible="False" CornerRadius="10">
+										<Grid>
+											<!--Image-->
+											<Image Source="{Binding ItemImage}" Width="100"/>
+											<!--<Image Source="avares://EBISX_POS/Assets/Images/Burgers/burger.png" MaxWidth="100" />-->
+
+
+
+											<!--Price Overlay (Top-Right Corner)-->
+											<Border Background="Red"
+												CornerRadius="10"
+												Padding="5"
+												HorizontalAlignment="Right"
+												VerticalAlignment="Top"
+												Margin="5"
+													Opacity="0.8"
+														IsVisible="{Binding IsUpgradeMeal}">
+												<TextBlock Text="{Binding Price, StringFormat='+ ₱{0:F2}'}"
+														   Foreground="White"
+														   FontWeight="Bold"
+														   FontSize="18"/>
+											</Border>
+
+											<!-- "Size" Label -->
+											<Border Background="Beige"
+													CornerRadius="10"
+													Padding="5"
+													HorizontalAlignment="Left"
+													VerticalAlignment="Top"
+													Margin="5"
+													IsVisible="{Binding HasSize}">
+												<TextBlock Text="{Binding Size}"
+														   FontWeight="Bold"
+														   FontSize="14"
+														   Foreground="BlueViolet"/>
+											</Border>
+
+											<!--Middle Border-->
+											<Border BorderBrush="Orange" BorderThickness="0,3,0,0"
+													HorizontalAlignment="Stretch"
+													VerticalAlignment="Bottom"
+													Height="3"
+													Margin="0,125,0,30"/>
+											<!--Adjust margin to control spacing-->
+
+											<!--Item Name (Below the Middle Border)-->
+											<TextBlock Text="{Binding MenuName}"
+													  HorizontalAlignment="Center"
+													  VerticalAlignment="Bottom"
+													  Margin="5,40,5,5"
+													  FontWeight="Bold"
+													  FontSize="16" />
+										</Grid>
+									</Border>
+
+								</ToggleButton>
+							</DataTemplate>
+						</ItemsControl.ItemTemplate>
+					</ItemsControl>
+				</ScrollViewer>
+			</Grid>
+		</Border>
+
+	</StackPanel>
+</UserControl>

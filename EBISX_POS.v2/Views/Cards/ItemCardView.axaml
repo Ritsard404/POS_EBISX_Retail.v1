@@ -1,0 +1,75 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:EBISX_POS.ViewModels"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="EBISX_POS.Views.ItemCardView"
+             xmlns:models="clr-namespace:EBISX_POS.Models"
+             x:DataType="models:ItemMenu">
+    <Border BorderBrush="Orange" BorderThickness="3" IsHitTestVisible="False" CornerRadius="10">
+        <Grid>
+            <!--Image-->
+            <Image Source="{Binding ItemImage}" Width="100"/>
+            <!--<Image Source="avares://EBISX_POS/Assets/Images/Burgers/burger.png" MaxWidth="100" />-->
+
+            <!--Price Overlay (Top-Right Corner)-->
+            <Border Background="Red"
+                CornerRadius="10"
+                Padding="5"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+                Margin="5"
+                Opacity="0.8">
+                <TextBlock Text="{Binding Price, StringFormat='₱{0:F2}'}"
+                           Foreground="White"
+                           FontWeight="Bold"
+                           FontSize="18"/>
+            </Border>
+
+			<!-- "Solo" Label --><!--
+			<Border Background="Beige"
+                    CornerRadius="10"
+                    Padding="5"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    Margin="5"
+                    IsVisible="{Binding IsSolo}">
+				<TextBlock Text="Solo"
+                           FontWeight="Bold"
+                           FontSize="12"
+                           Foreground="BlueViolet"/>
+			</Border>-->
+
+			<!-- "Size" Label --><!--
+			<Border Background="Beige"
+                    CornerRadius="10"
+                    Padding="5"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Bottom"
+                    Margin="5,5,5,45"
+                    IsVisible="{Binding HasSize}">
+				<TextBlock Text="{Binding Size}"
+                           FontWeight="Bold"
+                           FontSize="14"
+                           Foreground="BlueViolet"/>
+			</Border>-->
+
+            <!--Middle Border-->
+            <Border BorderBrush="Orange" BorderThickness="0,3,0,0"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Bottom"
+                    Height="3"
+                    Margin="0,125,0,30"/>
+            <!--Adjust margin to control spacing-->
+
+            <!--Item Name (Below the Middle Border)-->
+            <TextBlock Text="{Binding ItemName}"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Bottom"
+                      Margin="5,40,5,5"
+                      FontWeight="Bold"
+                      FontSize="16" />
+        </Grid>
+    </Border>
+</UserControl>

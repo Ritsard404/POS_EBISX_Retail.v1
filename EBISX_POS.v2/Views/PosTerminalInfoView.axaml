@@ -1,0 +1,109 @@
+<Window xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:EBISX_POS.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="650"
+		Width="700" Height="650"
+             x:Class="EBISX_POS.v2.Views.PosTerminalInfoView"
+			 x:DataType="vm:PosTerminalInfoViewModel"
+        WindowStartupLocation="CenterScreen"
+        SystemDecorations="None"
+        CornerRadius="10">
+	<Border BorderThickness="15" CornerRadius="10" BorderBrush="Orange">
+
+		<ScrollViewer>
+			<StackPanel Margin="20" Spacing="15">
+				<Grid ColumnDefinitions="Auto, *, Auto">
+					<TextBlock Text="POS Terminal Information"
+							 FontSize="24"
+							 FontWeight="Bold"
+							   Grid.Column="0"
+							 HorizontalAlignment="Left"
+							 Margin="0,0,0,20"/>
+					<Button Content="X"
+							Grid.Column="2"
+							Command="{Binding CloseWindowCommand}"
+							CornerRadius="5"
+							HorizontalAlignment="Right"/>
+				</Grid>
+
+				<Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="10" ColumnSpacing="20">
+					<!-- POS Details -->
+					<TextBlock Text="POS Details"
+							 Grid.Row="0"
+							 Grid.ColumnSpan="2"
+							 FontSize="18"
+							 FontWeight="SemiBold"
+							 Margin="0,0,0,10"/>
+
+					<TextBlock Text="POS Serial Number:" Grid.Row="1" VerticalAlignment="Center"/>
+					<TextBox Text="{Binding PosSerialNumber, UpdateSourceTrigger=PropertyChanged}"
+							 Grid.Row="1" Grid.Column="1"/>
+
+					<TextBlock Text="MIN Number:" Grid.Row="2" VerticalAlignment="Center"/>
+					<TextBox Text="{Binding MinNumber, UpdateSourceTrigger=PropertyChanged}"
+							 Grid.Row="2" Grid.Column="1"/>
+
+					<TextBlock Text="Accreditation Number:" Grid.Row="3" VerticalAlignment="Center"/>
+					<TextBox Text="{Binding AccreditationNumber, UpdateSourceTrigger=PropertyChanged}"
+							 Grid.Row="3" Grid.Column="1"/>
+
+					<TextBlock Text="PTU Number:" Grid.Row="4" VerticalAlignment="Center"/>
+					<TextBox Text="{Binding PtuNumber, UpdateSourceTrigger=PropertyChanged}"
+							 Grid.Row="4" Grid.Column="1"/>
+
+					<TextBlock Text="Date Issued:" Grid.Row="5" VerticalAlignment="Center"/>
+					<DatePicker SelectedDate="{Binding DateIssued, Mode=TwoWay}"
+							   Grid.Row="5" Grid.Column="1"/>
+
+					<TextBlock Text="Valid Until:" Grid.Row="6" VerticalAlignment="Center"/>
+					<DatePicker SelectedDate="{Binding ValidUntil, Mode=TwoWay}"
+							   Grid.Row="6" Grid.Column="1"/>
+
+					<!-- Business Details -->
+					<TextBlock Text="Business Details"
+							 Grid.Row="7"
+							 Grid.ColumnSpan="2"
+							 FontSize="18"
+							 FontWeight="SemiBold"
+							 Margin="0,20,0,10"/>
+
+					<TextBlock Text="Registered Name:" Grid.Row="8" VerticalAlignment="Center"/>
+					<TextBox Text="{Binding RegisteredName, UpdateSourceTrigger=PropertyChanged}"
+							 Grid.Row="8" Grid.Column="1"/>
+
+					<TextBlock Text="Operated By:" Grid.Row="9" VerticalAlignment="Center"/>
+					<TextBox Text="{Binding OperatedBy, UpdateSourceTrigger=PropertyChanged}"
+							 Grid.Row="9" Grid.Column="1"/>
+
+					<TextBlock Text="Address:" Grid.Row="10" VerticalAlignment="Center"/>
+					<TextBox Text="{Binding Address, UpdateSourceTrigger=PropertyChanged}"
+							 Grid.Row="10" Grid.Column="1"/>
+
+					<TextBlock Text="VAT TIN Number:" Grid.Row="11" VerticalAlignment="Center"/>
+					<TextBox Text="{Binding VatTinNumber, UpdateSourceTrigger=PropertyChanged}"
+							 Grid.Row="11" Grid.Column="1"/>
+				</Grid>
+
+				<StackPanel Orientation="Horizontal"
+							HorizontalAlignment="Center"
+							Spacing="10"
+							Margin="0,20,0,0">
+					<Button Content="Save"
+							Command="{Binding SavePosTerminalInfoCommand}"
+							IsEnabled="{Binding !IsLoading}"/>
+				</StackPanel>
+
+				<TextBlock Text="{Binding StatusMessage}"
+						 Foreground="{Binding StatusMessage, Converter={StaticResource StatusMessageColorConverter}}"
+						 HorizontalAlignment="Center"
+						 Margin="0,10,0,0"/>
+
+				<ProgressBar IsVisible="{Binding IsLoading}"
+							IsIndeterminate="True"
+							Margin="0,10,0,0"/>
+			</StackPanel>
+		</ScrollViewer>
+	</Border>
+</Window>

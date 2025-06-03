@@ -1,0 +1,527 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:EBISX_POS.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="600"
+        x:Class="EBISX_POS.Views.TenderOrderWindow"
+        Title="Tender Order"
+		WindowStartupLocation="CenterScreen"
+		ExtendClientAreaToDecorationsHint="True"
+		SystemDecorations="None"
+		Width="500" Height="650"
+		x:DataType="vm:TenderOrderViewModel"
+		CornerRadius="10">
+
+	<Window.DataContext>
+		<vm:TenderOrderViewModel />
+	</Window.DataContext>
+
+	<Border BorderThickness="15" CornerRadius="10" BorderBrush="Orange">
+		<Grid RowDefinitions="Auto, *">
+			<Border Grid.Row="0" Height="200" BorderThickness="0,0,0,5"  BorderBrush="Orange">
+				<ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Auto">
+					<StackPanel Margin="20,5,20,20" Spacing="15">
+						<Grid ColumnDefinitions="*,*,*" >
+							<TextBlock Grid.Column="0"
+									   VerticalAlignment="Center"
+									   HorizontalAlignment="Left"
+									   Text="Total Amount :"
+									   FontFamily="{StaticResource NunitoFont}"
+									   FontSize="18"
+									   FontWeight="ExtraBold"/>
+							<TextBlock Grid.Column="1"/>
+							<TextBlock Grid.Column="2"
+									   VerticalAlignment="Center"
+									   HorizontalAlignment="Right"
+									   Text="{Binding TenderCurrentOrder.TotalAmount, StringFormat='₱ {0:N2}'}}"
+									   FontFamily="{StaticResource NunitoFont}"
+									   FontSize="16"
+									   FontWeight="SemiBold"/>
+						</Grid>
+						<Grid ColumnDefinitions="*,*,*" IsVisible="{Binding TenderCurrentOrder.HasOrderDiscount}">
+							<Grid Grid.Column="0" ColumnDefinitions="Auto,Auto">
+								<TextBlock Grid.Column="0"
+										   VerticalAlignment="Center"
+										   HorizontalAlignment="Left"
+										   Text="Discount :"
+										   FontFamily="{StaticResource NunitoFont}"
+										   FontSize="18"
+										   FontWeight="ExtraBold"/>
+								<TextBlock Grid.Column="1"
+										   VerticalAlignment="Center"
+										   HorizontalAlignment="Left"
+										   Text=" PWD"
+										   FontFamily="{StaticResource NunitoFont}"
+										   FontSize="18"
+										   IsVisible="{Binding TenderCurrentOrder.HasPwdDiscount}"
+										   FontWeight="ExtraBold"/>
+								<TextBlock Grid.Column="1"
+										   VerticalAlignment="Center"
+										   HorizontalAlignment="Left"
+										   Text=" Senior"
+										   FontFamily="{StaticResource NunitoFont}"
+										   FontSize="18"
+										   IsVisible="{Binding TenderCurrentOrder.HasScDiscount}"
+										   FontWeight="ExtraBold"/>
+								<TextBlock Grid.Column="1"
+										   VerticalAlignment="Center"
+										   HorizontalAlignment="Left"
+										   Text=" (PROMO)"
+										   FontFamily="{StaticResource NunitoFont}"
+										   FontSize="18"
+										   IsVisible="{Binding TenderCurrentOrder.HasPromoDiscount}"
+										   FontWeight="ExtraBold"
+									   />
+								<TextBlock Grid.Column="1"
+										   VerticalAlignment="Center"
+										   HorizontalAlignment="Left"
+										   Text=" (COUPON)"
+										   FontFamily="{StaticResource NunitoFont}"
+										   FontSize="18"
+										   IsVisible="{Binding TenderCurrentOrder.HasCouponDiscount}"
+										   FontWeight="ExtraBold"
+									   />
+							</Grid>
+							<TextBlock Grid.Column="1"/>
+							<TextBlock Grid.Column="2"
+								   VerticalAlignment="Center"
+								   HorizontalAlignment="Right"
+								   Text="{Binding TenderCurrentOrder.DiscountAmount, StringFormat='₱ {0:G29}'}"
+								   FontFamily="{StaticResource NunitoFont}"
+								   FontSize="16"
+								   FontWeight="SemiBold"
+								   Classes.HasCouponDiscount="{Binding TenderCurrentOrder.HasCouponDiscount}">
+								<TextBlock.Styles>
+									<Style Selector="TextBlock.HasCouponDiscount">
+										<Setter Property="IsVisible" Value="False"/>
+									</Style>
+								</TextBlock.Styles>
+							</TextBlock>
+
+						</Grid>
+						<Grid ColumnDefinitions="*,*,*">
+							<TextBlock Grid.Column="0"
+									   VerticalAlignment="Center"
+									   HorizontalAlignment="Left"
+									   Text="Total Due :"
+									   FontFamily="{StaticResource NunitoFont}"
+									   FontSize="18"
+									   FontWeight="ExtraBold"/>
+							<TextBlock Grid.Column="1"/>
+							<TextBlock Grid.Column="2"
+									   VerticalAlignment="Center"
+									   HorizontalAlignment="Right"
+									   Text="{Binding TenderCurrentOrder.AmountDue, StringFormat='₱ {0:G29}'}}"
+									   FontFamily="{StaticResource NunitoFont}"
+									   FontSize="16"
+									   FontWeight="SemiBold"/>
+						</Grid>
+						<ItemsControl x:Name="AltPaymentList"
+									  ItemsSource="{Binding TenderCurrentOrder.OtherPayments}"
+									  IsVisible="{Binding TenderCurrentOrder.HasOtherPayments}">
+							<ItemsControl.ItemsPanel>
+								<ItemsPanelTemplate>
+									<StackPanel Spacing="5"/>
+								</ItemsPanelTemplate>
+							</ItemsControl.ItemsPanel>
+							<ItemsControl.ItemTemplate>
+								<DataTemplate>
+									<Grid ColumnDefinitions="*,*,*" Margin="0,0,0,15">
+										<!-- Sale Type Name with colon -->
+										<TextBlock Grid.Column="0"
+												   VerticalAlignment="Center"
+												   HorizontalAlignment="Left"
+												   Text="{Binding SaleTypeName, StringFormat='{}{0}:'}"
+												   FontFamily="{StaticResource NunitoFont}"
+												   FontSize="18"
+												   FontWeight="Bold"/>
+
+										<!-- Empty spacer -->
+										<TextBlock Grid.Column="1"/>
+
+										<!-- Amount -->
+										<TextBlock Grid.Column="2"
+												   VerticalAlignment="Center"
+												   HorizontalAlignment="Right"
+												   Text="{Binding Amount, StringFormat='₱ {0:N2}'}"
+												   FontFamily="{StaticResource NunitoFont}"
+												   FontSize="16"
+												   FontWeight="SemiBold"/>
+									</Grid>
+								</DataTemplate>
+							</ItemsControl.ItemTemplate>
+						</ItemsControl>
+
+						<Grid ColumnDefinitions="*,*,*">
+							<TextBlock Grid.Column="0"
+									   VerticalAlignment="Center"
+									   HorizontalAlignment="Left"
+									   Text="Tender Amount :"
+									   FontFamily="{StaticResource NunitoFont}"
+									   FontSize="18"
+									   FontWeight="ExtraBold"/>
+							<TextBlock Grid.Column="1"/>
+							<TextBlock Grid.Column="2"
+									   VerticalAlignment="Center"
+									   HorizontalAlignment="Right"
+									   Text="{Binding TenderInputDisplay, Mode=TwoWay}"
+									   FontFamily="{StaticResource NunitoFont}"
+									   FontSize="16"
+									   FontWeight="SemiBold"/>
+						</Grid>
+
+						<Grid ColumnDefinitions="*,*,*">
+							<TextBlock Grid.Column="0"
+									   VerticalAlignment="Center"
+									   HorizontalAlignment="Left"
+									   Text="Total Change :"
+									   FontFamily="{StaticResource NunitoFont}"
+									   FontSize="18"
+									   FontWeight="ExtraBold"/>
+							<TextBlock Grid.Column="1"/>
+							<TextBlock Grid.Column="2"
+									   VerticalAlignment="Center"
+									   HorizontalAlignment="Right"
+									   Text="{Binding TenderCurrentOrder.ChangeAmount, StringFormat='₱ {0:G29}'}}"
+									   FontFamily="{StaticResource NunitoFont}"
+									   FontSize="16"
+									   FontWeight="SemiBold"/>
+						</Grid>
+					</StackPanel>
+				</ScrollViewer>
+			</Border>
+
+			<Grid Grid.Row="1" RowDefinitions="*,*,*,*,*,*">
+				<StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="15">
+					<Button Content="1000"
+							Width="100"
+							Height="50"
+							FontSize="20"
+							FontFamily="{StaticResource NunitoFont}"
+							FontWeight="Black"
+							Foreground="White"
+							VerticalContentAlignment="Center"
+							HorizontalContentAlignment="Center"
+							Background="LightGreen"
+							Command="{Binding AddPresetAmountCommand}"
+							CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"/>
+					<Button Content="500"
+							Width="100"
+							Height="50"
+							FontSize="20"
+							FontFamily="{StaticResource NunitoFont}"
+							FontWeight="Black"
+							Foreground="White"
+							VerticalContentAlignment="Center"
+							HorizontalContentAlignment="Center"
+							Command="{Binding AddPresetAmountCommand}"
+							CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"
+							Background="LightGreen"/>
+					<Button Content="200"
+							Width="100"
+							Height="50"
+							FontSize="20"
+							FontFamily="{StaticResource NunitoFont}"
+							FontWeight="Black"
+							Foreground="White"
+							VerticalContentAlignment="Center"
+							HorizontalContentAlignment="Center"
+							Background="LightGreen"
+							Command="{Binding AddPresetAmountCommand}"
+							CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"/>
+					<Button Content="CLEAR"
+							Width="100"
+							Height="50"
+							FontSize="20"
+							FontFamily="{StaticResource NunitoFont}"
+							FontWeight="Black"
+							VerticalContentAlignment="Center"
+							HorizontalContentAlignment="Center"
+							Command="{Binding TenderButtonClickCommand}"
+							CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"/>
+				</StackPanel>
+
+				<StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="15">
+					<Button Content="100"
+							Width="100"
+							Height="50"
+							FontSize="20"
+							Foreground="White"
+							FontFamily="{StaticResource NunitoFont}"
+							FontWeight="Black"
+							VerticalContentAlignment="Center"
+							HorizontalContentAlignment="Center"
+							Background="LightGreen"
+							Command="{Binding AddPresetAmountCommand}"
+							CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"
+							/>
+					<Button Content="50"
+							Width="100"
+							Height="50"
+							FontSize="20"
+							FontFamily="{StaticResource NunitoFont}"
+							FontWeight="Black"
+							Foreground="White"
+							VerticalContentAlignment="Center"
+							HorizontalContentAlignment="Center"
+							Background="LightGreen"
+							Command="{Binding AddPresetAmountCommand}"
+							CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"/>
+					<Button Content="20"
+							Width="100"
+							Height="50"
+							FontSize="20"
+							Foreground="White"
+							FontFamily="{StaticResource NunitoFont}"
+							FontWeight="Black"
+							VerticalContentAlignment="Center"
+							HorizontalContentAlignment="Center"
+							Background="LightGreen"
+							Command="{Binding AddPresetAmountCommand}"
+							CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"/>
+					<Button Width="100"
+						Height="50"
+						VerticalContentAlignment="Center"
+						HorizontalContentAlignment="Center"
+						Click="PromoAndCouponDiscount_Click">
+						<StackPanel Orientation="Vertical">
+							<TextBlock Text="PROMO"
+									   FontSize="16"
+									   HorizontalAlignment="Center"
+									   FontFamily="{StaticResource NunitoFont}"
+									   FontWeight="Black"/>
+							<TextBlock Text="CODE"
+									   FontSize="16"
+									   HorizontalAlignment="Center"
+									   FontFamily="{StaticResource NunitoFont}"
+									   FontWeight="Black"/>
+						</StackPanel>
+					</Button>
+				</StackPanel>
+
+				<StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="15">
+					<Button Content="1"
+							Width="100"
+							Height="50"
+							FontSize="20"
+							FontFamily="{StaticResource NunitoFont}"
+							FontWeight="Black"
+							VerticalContentAlignment="Center"
+							HorizontalContentAlignment="Center"
+							CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"
+							Command="{Binding TenderButtonClickCommand}"/>
+					<Button Content="2"
+							Width="100"
+							Height="50"
+							FontSize="20"
+							FontFamily="{StaticResource NunitoFont}"
+							FontWeight="Black"
+							VerticalContentAlignment="Center"
+							HorizontalContentAlignment="Center"
+							CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"
+							Command="{Binding TenderButtonClickCommand}"/>
+					<Button Content="3"
+							Width="100"
+							Height="50"
+							FontSize="20"
+							FontFamily="{StaticResource NunitoFont}"
+							FontWeight="Black"
+							VerticalContentAlignment="Center"
+							HorizontalContentAlignment="Center"
+							CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"
+							Command="{Binding TenderButtonClickCommand}"/>
+					<!--<Button Width="100"
+						Height="50"
+						VerticalContentAlignment="Center"
+						HorizontalContentAlignment="Center"
+						Click="PwdScDiscount_Click">
+						<StackPanel Orientation="Vertical">
+							<TextBlock Text="DISCOUNT"
+									   FontSize="16"
+									   HorizontalAlignment="Center"
+									   FontFamily="{StaticResource NunitoFont}"
+									   FontWeight="Black"/>
+							<TextBlock Text="PWD/SC"
+									   FontSize="16"
+									   HorizontalAlignment="Center"
+									   FontFamily="{StaticResource NunitoFont}"
+									   FontWeight="Black"
+									   />
+						</StackPanel>
+					</Button>-->
+
+					<Button Width="100"
+						Height="50"
+						VerticalContentAlignment="Center"
+						HorizontalContentAlignment="Center"
+						Click="PromoAndCouponDiscount_Click">
+						<TextBlock Text="COUPON"
+								   FontSize="18"
+								   HorizontalAlignment="Center"
+								   FontFamily="{StaticResource NunitoFont}"
+								   FontWeight="Black"/>
+					</Button>
+
+				</StackPanel>
+
+				<StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="15">
+					<Button Content="4"
+							Width="100"
+							Height="50"
+							FontSize="20"
+							FontFamily="{StaticResource NunitoFont}"
+							FontWeight="Black"
+							VerticalContentAlignment="Center"
+							HorizontalContentAlignment="Center"
+							CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"
+							Command="{Binding TenderButtonClickCommand}"/>
+					<Button Content="5"
+							Width="100"
+							Height="50"
+							FontSize="20"
+							FontFamily="{StaticResource NunitoFont}"
+							FontWeight="Black"
+							VerticalContentAlignment="Center"
+							HorizontalContentAlignment="Center"
+							CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"
+							Command="{Binding TenderButtonClickCommand}"/>
+					<Button Content="6"
+							Width="100"
+							Height="50"
+							FontSize="20"
+							FontFamily="{StaticResource NunitoFont}"
+							FontWeight="Black"
+							VerticalContentAlignment="Center"
+							HorizontalContentAlignment="Center"
+							CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"
+							Command="{Binding TenderButtonClickCommand}"/>
+					<Button Width="100"
+							Height="50"
+							VerticalContentAlignment="Center"
+							HorizontalContentAlignment="Center"
+							Click="BackButton_Click">
+						<Path Data="{StaticResource arrow_reply_regular}"
+								Width="20"
+								Height="20"
+								Fill="Black"
+							Stretch="Uniform"
+							Stroke="Black"
+							StrokeThickness="2"/>
+					</Button>
+
+				</StackPanel>
+
+				<StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="15">
+					<Button Content="7"
+							Width="100"
+							Height="50"
+							FontSize="20"
+							FontFamily="{StaticResource NunitoFont}"
+							FontWeight="Black"
+							VerticalContentAlignment="Center"
+							HorizontalContentAlignment="Center"
+							CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"
+							Command="{Binding TenderButtonClickCommand}"/>
+					<Button Content="8"
+							Width="100"
+							Height="50"
+							FontSize="20"
+							FontFamily="{StaticResource NunitoFont}"
+							FontWeight="Black"
+							VerticalContentAlignment="Center"
+							HorizontalContentAlignment="Center"
+							Command="{Binding TenderButtonClickCommand}"
+							CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"/>
+					<Button Content="9"
+							Width="100"
+							Height="50"
+							FontSize="20"
+							FontFamily="{StaticResource NunitoFont}"
+							FontWeight="Black"
+							VerticalContentAlignment="Center"
+							HorizontalContentAlignment="Center"
+							Command="{Binding TenderButtonClickCommand}"
+							CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"/>
+					<Button Content="ENTER"
+							Width="100"
+							Height="50"
+							FontSize="20"
+							FontFamily="{StaticResource NunitoFont}"
+							FontWeight="Black"
+							VerticalContentAlignment="Center"
+							HorizontalContentAlignment="Center"
+							Click="EnterButton_Click"/>
+				</StackPanel>
+
+				<StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="15">
+					<Button Content="0"
+							Width="100"
+							Height="50"
+							FontSize="20"
+							FontFamily="{StaticResource NunitoFont}"
+							FontWeight="Black"
+							VerticalContentAlignment="Center"
+							HorizontalContentAlignment="Center"
+							Command="{Binding TenderButtonClickCommand}"
+							CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"/>
+					<Button Content="."
+							Width="100"
+							Height="50"
+							FontSize="25"
+							FontFamily="{StaticResource NunitoFont}"
+							FontWeight="Black"
+							VerticalContentAlignment="Center"
+							HorizontalContentAlignment="Center"
+							Command="{Binding TenderButtonClickCommand}"
+							CommandParameter="{Binding Content, RelativeSource={RelativeSource Self}}"/>
+					<Button Width="100"
+						Height="50"
+						VerticalContentAlignment="Center"
+						HorizontalContentAlignment="Center"
+						Click="OtherPayment_Click">
+						<StackPanel Orientation="Vertical">
+							<TextBlock Text="E-Wallet"
+									   FontSize="16"
+									   HorizontalAlignment="Center"
+									   FontFamily="{StaticResource NunitoFont}"
+									   FontWeight="Black"/>
+						</StackPanel>
+					</Button>
+					<Button Width="100"
+						Height="50"
+						VerticalContentAlignment="Center"
+						HorizontalContentAlignment="Center"
+						Click="ExactAmount_Click">
+						<StackPanel Orientation="Vertical">
+							<TextBlock Text="Exact"
+									   FontSize="16"
+									   HorizontalAlignment="Center"
+									   FontFamily="{StaticResource NunitoFont}"
+									   FontWeight="Black"/>
+							<TextBlock Text="Amount"
+									   FontSize="16"
+									   HorizontalAlignment="Center"
+									   FontFamily="{StaticResource NunitoFont}"
+									   FontWeight="Black"/>
+						</StackPanel>
+					</Button>
+					
+				</StackPanel>
+			</Grid>
+
+			<Grid Grid.Row="1"
+				  x:Name="LoadingOverlay"
+						  IsVisible="False"
+						  Background="#80000000"
+			  
+				  >
+				<ProgressBar Width="100"
+						  IsIndeterminate="True"
+							  Foreground="White"
+							  HorizontalAlignment="Center"
+							  VerticalAlignment="Center"/>
+			</Grid>
+		</Grid>
+	</Border>
+</Window>

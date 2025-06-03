@@ -1,0 +1,43 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="250"
+        x:Class="EBISX_POS.Views.PromoCodeWindow"
+        Title="Promo Code"
+		WindowStartupLocation="CenterScreen"
+		ExtendClientAreaToDecorationsHint="True"
+		SystemDecorations="None"
+		Width="400" Height="250"
+		CornerRadius="10">
+	<Border BorderThickness="15" CornerRadius="10" BorderBrush="Orange">
+		<StackPanel Orientation="Vertical" Margin="10" HorizontalAlignment="Center" VerticalAlignment="Center">
+			<TextBox x:Name="PromoCodeTextBox"
+                 Watermark="Input Promo Code"
+                 UseFloatingWatermark="True"
+					 Height="40"
+				 Margin="0,0,0, 40"/>
+
+			<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
+				<!--<Button Content="Close"
+						Click="CloseButton_Click"
+						Width="130" Height="40"
+						FontWeight="SemiBold"
+						FontSize="16"
+						FontFamily="{StaticResource NunitoFont}"
+						Background="Red"
+						VerticalContentAlignment="Center"
+						HorizontalContentAlignment="Center"/>-->
+				<Button Content="Apply"
+						Width="130" Height="40"
+						FontWeight="SemiBold"
+						FontFamily="{StaticResource NunitoFont}"
+						FontSize="16"
+						Margin="20,0,0,0"
+						VerticalContentAlignment="Center"
+						HorizontalContentAlignment="Center"
+						Click="ApplyCodeButton_Click"/>
+			</StackPanel>
+		</StackPanel>
+	</Border>
+</Window>

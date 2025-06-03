@@ -1,0 +1,108 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:models="clr-namespace:EBISX_POS.Models"
+        xmlns:views="clr-namespace:EBISX_POS.Views"
+        mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="650"
+        x:Class="EBISX_POS.Views.SelectDiscountPwdScWindow"
+        x:DataType="views:SelectDiscountPwdScWindow"
+        Title="Select Discount Pwd/Sc"
+        WindowStartupLocation="CenterScreen"
+        ExtendClientAreaToDecorationsHint="True"
+        SystemDecorations="None"
+		Width="500" Height="650"
+        CornerRadius="10">
+	<Border BorderThickness="15" CornerRadius="10" BorderBrush="Orange">
+
+		<Grid RowDefinitions="Auto,*, Auto" Margin="20,10,20,0">
+			<Grid Grid.Row="0" ColumnDefinitions="*,*">
+				<StackPanel Orientation="Vertical" HorizontalAlignment="Center" Spacing="10" Grid.Column="0">
+					<!-- Senior checkbox is default, bound to IsSeniorSelected -->
+					<CheckBox x:Name="CheckBoxSenior"
+							  IsChecked="{Binding IsSeniorSelected, Mode=TwoWay}"
+							  Content="Senior" />
+					<!-- PWD checkbox is bound to IsPwdSelected -->
+					<CheckBox x:Name="CheckBoxPwd"
+							  IsChecked="{Binding IsPwdSelected, Mode=TwoWay}"
+							  Content="PWD" />
+				</StackPanel>
+				<StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+					<Button Width="40"
+							FontSize="20"
+							VerticalContentAlignment="Center"
+							HorizontalContentAlignment="Center"
+							FontWeight="Bold"
+							Content="-"
+							Click="EditQuantity_Click"
+							CommandParameter="-1"/>
+					<TextBox Text="{Binding MaxSelectionCount, Mode=TwoWay}"
+							 VerticalContentAlignment="Center"
+							 HorizontalContentAlignment="Center"
+							 Margin="10, 0, 10, 0"
+							 IsReadOnly="True" />
+					<Button Width="40"
+							FontSize="20"
+							VerticalContentAlignment="Center"
+							HorizontalContentAlignment="Center"
+							FontWeight="Bold"
+							Content="+"
+							Click="EditQuantity_Click"
+							CommandParameter="1" />
+				</StackPanel>
+			</Grid>
+
+			<ScrollViewer Grid.Row="1" CornerRadius="10" Margin="20,40,20,40" VerticalScrollBarVisibility="Auto">
+				<ListBox x:Name="CurrentOrder"
+						 SelectionMode="Multiple,Toggle"
+						 SelectionChanged="ListBox_SelectionChanged">
+					<ListBox.ItemTemplate>
+						<DataTemplate x:DataType="models:OrderItemState">
+							<Border BorderBrush="AliceBlue" BorderThickness="1"
+									CornerRadius="4" Padding="4" MinHeight="40">
+								<StackPanel>
+									<!-- For each OrderItemState, list its sub-orders -->
+									<ItemsControl ItemsSource="{Binding DisplaySubOrders}">
+										<ItemsControl.ItemTemplate>
+											<DataTemplate x:DataType="models:SubOrderItem">
+												<Grid ColumnDefinitions="50,*,Auto" VerticalAlignment="Center">
+													<TextBlock Text="{Binding Quantity}"
+															   Grid.Column="0"
+															   HorizontalAlignment="Center"
+															   Opacity="{Binding Opacity}"/>
+													<TextBlock Text="{Binding DisplayName}"
+															   Grid.Column="1"
+															   HorizontalAlignment="Left"/>
+													<TextBlock Text="{Binding ItemPriceString}"
+															   Grid.Column="2"
+															   Margin="0,0,10,0"
+															   HorizontalAlignment="Right"/>
+												</Grid>
+											</DataTemplate>
+										</ItemsControl.ItemTemplate>
+									</ItemsControl>
+								</StackPanel>
+							</Border>
+
+						</DataTemplate>
+					</ListBox.ItemTemplate>
+				</ListBox>
+			</ScrollViewer>
+
+
+
+			<Button Content="Save"
+					Click="SaveButton_Click"
+					Width="130" Height="40"
+					FontWeight="SemiBold"
+					FontSize="16"
+					Grid.Row="2"
+					Background="Green"
+					Margin="0 ,0, 10, 10"
+					HorizontalAlignment="Right"
+					VerticalContentAlignment="Center"
+					HorizontalContentAlignment="Center"/>
+		</Grid>
+	</Border>
+
+</Window>

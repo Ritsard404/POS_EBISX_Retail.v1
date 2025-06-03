@@ -1,0 +1,68 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:views="clr-namespace:EBISX_POS.Views"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="270"
+        x:Class="EBISX_POS.Views.ManagerSwipeWindow"
+        x:DataType="views:ManagerSwipeWindow"
+        Title="Manager Authorization"
+        WindowStartupLocation="CenterScreen"
+        ExtendClientAreaToDecorationsHint="True"
+        SystemDecorations="None"
+        Width="300" Height="270"
+        CornerRadius="10">
+	<Border BorderThickness="10" CornerRadius="10" Padding="10" BorderBrush="Orange">
+		<Grid>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto"/>
+				<!-- Header -->
+				<RowDefinition Height="*"/>
+				<!-- Message -->
+				<RowDefinition Height="Auto"/>
+				<!-- Email -->
+				<!-- Button -->
+			</Grid.RowDefinitions>
+
+			<TextBlock x:Name="HeaderTextBlock"
+                       FontSize="20" FontWeight="Bold"
+				       TextWrapping="Wrap"
+                       TextAlignment="Center"
+					   FontFamily="{StaticResource NunitoFont}"
+                       Grid.Row="0"/>
+
+			<TextBlock x:Name="BodyMessageTextBlock"
+                       FontSize="18" TextAlignment="Left"
+				   TextWrapping="Wrap"
+				   FontFamily="{StaticResource NunitoFont}"
+                       Grid.Row="1" VerticalAlignment="Center" Margin="0,5,0,0"/>
+
+            <StackPanel Grid.Row="1" Margin="0,20,0,0" VerticalAlignment="Bottom">
+                <TextBox x:Name="EmailTextBox"
+                         Watermark="Enter manager email"
+                         FontFamily="{StaticResource NunitoFont}"
+                         FontSize="16"
+                         Margin="0,0,0,5"
+						 PasswordChar="*"
+						 RevealPassword="False"/>
+                <TextBlock x:Name="ValidationTextBlock"
+                          Foreground="Red"
+                          FontSize="14"
+                          FontFamily="{StaticResource NunitoFont}"
+                          IsVisible="False"/>
+            </StackPanel>
+
+			<Button x:Name="SwipeButton"
+                    Width="100" Height="30"
+                    FontWeight="SemiBold"
+                    FontFamily="{StaticResource NunitoFont}"
+                    FontSize="16"
+                    Margin="0,20,0,0"
+                    VerticalContentAlignment="Center"
+					HorizontalContentAlignment="Center"
+                    HorizontalAlignment="Right"
+                    Grid.Row="2"
+                    Click="OnSwipeClicked"/>
+		</Grid>
+	</Border>
+</Window>
