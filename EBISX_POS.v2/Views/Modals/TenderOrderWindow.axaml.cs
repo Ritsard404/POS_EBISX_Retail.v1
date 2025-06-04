@@ -89,6 +89,7 @@ namespace EBISX_POS.Views
                     VatExempt = order.VatExemptSales,
                     VatAmount = order.VatAmount,
                     VatSales = order.VatSales,
+                    VatZero = order.VatZero,
                     TotalTendered = order.TenderAmount,
                     CashierEmail = CashierState.CashierEmail ?? ""
                 };
@@ -149,6 +150,7 @@ namespace EBISX_POS.Views
                     VatExempt = order.VatExemptSales,
                     VatAmount = order.VatAmount,
                     VatSales = order.VatSales,
+                    VatZero = order.VatZero,
                     TotalTendered = order.TenderAmount,
                     CashierEmail = CashierState.CashierEmail ?? ""
                 };

@@ -5,6 +5,8 @@ using EBISX_POS.API.Services.DTO.Journal;
 using EBISX_POS.API.Services.DTO.Order;
 using EBISX_POS.API.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using System.Diagnostics;
 
 namespace EBISX_POS.API.Services.Repositories
 {
@@ -532,9 +534,15 @@ namespace EBISX_POS.API.Services.Repositories
             }
 
             // Retrieve the current pending order for the cashier
+
             var currentOrder = await _dataContext.Order
                 .Include(o => o.Cashier)
                 .Include(o => o.Items)
+                    .ThenInclude(i => i.Menu)
+                .Include(o => o.Items)
+                    .ThenInclude(i => i.Drink)
+                .Include(o => o.Items)
+                    .ThenInclude(i => i.AddOn)
                 .FirstOrDefaultAsync(o => o.IsPending &&
                                           o.Cashier != null &&
                                           o.Cashier.UserEmail == cashierEmail &&
@@ -545,10 +553,34 @@ namespace EBISX_POS.API.Services.Repositories
                 return (false, "No Order Pending");
             }
 
+            // Restore quantities back to stock
+            foreach (var item in currentOrder.Items)
+            {
+                if (item.Menu != null && item.ItemQTY.HasValue)
+                {
+                    item.Menu.Qty = (item.Menu.Qty ?? 0) + item.ItemQTY.Value;
+                }
+
+                if (item.Drink != null && item.ItemQTY.HasValue)
+                {
+                    item.Drink.Qty = (item.Drink.Qty ?? 0) + item.ItemQTY.Value;
+                }
+
+                if (item.AddOn != null && item.ItemQTY.HasValue)
+                {
+                    item.AddOn.Qty = (item.AddOn.Qty ?? 0) + item.ItemQTY.Value;
+                }
+
+                // Mark the item voided
+                item.IsVoid = true;
+                item.VoidedAt = DateTimeOffset.Now;
+            }
+
             // Cancel the order
             currentOrder.IsPending = false;
             currentOrder.IsCancelled = true;
             currentOrder.StatusChangeDate = DateTime.Now;
+
             currentOrder.UserLog ??= new List<UserLog>();
             currentOrder.UserLog.Add(new UserLog
             {
@@ -830,6 +862,7 @@ namespace EBISX_POS.API.Services.Repositories
             finishOrder.VatExempt = finalizeOrder.VatExempt;
             finishOrder.VatSales = finalizeOrder.VatSales;
             finishOrder.VatAmount = finalizeOrder.VatAmount;
+            finishOrder.VatZero = finalizeOrder.VatZero;
 
             finishOrder.UserLog ??= new List<UserLog>();
             finishOrder.UserLog.Add(new UserLog
@@ -867,7 +900,12 @@ namespace EBISX_POS.API.Services.Repositories
             return (true, "Order finalized successfully.", response);
         }
 
-
+        private string NormalizeDiscountType(string discountType)
+        {
+            return discountType != null && discountType.StartsWith("s-")
+                ? discountType.Substring(2)
+                : discountType;
+        }
         public async Task<List<GetCurrentOrderItemsDTO>> GetCurrentOrderItems(string cashierEmail)
         {
             var cashier = await _dataContext.Order
@@ -921,11 +959,23 @@ namespace EBISX_POS.API.Services.Repositories
                                                         ? i.Order?.DiscountAmount ?? 0m
                                                         : 0m))
                                          .FirstOrDefault();
+
+
+                    var pwdDisc = g.Any(i =>
+                        i.IsPwdDiscounted ||
+                        NormalizeDiscountType(i.Order.DiscountType) == DiscountTypeEnum.Pwd.ToString());
+
+                    var seniorDisc = g.Any(i =>
+                        i.IsSeniorDiscounted ||
+                        NormalizeDiscountType(i.Order.DiscountType) == DiscountTypeEnum.Senior.ToString());
+
                     // Check for other discount types.
-                    var otherDiscount = g.Any(i => i.IsPwdDiscounted || i.IsSeniorDiscounted);
+                    var otherDiscount = pwdDisc || seniorDisc;
 
                     // Set HasDiscount to true if there's any other discount or promo discount value is greater than zero.
                     var hasDiscount = otherDiscount || (promoDiscount > 0m);
+
+                    var isVatExempt = g.Any(i => i.Menu != null && i.Menu.IsVatExempt);
 
                     // Build the DTO from the group
                     var dto = new GetCurrentOrderItemsDTO
@@ -934,8 +984,9 @@ namespace EBISX_POS.API.Services.Repositories
                         EntryId = g.Key ?? "",
                         HasDiscount = hasDiscount,
                         PromoDiscountAmount = promoDiscount,
-                        IsPwdDiscounted = g.Any(i => i.IsPwdDiscounted),
-                        IsSeniorDiscounted = g.Any(i => i.IsSeniorDiscounted),
+                        IsPwdDiscounted = pwdDisc,
+                        IsSeniorDiscounted = seniorDisc,
+                        IsVatExempt = isVatExempt,
                         // Order each group so that the parent (Meal == null) comes first.
                         SubOrders = g.OrderBy(i => i.Meal == null ? 0 : 1)
                                      .Select(i => new CurrentOrderItemsSubOrder
@@ -983,7 +1034,7 @@ namespace EBISX_POS.API.Services.Repositories
                     {
                         new CurrentOrderItemsSubOrder
                         {Name = o.DiscountType.StartsWith("s-") == true
-                        ? o.DiscountType.Substring(2) 
+                        ? o.DiscountType.Substring(2)
                         : o.DiscountType,
                             ItemPrice   = o.DiscountPercent ?? 0m,
                             Quantity    = 1,
@@ -1035,6 +1086,7 @@ namespace EBISX_POS.API.Services.Repositories
             groupedItems.AddRange(couponItems);
             if (orderWithOtherDiscount != null)
                 groupedItems.Add(orderWithOtherDiscount);
+
 
             return groupedItems;
         }
@@ -1335,15 +1387,15 @@ namespace EBISX_POS.API.Services.Repositories
 
             if (orderToRefund == null)
                 return (false, "Order not found.");
-            
+
 
             if (orderToRefund.IsReturned)
                 return (false, "Order has already been returned.");
-            
+
 
             if (orderToRefund.IsCancelled)
                 return (false, "Cannot refund a cancelled order.");
-            
+
             if (DateTimeOffset.Now - orderToRefund.CreatedAt > TimeSpan.FromDays(1))
                 return (false, "Refund period has expired (more than 1 day since purchase).");
 

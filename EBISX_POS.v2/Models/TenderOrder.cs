@@ -1,8 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using EBISX_POS.API.Services.DTO.Payment;
 using EBISX_POS.State;
+using Newtonsoft.Json;
 using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 
 namespace EBISX_POS.Models
@@ -12,6 +14,7 @@ namespace EBISX_POS.Models
         [ObservableProperty] private decimal vatSales = 0m;
         [ObservableProperty] private decimal vatAmount = 0m;
         [ObservableProperty] private decimal vatExemptSales = 0m;
+        [ObservableProperty] private decimal vatZero = 0m;
 
         [ObservableProperty] private decimal totalAmount = 0m;
         [ObservableProperty] private decimal tenderAmount = 0m;
@@ -68,11 +71,21 @@ namespace EBISX_POS.Models
             TotalAmount = OrderState.CurrentOrder
                 .Sum(orderItem => orderItem.TotalPrice);
 
+            VatZero = OrderState.CurrentOrder
+                .Where(orderItem => orderItem.IsVatExempt)
+                .Sum(orderItem => orderItem.TotalPrice);
+
+            Debug.WriteLine(VatZero);
+
             VatExemptSales = (HasScDiscount || HasPwdDiscount) ? DiscountAmount : 0m;
 
-            VatSales = !HasOrderDiscount ? TotalAmount / 1.12m : OrderState.CurrentOrder
-                .Where(d => !d.IsPwdDiscounted && !d.IsSeniorDiscounted)
-                .Sum(orderItem => orderItem.TotalPrice) / 1.12m;
+            VatSales = !HasOrderDiscount ? 
+                OrderState.CurrentOrder
+                    .Where(orderItem => !orderItem.IsVatExempt)
+                    .Sum(orderItem => orderItem.TotalPrice) / 1.12m 
+                : OrderState.CurrentOrder
+                    .Where(d => !d.IsPwdDiscounted && !d.IsSeniorDiscounted)
+                    .Sum(orderItem => orderItem.TotalPrice) / 1.12m;
 
             VatAmount = (!HasOrderDiscount ? TotalAmount - (TotalAmount / 1.12m) : VatSales - (VatSales / 1.12m));
 
@@ -108,11 +121,11 @@ namespace EBISX_POS.Models
             {
                 DiscountAmount = PromoDiscountAmount;
             }
-            else if (HasPwdDiscount || HasScDiscount)
-            {
-                DiscountAmount = OrderState.CurrentOrder
-                        .Sum(orderItem => orderItem.TotalDiscountPrice);
-            }
+            //else if (HasPwdDiscount || HasScDiscount)
+            //{
+            //    DiscountAmount = OrderState.CurrentOrder
+            //            .Sum(orderItem => orderItem.TotalDiscountPrice);
+            //}
             else if (HasOtherDiscount)
             {
                 DiscountPercent = OrderState.CurrentOrder

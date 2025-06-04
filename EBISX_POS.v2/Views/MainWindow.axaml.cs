@@ -176,7 +176,7 @@ namespace EBISX_POS.Views
                 if (!OrderState.CurrentOrderItem.SubOrders.Any())
                 {
                     OrderState.CurrentOrderItem.Quantity = digit;
-                    OrderState.UpdateItemOrder(itemType: "Menu", itemId: 0, name: "Select Menu", price: 0, size: null, false, false);
+                    OrderState.UpdateItemOrder(itemType: "Menu", itemId: 0, name: "Select Menu", price: 0, size: null, false, false, false);
                     OrderState.CurrentOrderItem.RefreshDisplaySubOrders();
                     return;
                 }
@@ -566,7 +566,8 @@ namespace EBISX_POS.Views
                             price: product.MenuPrice,
                             size: product.Size,
                             hasAddOn: product.HasAddOn,
-                            hasDrink: product.HasDrink
+                            hasDrink: product.HasDrink,
+                            isVatZero: product.IsVatExempt
                         );
 
                         IsLoadMenu.IsVisible = true;

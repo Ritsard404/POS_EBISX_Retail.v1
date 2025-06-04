@@ -35,6 +35,7 @@ namespace EBISX_POS.Services.DTO.Report
         public required string VatExemptSales { get; set; }
         public required string VatSales { get; set; }
         public required string VatAmount { get; set; }
+        public required string VatZero { get; set; }
 
         public List<string> ElligiblePeopleDiscounts { get; set; } = new();
 
@@ -69,6 +70,7 @@ namespace EBISX_POS.Services.DTO.Report
                 VatExemptSales = string.Empty,
                 VatSales = string.Empty,
                 VatAmount = string.Empty,
+                VatZero = string.Empty,
                 PrintCount = string.Empty,
 
                 ElligiblePeopleDiscounts = new List<string>(),

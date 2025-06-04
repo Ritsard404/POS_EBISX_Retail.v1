@@ -457,7 +457,7 @@ namespace EBISX_POS.Helper
             writer.WriteLine(CenterText($"{"Change:",-20}{invoice.ChangeAmount,20}"));
             writer.WriteLine();
 
-            writer.WriteLine(CenterText($"{"Vat Zero Sales:",-20}{0.ToString("C", PesoCulture),20}"));
+            writer.WriteLine(CenterText($"{"Vat Zero Sales:",-20}{invoice.VatZero,20}"));
             writer.WriteLine(CenterText($"{"Vat Exempt Sales:",-20}{invoice.VatExemptSales,20}"));
             writer.WriteLine(CenterText($"{"Vatables Sales:",-20}{invoice.VatSales,20}"));
             writer.WriteLine(CenterText($"{"VAT Amount:",-20}{invoice.VatAmount,20}"));

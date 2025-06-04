@@ -17,6 +17,7 @@ namespace EBISX_POS.API.Models
         public decimal? TotalTendered { get; set; }
         public decimal? ChangeAmount { get; set; }
         public decimal? VatSales { get; set; }
+        public decimal? VatZero { get; set; }
         public decimal? VatExempt { get; set; }
         public decimal? VatAmount { get; set; }
         public required DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.Now;

@@ -39,6 +39,7 @@ namespace EBISX_POS.Models
 
         public bool HasDrinks { get; set; } = false;
         public bool HasAddOns { get; set; } = false;
+        public bool IsVatExempt { get; set; }
 
         // Using ObservableCollection so UI is notified on add/remove.
         [ObservableProperty]

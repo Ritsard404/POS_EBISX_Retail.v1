@@ -18,6 +18,7 @@ namespace EBISX_POS.API.Services.DTO.Order
         public decimal? PromoDiscountAmount { get; set; }
         public bool IsPwdDiscounted { get; set; } = false;
         public bool IsSeniorDiscounted { get; set; } = false;
+        public bool IsVatExempt { get; set; } = false;
         public string? CouponCode { get; set; }
         public decimal DiscountAmount => SubOrders?
             .Where(i => (i.AddOnId == null && i.MenuId == null && i.DrinkId == null))

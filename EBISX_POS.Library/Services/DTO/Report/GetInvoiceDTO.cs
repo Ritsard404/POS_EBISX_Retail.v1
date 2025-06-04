@@ -28,6 +28,7 @@
         public string VatExemptSales { get; set; } = string.Empty; // Default to empty string
         public string VatSales { get; set; } = string.Empty; // Default to empty string
         public string VatAmount { get; set; } = string.Empty; // Default to empty string
+        public string VatZero { get; set; } = string.Empty; // Default to empty string
 
         public List<string> ElligiblePeopleDiscounts { get; set; } = new List<string>(); // Default to empty list
 

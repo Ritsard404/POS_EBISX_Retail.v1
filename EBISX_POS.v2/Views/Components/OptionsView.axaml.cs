@@ -48,7 +48,7 @@ namespace EBISX_POS.Views
                 {
                     HandleSelection(ref _selectedDrinksButton, clickedButton, ref _selectedDrink);
 
-                    OrderState.UpdateItemOrder(itemType: "Drink", itemId: Drink.MenuId, name: Drink.MenuName, price: Drink.MenuPrice, size: SelectedOptionsState.SelectedSize, hasAddOn: false, hasDrink: false);
+                    OrderState.UpdateItemOrder(itemType: "Drink", itemId: Drink.MenuId, name: Drink.MenuName, price: Drink.MenuPrice, size: SelectedOptionsState.SelectedSize, hasAddOn: false, hasDrink: false, isVatZero: false);
 
                     //Debug.WriteLine($"Selected Drink: {Drink.MenuId}");
                     //OrderState.DisplayOrders();
@@ -57,7 +57,7 @@ namespace EBISX_POS.Views
                 {
                     HandleSelection(ref _selectedAddOnButton, clickedButton, ref _selectedAddOn);
 
-                    OrderState.UpdateItemOrder(itemType: "Add-On", itemId: AddOn.MenuId, name: AddOn.MenuName, price: AddOn.Price, size: AddOn.Size, hasAddOn: false, hasDrink: false);
+                    OrderState.UpdateItemOrder(itemType: "Add-On", itemId: AddOn.MenuId, name: AddOn.MenuName, price: AddOn.Price, size: AddOn.Size, hasAddOn: false, hasDrink: false, isVatZero: false);
 
                     //Debug.WriteLine($"Selected AddOn: {AddOn.MenuName} Size: {AddOn.Size}");
                     //OrderState.DisplayOrders();
@@ -114,5 +114,5 @@ namespace EBISX_POS.Views
                 selectedValue = clickedButton.Content?.ToString();
             }
         }
-      }
+    }
 }

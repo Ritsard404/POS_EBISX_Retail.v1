@@ -137,7 +137,8 @@ namespace EBISX_POS.Views
                     IsSeniorDiscounted = dto.IsSeniorDiscounted,
                     PromoDiscountAmount = dto.PromoDiscountAmount,
                     HasPwdScDiscount = dto.HasDiscount && dto.PromoDiscountAmount == null,
-                    CouponCode = dto.CouponCode
+                    CouponCode = dto.CouponCode,
+                    IsVatExempt = dto.IsVatExempt,
 
                 };
 

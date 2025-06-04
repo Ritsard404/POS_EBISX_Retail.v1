@@ -15,6 +15,7 @@ namespace EBISX_POS.API.Services.DTO.Order
         public required decimal VatExempt { get; set; }
         public required decimal VatSales { get; set; }
         public required decimal VatAmount { get; set; }
+        public required decimal VatZero { get; set; }
 
         public required string CashierEmail { get; set; }
     }

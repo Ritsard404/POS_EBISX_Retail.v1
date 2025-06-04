@@ -360,7 +360,7 @@ namespace EBISX_POS.Util
             content.AppendLine(CenterText($"{"Change:",-15}{TenderState.tenderOrder.ChangeAmount.ToString("C", PesoCulture),17}"));
             content.AppendLine();
 
-            content.AppendLine(CenterText($"{"VAT Zero:",-15}{0.ToString("C", PesoCulture),17}"));
+            content.AppendLine(CenterText($"{"VAT Zero:",-15}{TenderState.tenderOrder.VatZero.ToString("C", PesoCulture),17}"));
             content.AppendLine(CenterText($"{"VAT Exempt:",-15}{(TenderState.tenderOrder.VatExemptSales).ToString("C", PesoCulture),17}"));
             content.AppendLine(CenterText($"{"VAT Sales:",-15}{(TenderState.tenderOrder.VatSales).ToString("C", PesoCulture),17}"));
             content.AppendLine(CenterText($"{"VAT Amt:",-15}{(TenderState.tenderOrder.VatAmount).ToString("C", PesoCulture),17}"));
@@ -530,7 +530,7 @@ namespace EBISX_POS.Util
             content.AppendLine(CenterText($"{"Change:",-15}{FormatCurrency(invoice.ChangeAmount),17}"));
             content.AppendLine();
 
-            content.AppendLine(CenterText($"{"VAT Zero:",-15}{0m.ToString("C", PesoCulture),17}"));
+            content.AppendLine(CenterText($"{"VAT Zero:",-15}{FormatCurrency(invoice.VatZero),17}"));
             content.AppendLine(CenterText($"{"VAT Exempt:",-15}{FormatCurrency(invoice.VatExemptSales),17}"));
             content.AppendLine(CenterText($"{"VAT Sales:",-15}{FormatCurrency(invoice.VatSales),17}"));
             content.AppendLine(CenterText($"{"VAT Amt:",-15}{FormatCurrency(invoice.VatAmount),17}"));

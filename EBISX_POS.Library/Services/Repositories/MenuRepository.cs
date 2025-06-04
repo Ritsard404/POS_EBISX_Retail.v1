@@ -720,6 +720,13 @@ namespace EBISX_POS.API.Services.Repositories
                     }
                 }
 
+                // Check existence of product
+                var productExist = await _dataContext.Menu.AnyAsync(i => i.SearchId == menu.SearchId);
+                if (productExist)
+                {
+                    return (false, "Product already exist!");
+                }
+
                 // Add menu
                 await _dataContext.Menu.AddAsync(menu);
 
@@ -824,6 +831,12 @@ namespace EBISX_POS.API.Services.Repositories
                     {
                         return (false, "Add-on type not found");
                     }
+                }
+
+                var productExist = await _dataContext.Menu.AnyAsync(i => i.SearchId == menu.SearchId);
+                if (productExist)
+                {
+                    return (false, "Product already exist!");
                 }
 
                 // Update menu
@@ -1150,7 +1163,7 @@ namespace EBISX_POS.API.Services.Repositories
         public async Task<Menu?> GetProduct(int prodId)
         {
             return await _dataContext.Menu
-                .Where(c => c.Id == prodId && c.MenuIsAvailable && c.Qty > 0)
+                .Where(c => c.SearchId == prodId && c.MenuIsAvailable && c.Qty > 0)
                 .FirstOrDefaultAsync();
         }
 

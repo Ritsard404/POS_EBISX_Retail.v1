@@ -105,11 +105,12 @@ namespace EBISX_POS.Views
                     OrderState.UpdateItemOrder(
                         itemType: itemType,
                         itemId: item.Id,
-                        name: item.ItemName + (item.IsSolo ? " (Solo)" : ""),
+                        name: item.ItemName,
                         price: item.Price,
                         size: item.Size,
                         hasAddOn: item.HasAddOn,
-                        hasDrink: item.HasDrink
+                        hasDrink: item.HasDrink,
+                        isVatZero: item.IsVatZero
                     );
 
 
@@ -137,7 +138,7 @@ namespace EBISX_POS.Views
                 OrderState.CurrentOrderItem.Quantity = (OrderState.CurrentOrderItem.Quantity < 1)
                     ? 1
                     : OrderState.CurrentOrderItem.Quantity;
-                OrderState.UpdateItemOrder(itemType: "Menu", itemId: item.Id, name: item.ItemName, price: item.Price, size: null, hasAddOn: false, hasDrink: false);
+                OrderState.UpdateItemOrder(itemType: "Menu", itemId: item.Id, name: item.ItemName, price: item.Price, size: null, hasAddOn: false, hasDrink: false, isVatZero: item.IsVatZero);
 
                 var detailsWindow = new SubItemWindow(item, _menuService);
                 detailsWindow.DataContext = new SubItemWindowViewModel(item, _menuService, detailsWindow);

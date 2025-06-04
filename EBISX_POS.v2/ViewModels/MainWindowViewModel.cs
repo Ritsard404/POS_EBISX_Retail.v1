@@ -103,7 +103,8 @@ namespace EBISX_POS.ViewModels
                     IsSeniorDiscounted = dto.IsSeniorDiscounted,
                     PromoDiscountAmount = dto.PromoDiscountAmount,
                     HasPwdScDiscount = dto.HasDiscount && dto.PromoDiscountAmount == null,
-                    CouponCode = dto.CouponCode
+                    CouponCode = dto.CouponCode,
+                    IsVatExempt = dto.IsVatExempt
                 };
 
                 // Add the mapped OrderItemState to the static collection.

@@ -452,6 +452,7 @@ namespace EBISX_POS.Services
                     VatExemptSales = apiResponse.VatExemptSales,
                     VatSales = apiResponse.VatSales,
                     VatAmount = apiResponse.VatAmount,
+                    VatZero = apiResponse.VatZero,
 
                     ElligiblePeopleDiscounts = apiResponse.ElligiblePeopleDiscounts ?? new List<string>(),
 

@@ -56,7 +56,7 @@
 
 					<DataGrid.Columns>
 						<DataGridTextColumn Header="ID"
-											Binding="{Binding Id}" />
+											Binding="{Binding SearchId}" />
 						<DataGridTextColumn Header="Name"
 											Binding="{Binding MenuName}" />
 

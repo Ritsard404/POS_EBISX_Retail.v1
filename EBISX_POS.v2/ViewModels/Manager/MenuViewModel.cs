@@ -53,7 +53,7 @@ namespace EBISX_POS.ViewModels.Manager
 
             var filteredMenus = _allMenus.Where(m =>
                 m.MenuName.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
-                m.Id.ToString().Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+                m.SearchId.ToString().Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
                 m.Category?.CtgryName.Contains(SearchText, StringComparison.OrdinalIgnoreCase) == true ||
                 m.MenuPrice.ToString().Contains(SearchText)
             ).ToList();

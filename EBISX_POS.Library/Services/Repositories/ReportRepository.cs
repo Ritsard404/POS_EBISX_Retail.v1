@@ -206,6 +206,7 @@ namespace EBISX_POS.API.Services.Repositories
                 VatExemptSales = (order.VatExempt ?? 0m).ToString("C", pesoCulture),
                 VatSales = (order.VatSales ?? 0m).ToString("C", pesoCulture),
                 VatAmount = (order.VatAmount ?? 0m).ToString("C", pesoCulture),
+                VatZero = (order.VatZero ?? 0m).ToString("C", pesoCulture),
 
                 // Other tenders (e.g. gift cert, card, etc.)
                 OtherPayments = order.AlternativePayments
@@ -1102,7 +1103,9 @@ namespace EBISX_POS.API.Services.Repositories
                         Date = order.StatusChangeDate.Value.ToString("MM/dd/yyyy"),
                         InvoiceNum = $"{order.InvoiceNumber:D12}",
                         Src = "VOIDED",
-                        DiscType = order.DiscountType ?? "",
+                        DiscType = order.DiscountType.StartsWith("s-")
+                            ? order.DiscountType.Substring(2)
+                            : order.DiscountType,
                         Percent = order.DiscountPercent?.ToString() ?? "",
                         SubTotal = Math.Round(-subTotal, 2),
                         AmountDue = Math.Round(-amountDue, 2),

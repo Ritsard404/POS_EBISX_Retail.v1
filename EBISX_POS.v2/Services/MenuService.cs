@@ -103,6 +103,7 @@ namespace EBISX_POS.Services
                 IsDrink = menu.DrinkType != null,
                 HasAddOn = menu.HasAddOn,
                 HasDrink = menu.HasDrink,
+                IsVatZero = menu.IsVatExempt
             }).ToList();
             try
             {

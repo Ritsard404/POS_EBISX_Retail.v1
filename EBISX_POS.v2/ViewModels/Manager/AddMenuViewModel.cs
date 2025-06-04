@@ -351,6 +351,7 @@ namespace EBISX_POS.ViewModels.Manager
                 var menuToSave = new API.Models.Menu
                 {
                     Id = MenuDetails!.Id,
+                    SearchId = MenuDetails.SearchId,
                     MenuName = MenuDetails.MenuName,
                     MenuPrice = MenuDetails.MenuPrice,
                     Category = MenuDetails.Category,

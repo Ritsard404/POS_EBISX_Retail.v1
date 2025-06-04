@@ -20,8 +20,6 @@ namespace EBISX_POS.State
     public static class OrderState
     {
         public static ObservableCollection<OrderItemState> CurrentOrder { get; set; } = new ObservableCollection<OrderItemState>();
-        //public static ObservableCollection<OrderItem> OrderItems = new ObservableCollection<OrderItem>();
-        //public static OrderItemState CurrentOrderItem { get; set; } = new OrderItemState();
 
         private static OrderItemState _currentOrderItem = new OrderItemState();
         public static OrderItemState CurrentOrderItem
@@ -47,7 +45,7 @@ namespace EBISX_POS.State
         }
 
 
-        public static void UpdateItemOrder(string itemType, int itemId, string name, decimal price, string? size, bool? hasDrink, bool? hasAddOn)
+        public static void UpdateItemOrder(string itemType, int itemId, string name, decimal price, string? size, bool? hasDrink, bool? hasAddOn, bool isVatZero)
         {
             // Determine the correct predicate based on the item type.
             Func<SubOrderItem, bool> predicate = itemType switch
@@ -61,6 +59,7 @@ namespace EBISX_POS.State
             var item = CurrentOrderItem.SubOrders.FirstOrDefault(predicate);
             CurrentOrderItem.HasDrinks = hasDrink ?? false;
             CurrentOrderItem.HasAddOns = hasAddOn ?? false;
+            CurrentOrderItem.IsVatExempt = isVatZero;
 
             if (item != null)
             {

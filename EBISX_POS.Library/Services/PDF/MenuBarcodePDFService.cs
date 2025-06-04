@@ -93,7 +93,7 @@ namespace EBISX_POS.API.Services.PDF
             try
             {
                 // Generate barcode as bit matrix first
-                var bitMatrix = _barcodeWriter.Encode(menu.Id.ToString());
+                var bitMatrix = _barcodeWriter.Encode(menu.SearchId.ToString());
                 using var bitmap = new Bitmap(bitMatrix.Width, bitMatrix.Height);
 
                 // Convert bit matrix to bitmap
@@ -117,7 +117,7 @@ namespace EBISX_POS.API.Services.PDF
                 var idFont = new XFont(FONT_FAMILY, ID_FONT_SIZE, XFontStyle.Bold);
                 var idY = y + BARCODE_HEIGHT + TEXT_SPACING;
                 var idRect = new XRect(x, idY, LABEL_WIDTH, ID_FONT_SIZE);
-                gfx.DrawString(menu.Id.ToString(), idFont, XBrushes.Black, idRect, XStringFormats.Center);
+                gfx.DrawString(menu.SearchId.ToString(), idFont, XBrushes.Black, idRect, XStringFormats.Center);
 
                 // Draw menu name
                 var nameFont = new XFont(FONT_FAMILY, NAME_FONT_SIZE, XFontStyle.Regular);

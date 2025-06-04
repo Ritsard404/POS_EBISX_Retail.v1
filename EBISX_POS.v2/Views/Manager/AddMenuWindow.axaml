@@ -78,6 +78,18 @@
 				<!-- Row 1: Name & Price -->
 				<StackPanel Orientation="Horizontal" Spacing="10">
 					<StackPanel>
+						<TextBlock Text="Product ID" Margin="0,0,0,5"/>
+						<TextBox
+						  Width="200"
+						  Watermark="ID"
+						  Text="{Binding MenuDetails.SearchId, UpdateSourceTrigger=PropertyChanged}"/>
+					</StackPanel>
+					
+				</StackPanel>
+				
+				<!-- Row 1: Name & Price -->
+				<StackPanel Orientation="Horizontal" Spacing="10">
+					<StackPanel>
 						<TextBlock Text="Product Name" Margin="0,0,0,5"/>
 						<TextBox
 						  Width="200"
