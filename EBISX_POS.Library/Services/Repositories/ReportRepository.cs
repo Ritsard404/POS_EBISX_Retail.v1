@@ -1057,7 +1057,7 @@ namespace EBISX_POS.API.Services.Repositories
                 var lessDiscount = Math.Round(order.DiscountAmount ?? 0m, 2);
                 var netOfSales = Math.Round(subTotal - lessDiscount, 2);
                 var vatable = Math.Round(order.VatSales ?? 0m, 2);
-                var zeroRated = 0m;
+                var zeroRated = Math.Round(order.VatZero ?? 0m, 2);
                 var exempt = Math.Round(order.VatExempt ?? 0m, 2);
                 var vat = Math.Round(order.VatAmount ?? 0m, 2);
 
@@ -1067,7 +1067,9 @@ namespace EBISX_POS.API.Services.Repositories
                     Date = order.CreatedAt.ToString("MM/dd/yyyy"),
                     InvoiceNum = order.InvoiceNumber.ToString("D12"),
                     Src = "",
-                    DiscType = order.DiscountType ?? "",
+                    DiscType = order.DiscountType.StartsWith("s-")
+                            ? order.DiscountType.Substring(2)
+                            : order.DiscountType,
                     Percent = order.DiscountPercent?.ToString() ?? "",
                     SubTotal = subTotal,
                     AmountDue = amountDue,
@@ -1139,7 +1141,9 @@ namespace EBISX_POS.API.Services.Repositories
                         Date = order.StatusChangeDate.Value.ToString("MM/dd/yyyy"),
                         InvoiceNum = $"{order.InvoiceNumber:D12}",
                         Src = "REFUNDED",
-                        DiscType = order.DiscountType ?? "",
+                        DiscType = order.DiscountType.StartsWith("s-")
+                            ? order.DiscountType.Substring(2)
+                            : order.DiscountType,
                         Percent = order.DiscountPercent?.ToString() ?? "",
                         SubTotal = Math.Round(-subTotal, 2),
                         AmountDue = Math.Round(-amountDue, 2),
