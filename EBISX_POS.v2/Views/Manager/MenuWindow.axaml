@@ -59,6 +59,8 @@
 											Binding="{Binding SearchId}" />
 						<DataGridTextColumn Header="Name"
 											Binding="{Binding MenuName}" />
+						<DataGridTextColumn Header="Unit"
+											Binding="{Binding BaseUnit}" />
 
 						<DataGridTextColumn Header="Price (₱)"
 											Binding="{Binding MenuPrice, StringFormat='₱{0:F2}'}" />
@@ -78,8 +80,8 @@
 						<DataGridCheckBoxColumn Header="Is Add-On"
 												Binding="{Binding IsAddOn}" />-->
 
-						<DataGridTextColumn Header="Quantity"
-												Binding="{Binding Qty}" />
+						<DataGridTextColumn Header="Cost"
+												Binding="{Binding MenuCost}" />
 						
 						<DataGridCheckBoxColumn Header="Available"
 												Binding="{Binding MenuIsAvailable}" />

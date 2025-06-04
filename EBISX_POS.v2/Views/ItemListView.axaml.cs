@@ -46,10 +46,12 @@ namespace EBISX_POS.Views
 
         public async Task LoadMenusAsync(int categoryId)
         {
+            IsLoadMenu.IsVisible = true;
             if (DataContext is ItemListViewModel viewModel)
             {
                 await viewModel.LoadMenusAsync(categoryId);
             }
+            IsLoadMenu.IsVisible = false;
         }
 
         public void UpdateDataContext(ItemListViewModel viewModel)
@@ -61,6 +63,7 @@ namespace EBISX_POS.Views
         {
             if (sender is Button clickedButton && clickedButton.DataContext is ItemMenu item)
             {
+                IsLoadMenu.IsVisible = true;
                 HandleSelection(ref _selectedItemButton, clickedButton, ref _selectedItem);
 
 
@@ -145,6 +148,7 @@ namespace EBISX_POS.Views
 
 
                 await detailsWindow.ShowDialog((Window)this.VisualRoot);
+                IsLoadMenu.IsVisible = false;
             }
         }
 

@@ -97,7 +97,8 @@ namespace EBISX_POS.ViewModels.Manager
                 IsAddOn = false,
                 Category = new Category { Id = 0, CtgryName = "" },
                 DrinkType = new DrinkType { Id = 0, DrinkTypeName = "" },
-                AddOnType = new AddOnType { Id = 0, AddOnTypeName = "" }
+                AddOnType = new AddOnType { Id = 0, AddOnTypeName = "" },
+                MenuCost = 0
             };
 
             // Set edit mode if menuToEdit is provided
@@ -367,7 +368,8 @@ namespace EBISX_POS.ViewModels.Manager
                     IsAddOn = MenuDetails.IsAddOn,
                     MenuImagePath = MenuDetails.MenuImagePath,
                     MenuIsAvailable = MenuDetails.MenuIsAvailable,
-                    Qty = MenuDetails.Qty
+                    MenuCost = MenuDetails.MenuCost,
+                    //Qty = MenuDetails.Qty
                 };
 
                 var (isSuccess, message) = IsEditMode

@@ -192,7 +192,7 @@ namespace EBISX_POS.API.Services.Repositories
         public async Task<List<Menu>> Menus(int ctgryId)
         {
             return await _dataContext.Menu
-                .Where(c => c.Category.Id == ctgryId && c.MenuIsAvailable && c.Qty > 0)
+                .Where(c => c.Category.Id == ctgryId && c.MenuIsAvailable)
                 .Include(c => c.Category)
                 .Include(d => d.DrinkType)
                 .ToListAsync();
@@ -683,10 +683,10 @@ namespace EBISX_POS.API.Services.Repositories
                     return (false, "Product price must be greater than 0");
                 }
 
-                if (menu.Qty <= 0)
-                {
-                    return (false, "Product quantity must be greater than 0");
-                }
+                //if (menu.Qty <= 0)
+                //{
+                //    return (false, "Product quantity must be greater than 0");
+                //}
 
                 if (menu.Category == null)
                 {
@@ -849,7 +849,7 @@ namespace EBISX_POS.API.Services.Repositories
                 existingMenu.HasDrink = menu.HasDrink;
                 existingMenu.HasAddOn = menu.HasAddOn;
                 existingMenu.IsAddOn = menu.IsAddOn;
-                existingMenu.Qty = menu.Qty;
+                //existingMenu.Qty = menu.Qty;
                 //existingMenu.MenuIsAvailable = menu.MenuIsAvailable;
 
                 // Log the action
@@ -887,10 +887,10 @@ namespace EBISX_POS.API.Services.Repositories
                     return (false, "Menu not found");
                 }
 
-                if (menu.Qty > 0)
-                {
-                    return (false, "Cannot delete menu that has stock");
-                }
+                //if (menu.Qty > 0)
+                //{
+                //    return (false, "Cannot delete menu that has stock");
+                //}
 
                 var hasDependencies = await _dataContext.Item.AnyAsync(o => o.Menu != null && o.Menu.Id == id);
                 if (hasDependencies)
@@ -1163,13 +1163,13 @@ namespace EBISX_POS.API.Services.Repositories
         public async Task<Menu?> GetProduct(long prodId)
         {
             return await _dataContext.Menu
-                .FirstOrDefaultAsync(c => c.SearchId == prodId && c.MenuIsAvailable && c.Qty > 0);
+                .FirstOrDefaultAsync(c => c.SearchId == prodId && c.MenuIsAvailable);
         }
 
         public async Task<(bool isSuccess, string message)> GetProductBarcodes(string folderPath)
         {
             var menus = await _dataContext.Menu
-                .Where(m => m.MenuIsAvailable && m.Qty > 0)
+                .Where(m => m.MenuIsAvailable)
                 .ToListAsync();
 
             var barcodePdf = _menuBarcode.GenerateMenuBarcodeLabels(menus);

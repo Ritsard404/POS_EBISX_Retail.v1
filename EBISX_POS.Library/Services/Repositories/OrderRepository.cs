@@ -170,18 +170,18 @@ namespace EBISX_POS.API.Services.Repositories
             }
 
             // Check inventory availability
-            if (menu != null && menu.Qty.HasValue && menu.Qty.Value < addOrder.qty)
-            {
-                return (false, $"Insufficient inventory for {menu.MenuName}. Available: {menu.Qty.Value}");
-            }
-            if (drink != null && drink.Qty.HasValue && drink.Qty.Value < addOrder.qty)
-            {
-                return (false, $"Insufficient inventory for {drink.MenuName}. Available: {drink.Qty.Value}");
-            }
-            if (addOn != null && addOn.Qty.HasValue && addOn.Qty.Value < addOrder.qty)
-            {
-                return (false, $"Insufficient inventory for {addOn.MenuName}. Available: {addOn.Qty.Value}");
-            }
+            //if (menu != null && menu.Qty.HasValue && menu.Qty.Value < addOrder.qty)
+            //{
+            //    return (false, $"Insufficient inventory for {menu.MenuName}. Available: {menu.Qty.Value}");
+            //}
+            //if (drink != null && drink.Qty.HasValue && drink.Qty.Value < addOrder.qty)
+            //{
+            //    return (false, $"Insufficient inventory for {drink.MenuName}. Available: {drink.Qty.Value}");
+            //}
+            //if (addOn != null && addOn.Qty.HasValue && addOn.Qty.Value < addOrder.qty)
+            //{
+            //    return (false, $"Insufficient inventory for {addOn.MenuName}. Available: {addOn.Qty.Value}");
+            //}
 
             var currentOrder = await _dataContext.Order
                 .Include(o => o.Cashier)
@@ -271,18 +271,18 @@ namespace EBISX_POS.API.Services.Repositories
             currentOrder.TotalAmount += totalAmount;
 
             // Update inventory quantities
-            if (menu != null && menu.Qty.HasValue)
-            {
-                menu.Qty -= addOrder.qty;
-            }
-            if (drink != null && drink.Qty.HasValue)
-            {
-                drink.Qty -= addOrder.qty;
-            }
-            if (addOn != null && addOn.Qty.HasValue)
-            {
-                addOn.Qty -= addOrder.qty;
-            }
+            //if (menu != null && menu.Qty.HasValue)
+            //{
+            //    menu.Qty -= addOrder.qty;
+            //}
+            //if (drink != null && drink.Qty.HasValue)
+            //{
+            //    drink.Qty -= addOrder.qty;
+            //}
+            //if (addOn != null && addOn.Qty.HasValue)
+            //{
+            //    addOn.Qty -= addOrder.qty;
+            //}
 
             await _dataContext.SaveChangesAsync();
 
@@ -554,27 +554,27 @@ namespace EBISX_POS.API.Services.Repositories
             }
 
             // Restore quantities back to stock
-            foreach (var item in currentOrder.Items)
-            {
-                if (item.Menu != null && item.ItemQTY.HasValue)
-                {
-                    item.Menu.Qty = (item.Menu.Qty ?? 0) + item.ItemQTY.Value;
-                }
+            //foreach (var item in currentOrder.Items)
+            //{
+            //    if (item.Menu != null && item.ItemQTY.HasValue)
+            //    {
+            //        item.Menu.Qty = (item.Menu.Qty ?? 0) + item.ItemQTY.Value;
+            //    }
 
-                if (item.Drink != null && item.ItemQTY.HasValue)
-                {
-                    item.Drink.Qty = (item.Drink.Qty ?? 0) + item.ItemQTY.Value;
-                }
+            //    if (item.Drink != null && item.ItemQTY.HasValue)
+            //    {
+            //        item.Drink.Qty = (item.Drink.Qty ?? 0) + item.ItemQTY.Value;
+            //    }
 
-                if (item.AddOn != null && item.ItemQTY.HasValue)
-                {
-                    item.AddOn.Qty = (item.AddOn.Qty ?? 0) + item.ItemQTY.Value;
-                }
+            //    if (item.AddOn != null && item.ItemQTY.HasValue)
+            //    {
+            //        item.AddOn.Qty = (item.AddOn.Qty ?? 0) + item.ItemQTY.Value;
+            //    }
 
-                // Mark the item voided
-                item.IsVoid = true;
-                item.VoidedAt = DateTimeOffset.Now;
-            }
+            //    // Mark the item voided
+            //    item.IsVoid = true;
+            //    item.VoidedAt = DateTimeOffset.Now;
+            //}
 
             // Cancel the order
             currentOrder.IsPending = false;
@@ -729,38 +729,38 @@ namespace EBISX_POS.API.Services.Repositories
             }
 
             // Check inventory availability for the new quantity
-            if (item.Menu != null && item.Menu.Qty.HasValue)
-            {
-                var currentQty = item.ItemQTY ?? 0;
-                var qtyDifference = editOrder.qty - currentQty;
-                if (item.Menu.Qty.Value < qtyDifference)
-                {
-                    return (false, $"Insufficient inventory for {item.Menu.MenuName}. Available: {item.Menu.Qty.Value}");
-                }
-                item.Menu.Qty -= qtyDifference;
-            }
+            //if (item.Menu != null && item.Menu.Qty.HasValue)
+            //{
+            //    var currentQty = item.ItemQTY ?? 0;
+            //    var qtyDifference = editOrder.qty - currentQty;
+            //    if (item.Menu.Qty.Value < qtyDifference)
+            //    {
+            //        return (false, $"Insufficient inventory for {item.Menu.MenuName}. Available: {item.Menu.Qty.Value}");
+            //    }
+            //    item.Menu.Qty -= qtyDifference;
+            //}
 
-            if (item.Drink != null && item.Drink.Qty.HasValue)
-            {
-                var currentQty = item.ItemQTY ?? 0;
-                var qtyDifference = editOrder.qty - currentQty;
-                if (item.Drink.Qty.Value < qtyDifference)
-                {
-                    return (false, $"Insufficient inventory for {item.Drink.MenuName}. Available: {item.Drink.Qty.Value}");
-                }
-                item.Drink.Qty -= qtyDifference;
-            }
+            //if (item.Drink != null && item.Drink.Qty.HasValue)
+            //{
+            //    var currentQty = item.ItemQTY ?? 0;
+            //    var qtyDifference = editOrder.qty - currentQty;
+            //    if (item.Drink.Qty.Value < qtyDifference)
+            //    {
+            //        return (false, $"Insufficient inventory for {item.Drink.MenuName}. Available: {item.Drink.Qty.Value}");
+            //    }
+            //    item.Drink.Qty -= qtyDifference;
+            //}
 
-            if (item.AddOn != null && item.AddOn.Qty.HasValue)
-            {
-                var currentQty = item.ItemQTY ?? 0;
-                var qtyDifference = editOrder.qty - currentQty;
-                if (item.AddOn.Qty.Value < qtyDifference)
-                {
-                    return (false, $"Insufficient inventory for {item.AddOn.MenuName}. Available: {item.AddOn.Qty.Value}");
-                }
-                item.AddOn.Qty -= qtyDifference;
-            }
+            //if (item.AddOn != null && item.AddOn.Qty.HasValue)
+            //{
+            //    var currentQty = item.ItemQTY ?? 0;
+            //    var qtyDifference = editOrder.qty - currentQty;
+            //    if (item.AddOn.Qty.Value < qtyDifference)
+            //    {
+            //        return (false, $"Insufficient inventory for {item.AddOn.MenuName}. Available: {item.AddOn.Qty.Value}");
+            //    }
+            //    item.AddOn.Qty -= qtyDifference;
+            //}
 
             // Update the main item's quantity
             item.ItemQTY = editOrder.qty;
@@ -775,29 +775,29 @@ namespace EBISX_POS.API.Services.Repositories
                     .Where(i => i.Meal != null && i.Meal.Id == item.Id && !i.IsVoid)
                     .ToListAsync();
 
-                foreach (var childItem in childItems)
-                {
-                    if (childItem.Menu != null && childItem.Menu.Qty.HasValue)
-                    {
-                        var currentQty = childItem.ItemQTY ?? 0;
-                        var qtyDifference = editOrder.qty - currentQty;
-                        childItem.Menu.Qty -= qtyDifference;
-                    }
-                    if (childItem.Drink != null && childItem.Drink.Qty.HasValue)
-                    {
-                        var currentQty = childItem.ItemQTY ?? 0;
-                        var qtyDifference = editOrder.qty - currentQty;
-                        childItem.Drink.Qty -= qtyDifference;
-                    }
-                    if (childItem.AddOn != null && childItem.AddOn.Qty.HasValue)
-                    {
-                        var currentQty = childItem.ItemQTY ?? 0;
-                        var qtyDifference = editOrder.qty - currentQty;
-                        childItem.AddOn.Qty -= qtyDifference;
-                    }
+                //    foreach (var childItem in childItems)
+                //    {
+                //        if (childItem.Menu != null && childItem.Menu.Qty.HasValue)
+                //        {
+                //            var currentQty = childItem.ItemQTY ?? 0;
+                //            var qtyDifference = editOrder.qty - currentQty;
+                //            childItem.Menu.Qty -= qtyDifference;
+                //        }
+                //        if (childItem.Drink != null && childItem.Drink.Qty.HasValue)
+                //        {
+                //            var currentQty = childItem.ItemQTY ?? 0;
+                //            var qtyDifference = editOrder.qty - currentQty;
+                //            childItem.Drink.Qty -= qtyDifference;
+                //        }
+                //        if (childItem.AddOn != null && childItem.AddOn.Qty.HasValue)
+                //        {
+                //            var currentQty = childItem.ItemQTY ?? 0;
+                //            var qtyDifference = editOrder.qty - currentQty;
+                //            childItem.AddOn.Qty -= qtyDifference;
+                //        }
 
-                    childItem.ItemQTY = editOrder.qty;
-                }
+                //        childItem.ItemQTY = editOrder.qty;
+                //    }
             }
 
             // Recalculate the order's total amount from scratch:
@@ -1226,18 +1226,18 @@ namespace EBISX_POS.API.Services.Repositories
             }
 
             // Restore inventory quantities
-            if (voidItem.Menu != null && voidItem.Menu.Qty.HasValue)
-            {
-                voidItem.Menu.Qty += voidItem.ItemQTY ?? 0;
-            }
-            if (voidItem.Drink != null && voidItem.Drink.Qty.HasValue)
-            {
-                voidItem.Drink.Qty += voidItem.ItemQTY ?? 0;
-            }
-            if (voidItem.AddOn != null && voidItem.AddOn.Qty.HasValue)
-            {
-                voidItem.AddOn.Qty += voidItem.ItemQTY ?? 0;
-            }
+            //if (voidItem.Menu != null && voidItem.Menu.Qty.HasValue)
+            //{
+            //    voidItem.Menu.Qty += voidItem.ItemQTY ?? 0;
+            //}
+            //if (voidItem.Drink != null && voidItem.Drink.Qty.HasValue)
+            //{
+            //    voidItem.Drink.Qty += voidItem.ItemQTY ?? 0;
+            //}
+            //if (voidItem.AddOn != null && voidItem.AddOn.Qty.HasValue)
+            //{
+            //    voidItem.AddOn.Qty += voidItem.ItemQTY ?? 0;
+            //}
 
             // Mark the main item as void
             voidItem.IsVoid = true;
@@ -1251,24 +1251,24 @@ namespace EBISX_POS.API.Services.Repositories
                 .Where(i => i.Meal != null && i.Meal.Id == voidItem.Id && i.Order.Id == voidItem.Order.Id)
                 .ToListAsync();
 
-            foreach (var item in relatedItems)
-            {
-                if (item.Menu != null && item.Menu.Qty.HasValue)
-                {
-                    item.Menu.Qty += item.ItemQTY ?? 0;
-                }
-                if (item.Drink != null && item.Drink.Qty.HasValue)
-                {
-                    item.Drink.Qty += item.ItemQTY ?? 0;
-                }
-                if (item.AddOn != null && item.AddOn.Qty.HasValue)
-                {
-                    item.AddOn.Qty += item.ItemQTY ?? 0;
-                }
+            //foreach (var item in relatedItems)
+            //{
+            //    if (item.Menu != null && item.Menu.Qty.HasValue)
+            //    {
+            //        item.Menu.Qty += item.ItemQTY ?? 0;
+            //    }
+            //    if (item.Drink != null && item.Drink.Qty.HasValue)
+            //    {
+            //        item.Drink.Qty += item.ItemQTY ?? 0;
+            //    }
+            //    if (item.AddOn != null && item.AddOn.Qty.HasValue)
+            //    {
+            //        item.AddOn.Qty += item.ItemQTY ?? 0;
+            //    }
 
-                item.IsVoid = true;
-                item.VoidedAt = DateTimeOffset.Now;
-            }
+            //    item.IsVoid = true;
+            //    item.VoidedAt = DateTimeOffset.Now;
+            //}
 
             // Recalculate and update the order's TotalAmount after voiding items.
             var order = voidItem.Order;

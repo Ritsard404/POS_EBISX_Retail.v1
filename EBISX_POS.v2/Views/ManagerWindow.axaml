@@ -242,16 +242,6 @@
 
 							<!-- First Pair -->
 							<Grid ColumnDefinitions="*,*" Margin="0,0,0,10">
-								<Button Classes="myButton"
-										Click="LoadData_Click"
-										Grid.Column="0"
-										IsVisible="False">
-									<StackPanel VerticalAlignment="Center"
-												Orientation="Vertical"
-												Spacing="5">
-										<TextBlock FontSize="30" Text="Load Data"/>
-									</StackPanel>
-								</Button>
 
 								<Button Classes="myButton"
 										Grid.Column="0"
@@ -308,6 +298,15 @@
 										<TextBlock FontSize="26" Text="And Promo"/>
 									</StackPanel>
 								</Button>-->
+								<Button Classes="myButton"
+										Click="LoadData_Click"
+										Grid.Column="0">
+									<StackPanel VerticalAlignment="Center"
+												Orientation="Vertical"
+												Spacing="5">
+										<TextBlock FontSize="30" Text="Load Data"/>
+									</StackPanel>
+								</Button>
 							</Grid>
 						</StackPanel>
 					</ScrollViewer>

@@ -3,17 +3,34 @@ using EBISX_POS.API.Models;
 using EBISX_POS.API.Services.DTO.Auth;
 using EBISX_POS.API.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using Microsoft.AspNetCore.Http;
 using System.Diagnostics;
+using EBISX_POS.API.Services.DTO.Menu;
+using System.Net.Http.Json;
+using System.Security.Cryptography;
 
 namespace EBISX_POS.API.Services.Repositories
 {
     public class AuthRepository(DataContext _dataContext, IServiceProvider _services) : IAuth
     {
+        private static readonly HttpClient _httpClient = new()
+        {
+            BaseAddress = new Uri("https://ebisx.com/")
+        };
+
+        private static long GenerateSearchIdFromText(string text)
+        {
+            // Use SHA256 to generate a hash
+            using var sha256 = SHA256.Create();
+            var hashBytes = sha256.ComputeHash(System.Text.Encoding.UTF8.GetBytes(text));
+            
+            // Take first 8 bytes and convert to long
+            // We use absolute value to ensure positive number
+            var numericHash = Math.Abs(BitConverter.ToInt64(hashBytes, 0));
+            
+            // Ensure it's not too large for our database
+            return numericHash % 1000000000000; // 12 digits max
+        }
+
         public async Task<List<CashierDTO>> Cashiers()
         {
             var cashiers = await _dataContext.User
@@ -210,13 +227,100 @@ namespace EBISX_POS.API.Services.Repositories
         {
             try
             {
-                // Perform the actual seeding
-                return (true, "Seed data loaded successfully.");
+                var response = await _httpClient.GetFromJsonAsync<MenuResponseDTO>("asspos/mobileloaditems.php?db_name=arseneso_barandog&usecenter=MAIN");
+                
+                if (response?.AllUsers == null || !response.AllUsers.Any())
+                {
+                    return (false, "No menu items found in the API response.");
+                }
+
+                // Get unique categories from the API data
+                var categories = response.AllUsers
+                    .Select(x => x.ItemGroup)
+                    .Distinct()
+                    .Select(categoryName => new Category { CtgryName = categoryName })
+                    .ToList();
+
+                // Add new categories to database
+                foreach (var category in categories)
+                {
+                    if (!await _dataContext.Category.AnyAsync(c => c.CtgryName == category.CtgryName))
+                    {
+                        await _dataContext.Category.AddAsync(category);
+                    }
+                }
+                await _dataContext.SaveChangesAsync();
+
+                // Get all categories from database for reference
+                var dbCategories = await _dataContext.Category.ToListAsync();
+
+                // Process menu items
+                foreach (var item in response.AllUsers)
+                {
+                    var category = dbCategories.First(c => c.CtgryName == item.ItemGroup);
+                    
+                    // Check if menu item already exists
+                    var existingMenu = await _dataContext.Menu
+                        .FirstOrDefaultAsync(m => m.MenuName == item.Description);
+
+                    // Generate SearchId from barcode
+                    long searchId;
+                    if (string.IsNullOrWhiteSpace(item.Barcode))
+                    {
+                        // If barcode is empty, use the item description
+                        searchId = GenerateSearchIdFromText(item.Description);
+                    }
+                    else if (long.TryParse(item.Barcode, out var numericBarcode))
+                    {
+                        // If barcode is numeric, use it directly
+                        searchId = numericBarcode;
+                    }
+                    else
+                    {
+                        // If barcode is text, generate a numeric hash
+                        searchId = GenerateSearchIdFromText(item.Barcode);
+                    }
+
+                    if (existingMenu == null)
+                    {
+                        // Create new menu item
+                        var menu = new Menu
+                        {
+                            MenuName = item.ItemId,
+                            MenuCost = decimal.TryParse(item.Cost, out var cost) ? cost : 0,
+                            MenuPrice = decimal.TryParse(item.Price, out var price) ? price : 0,
+                            BaseUnit = item.BaseUnit,
+                            MenuImagePath = item.ImageLocation,
+                            MenuType = item.ItemType,
+                            MenuIsAvailable = true,
+                            IsVatExempt = item.VatType.Contains("EXEMPT", StringComparison.OrdinalIgnoreCase),
+                            Category = category,
+                            SearchId = searchId
+                        };
+
+                        await _dataContext.Menu.AddAsync(menu);
+                    }
+                    else
+                    {
+                        // Update existing menu item
+                        existingMenu.MenuCost = decimal.TryParse(item.Cost, out var cost) ? cost : existingMenu.MenuCost;
+                        existingMenu.MenuPrice = decimal.TryParse(item.Price, out var price) ? price : existingMenu.MenuPrice;
+                        existingMenu.BaseUnit = item.BaseUnit;
+                        existingMenu.MenuImagePath = item.ImageLocation;
+                        existingMenu.MenuType = item.ItemType;
+                        existingMenu.IsVatExempt = item.VatType.Contains("EXEMPT", StringComparison.OrdinalIgnoreCase);
+                        existingMenu.Category = category;
+                        existingMenu.SearchId = searchId;
+                    }
+                }
+
+                await _dataContext.SaveChangesAsync();
+                return (true, "Menu data loaded successfully.");
             }
             catch (Exception ex)
             {
-                // You could log ex here
-                return (false, $"Seeding failed: {ex.Message}");
+                Debug.WriteLine($"Error loading menu data: {ex.Message}");
+                return (false, $"Failed to load menu data: {ex.Message}");
             }
         }
 

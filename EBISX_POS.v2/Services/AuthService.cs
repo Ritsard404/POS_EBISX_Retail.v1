@@ -210,6 +210,7 @@ namespace EBISX_POS.Services
         public async Task<(bool Success, string Message)> LoadDataAsync()
         {
             return await _auth.LoadData();
+
             if (string.IsNullOrEmpty(_apiSettings.LocalAPI.AuthEndpoint))
                 throw new InvalidOperationException("API settings are not configured.");
 

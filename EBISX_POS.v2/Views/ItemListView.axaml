@@ -31,5 +31,10 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </ScrollViewer>
+		<ProgressBar Name="IsLoadMenu"
+				  IsIndeterminate="True"
+				  HorizontalAlignment="Center"
+				  Width="100"
+				  VerticalAlignment="Center"/>
     </Grid>
 </UserControl>
