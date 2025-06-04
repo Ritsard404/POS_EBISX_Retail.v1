@@ -300,6 +300,7 @@
 								</Button>-->
 								<Button Classes="myButton"
 										Click="LoadData_Click"
+										x:Name="LoadDataButton"
 										Grid.Column="0">
 									<StackPanel VerticalAlignment="Center"
 												Orientation="Vertical"
