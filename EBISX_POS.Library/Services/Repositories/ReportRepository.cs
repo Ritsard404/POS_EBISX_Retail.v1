@@ -1059,7 +1059,10 @@ namespace EBISX_POS.API.Services.Repositories
                 var vatable = Math.Round(order.VatSales ?? 0m, 2);
                 var zeroRated = Math.Round(order.VatZero ?? 0m, 2);
                 var exempt = Math.Round(order.VatExempt ?? 0m, 2);
-                var vat = Math.Round(order.VatAmount ?? 0m, 2);
+                var vat = Math.Round(order.VatAmount ?? 0m, 2); 
+                var discType = !string.IsNullOrWhiteSpace(order.DiscountType)
+                    ? (order.DiscountType.StartsWith("s-") ? order.DiscountType.Substring(2) : order.DiscountType)
+                    : "";
 
                 // Create initial transaction entry
                 var baseTransaction = new TransactionListDTO
@@ -1067,9 +1070,7 @@ namespace EBISX_POS.API.Services.Repositories
                     Date = order.CreatedAt.ToString("MM/dd/yyyy"),
                     InvoiceNum = order.InvoiceNumber.ToString("D12"),
                     Src = "",
-                    DiscType = order.DiscountType.StartsWith("s-")
-                            ? order.DiscountType.Substring(2)
-                            : order.DiscountType,
+                    DiscType = discType,
                     Percent = order.DiscountPercent?.ToString() ?? "",
                     SubTotal = subTotal,
                     AmountDue = amountDue,
@@ -1105,9 +1106,7 @@ namespace EBISX_POS.API.Services.Repositories
                         Date = order.StatusChangeDate.Value.ToString("MM/dd/yyyy"),
                         InvoiceNum = $"{order.InvoiceNumber:D12}",
                         Src = "VOIDED",
-                        DiscType = order.DiscountType.StartsWith("s-")
-                            ? order.DiscountType.Substring(2)
-                            : order.DiscountType,
+                        DiscType = discType,
                         Percent = order.DiscountPercent?.ToString() ?? "",
                         SubTotal = Math.Round(-subTotal, 2),
                         AmountDue = Math.Round(-amountDue, 2),
@@ -1141,9 +1140,7 @@ namespace EBISX_POS.API.Services.Repositories
                         Date = order.StatusChangeDate.Value.ToString("MM/dd/yyyy"),
                         InvoiceNum = $"{order.InvoiceNumber:D12}",
                         Src = "REFUNDED",
-                        DiscType = order.DiscountType.StartsWith("s-")
-                            ? order.DiscountType.Substring(2)
-                            : order.DiscountType,
+                        DiscType = discType,
                         Percent = order.DiscountPercent?.ToString() ?? "",
                         SubTotal = Math.Round(-subTotal, 2),
                         AmountDue = Math.Round(-amountDue, 2),
