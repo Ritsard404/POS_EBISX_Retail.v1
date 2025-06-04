@@ -879,6 +879,12 @@ namespace EBISX_POS.API.Services.Repositories
                     return (false, "Cannot delete menu that has stock");
                 }
 
+                var hasDependencies = await _dataContext.Item.AnyAsync(o => o.Menu != null && o.Menu.Id == id);
+                if (hasDependencies)
+                {
+                    return (false, "Cannot delete menu: it is used in orders or related data.");
+                }
+
                 // Delete menu
                 _dataContext.Menu.Remove(menu);
 
