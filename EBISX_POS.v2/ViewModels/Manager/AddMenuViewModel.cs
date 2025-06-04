@@ -60,6 +60,9 @@ namespace EBISX_POS.ViewModels.Manager
         private string _availabilityName;
 
         [ObservableProperty]
+        private string _hasVatZero = "Has Vat Zero";
+
+        [ObservableProperty]
         private string _hasAddOnName = "Has Add-On";
 
         [ObservableProperty]
@@ -101,6 +104,7 @@ namespace EBISX_POS.ViewModels.Manager
             IsEditMode = menuToEdit != null;
             WindowTitle = IsEditMode ? "Edit Product" : "Add New Product";
             AvailabilityName = MenuDetails.MenuIsAvailable ? "Available" : "Not Available";
+            HasVatZero = MenuDetails.IsVatExempt ? "Has Vat Zero ✓" : "Has Vat Zero";
             HasAddOnName = MenuDetails.HasAddOn ? "Has Add-On ✓" : "Has Add-On";
             HasDrinkName = MenuDetails.HasDrink ? "Has Drink ✓" : "Has Drink";
             IsAddOnName = MenuDetails.IsAddOn ? "Is Add-On ✓" : "Is Add-On";

@@ -84,7 +84,11 @@
 						  Watermark="ID"
 						  Text="{Binding MenuDetails.SearchId, UpdateSourceTrigger=PropertyChanged}"/>
 					</StackPanel>
-					
+					<ToggleButton
+					  Width="130"
+					  Content="{Binding HasVatZero}"
+					  HorizontalContentAlignment="Center"
+					  IsChecked="{Binding MenuDetails.IsVatExempt}"/>
 				</StackPanel>
 				
 				<!-- Row 1: Name & Price -->
