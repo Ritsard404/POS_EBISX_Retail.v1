@@ -19,9 +19,10 @@ namespace EBISX_POS.API.Services.PDF
 
         // Constants for layout
         private const double MARGIN = 20; // Margin in points
-        private const double LABEL_WIDTH = 180; // Width of each label in points
-        private const double LABEL_HEIGHT = 90; // Height of each label in points
-        private const double BARCODE_HEIGHT = 40; // Height of barcode in points
+        private const double INNER_PADDING = 5;    // Padding inside each label
+        private const double LABEL_WIDTH = 175; // Width of each label in points
+        private const double LABEL_HEIGHT = 70; // Height of each label in points
+        private const double BARCODE_HEIGHT = 25; // Height of barcode in points
         private const double TEXT_SPACING = 5; // Spacing between elements in points
 
         // Font settings
@@ -92,11 +93,13 @@ namespace EBISX_POS.API.Services.PDF
         {
             try
             {
-                // Generate barcode as bit matrix first
+                var contentX = x + INNER_PADDING;
+                var contentY = y + INNER_PADDING;
+                var contentWidth = LABEL_WIDTH - (2 * INNER_PADDING);
+
+                // Generate barcode
                 var bitMatrix = _barcodeWriter.Encode(menu.SearchId.ToString());
                 using var bitmap = new Bitmap(bitMatrix.Width, bitMatrix.Height);
-
-                // Convert bit matrix to bitmap
                 for (int i = 0; i < bitMatrix.Width; i++)
                 {
                     for (int j = 0; j < bitMatrix.Height; j++)
@@ -109,36 +112,29 @@ namespace EBISX_POS.API.Services.PDF
                 bitmap.Save(ms, ImageFormat.Png);
                 ms.Position = 0;
 
-                // Create and dispose XImage properly
                 using var barcodeImage = XImage.FromStream(ms);
-                gfx.DrawImage(barcodeImage, x, y, LABEL_WIDTH, BARCODE_HEIGHT);
+                gfx.DrawImage(barcodeImage, contentX, contentY, contentWidth, BARCODE_HEIGHT);
 
                 // Draw menu ID
                 var idFont = new XFont(FONT_FAMILY, ID_FONT_SIZE, XFontStyle.Bold);
-                var idY = y + BARCODE_HEIGHT + TEXT_SPACING;
-                var idRect = new XRect(x, idY, LABEL_WIDTH, ID_FONT_SIZE);
-                gfx.DrawString(menu.SearchId.ToString(), idFont, XBrushes.Black, idRect, XStringFormats.Center);
+                var idY = contentY + BARCODE_HEIGHT + TEXT_SPACING;
+                gfx.DrawString(menu.SearchId.ToString(), idFont, XBrushes.Black,
+                    new XRect(contentX, idY, contentWidth, ID_FONT_SIZE), XStringFormats.Center);
 
                 // Draw menu name
                 var nameFont = new XFont(FONT_FAMILY, NAME_FONT_SIZE, XFontStyle.Regular);
                 var nameY = idY + ID_FONT_SIZE + TEXT_SPACING;
-                var nameRect = new XRect(x, nameY, LABEL_WIDTH, NAME_FONT_SIZE);
-                
-                // Truncate name if too long
-                var displayName = menu.MenuName;
-                if (displayName.Length > 20)
-                {
-                    displayName = displayName.Substring(0, 17) + "...";
-                }
-                
-                gfx.DrawString(displayName, nameFont, XBrushes.Black, nameRect, XStringFormats.Center);
 
-                // Draw border around label (optional)
+                var displayName = menu.MenuName.Length > 20 ? menu.MenuName[..17] + "..." : menu.MenuName;
+
+                gfx.DrawString(displayName, nameFont, XBrushes.Black,
+                    new XRect(contentX, nameY, contentWidth, NAME_FONT_SIZE), XStringFormats.Center);
+
+                // Optional border
                 gfx.DrawRectangle(XPens.LightGray, x, y, LABEL_WIDTH, LABEL_HEIGHT);
             }
             catch (Exception ex)
             {
-                // Log error or handle it appropriately
                 Console.WriteLine($"Error generating barcode for menu {menu.Id}: {ex.Message}");
             }
         }

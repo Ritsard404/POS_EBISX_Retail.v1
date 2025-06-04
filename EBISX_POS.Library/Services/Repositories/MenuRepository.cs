@@ -1160,11 +1160,10 @@ namespace EBISX_POS.API.Services.Repositories
                                         u.IsActive);
         }
 
-        public async Task<Menu?> GetProduct(int prodId)
+        public async Task<Menu?> GetProduct(long prodId)
         {
             return await _dataContext.Menu
-                .Where(c => c.SearchId == prodId && c.MenuIsAvailable && c.Qty > 0)
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(c => c.SearchId == prodId && c.MenuIsAvailable && c.Qty > 0);
         }
 
         public async Task<(bool isSuccess, string message)> GetProductBarcodes(string folderPath)

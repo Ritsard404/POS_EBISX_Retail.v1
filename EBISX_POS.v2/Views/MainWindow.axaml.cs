@@ -541,7 +541,7 @@ namespace EBISX_POS.Views
             {
                 Debug.WriteLine($"Processing barcode: {barcode}");
 
-                if (int.TryParse(barcode, out int prodId))
+                if (long.TryParse(barcode, out long prodId))
                 {
                     var product = await _menu.GetProduct(prodId);
 
