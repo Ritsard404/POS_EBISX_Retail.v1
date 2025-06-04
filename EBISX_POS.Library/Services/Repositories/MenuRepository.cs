@@ -833,7 +833,7 @@ namespace EBISX_POS.API.Services.Repositories
                     }
                 }
 
-                var productExist = await _dataContext.Menu.AnyAsync(i => i.SearchId == menu.SearchId);
+                var productExist = await _dataContext.Menu.AnyAsync(i => i.SearchId == menu.SearchId && i.Id != menu.Id);
                 if (productExist)
                 {
                     return (false, "Product already exist!");
