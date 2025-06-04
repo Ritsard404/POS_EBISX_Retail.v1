@@ -261,7 +261,7 @@ namespace EBISX_POS.API.Services.Repositories
                     
                     // Check if menu item already exists
                     var existingMenu = await _dataContext.Menu
-                        .FirstOrDefaultAsync(m => m.MenuName == item.Description);
+                        .FirstOrDefaultAsync(m => m.MenuName == item.ItemId);
 
                     // Generate SearchId from barcode
                     long searchId;

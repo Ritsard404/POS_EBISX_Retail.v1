@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using EBISX_POS.Models;
 using System;
 using System.Collections.ObjectModel;
@@ -7,33 +8,73 @@ using EBISX_POS.API.Models; // Ensure this is added
 using EBISX_POS.Services;
 using System.Threading.Tasks; // Ensure this is added
 using System.Diagnostics; // Ensure this is added
+using System.Linq;
 
 namespace EBISX_POS.ViewModels
 {
-    public class ItemListViewModel : ViewModelBase
+    public partial class ItemListViewModel : ViewModelBase
     {
         private readonly MenuService _menuService;
+        private ObservableCollection<ItemMenu> _allMenuItems = new();
+        private string _searchText = string.Empty;
 
-        public ObservableCollection<ItemMenu> MenuItems { get; } = new();
+        [ObservableProperty]
+        private ObservableCollection<ItemMenu> _filteredMenuItems = new();
+
         public ICommand ItemClickCommand { get; }
+        public ICommand SearchCommand { get; }
+
+        public string SearchText
+        {
+            get => _searchText;
+            set
+            {
+                if (SetProperty(ref _searchText, value))
+                {
+                    FilterItems();
+                }
+            }
+        }
 
         public ItemListViewModel(MenuService menuService) 
         {
             _menuService = menuService;
             ItemClickCommand = new RelayCommand<ItemMenu>(OnItemClick);
-
+            SearchCommand = new RelayCommand<string>(OnSearch);
         }
 
         // This property returns true if there are any menus.
-        public bool HasMenus => MenuItems.Count > 0;
+        public bool HasMenus => FilteredMenuItems.Count > 0;
 
         public async Task LoadMenusAsync(int categoryId)
         {
             var menus = await _menuService.GetMenusAsync(categoryId);
-            MenuItems.Clear();
-            menus.ForEach(menu => MenuItems.Add(menu));
+            _allMenuItems.Clear();
+            menus.ForEach(menu => _allMenuItems.Add(menu));
+            FilterItems();
 
             // Notify that HasMenus may have changed.
+            OnPropertyChanged(nameof(HasMenus));
+        }
+
+        private void OnSearch(string? searchText)
+        {
+            SearchText = searchText ?? string.Empty;
+        }
+
+        private void FilterItems()
+        {
+            if (string.IsNullOrWhiteSpace(SearchText))
+            {
+                FilteredMenuItems = new ObservableCollection<ItemMenu>(_allMenuItems);
+            }
+            else
+            {
+                var filtered = _allMenuItems
+                    .Where(item => item.ItemName.Contains(SearchText, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+                FilteredMenuItems = new ObservableCollection<ItemMenu>(filtered);
+            }
             OnPropertyChanged(nameof(HasMenus));
         }
 
