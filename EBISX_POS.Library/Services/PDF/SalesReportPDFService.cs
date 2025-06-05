@@ -216,9 +216,9 @@ namespace EBISX_POS.API.Services.PDF
             {
                 "", // DATE
                 "", // INVOICE
-                "", // MENU NAME
+                "TOTALS:", // MENU NAME
                 "", // UNIT
-                "TOTALS:", // QTY
+                "", // QTY
                 sales.Sum(s => s.Cost).ToString("N2", phCulture), // COST
                 sales.Sum(s => s.Price).ToString("N2", phCulture), // PRICE
                 "", // GROUP

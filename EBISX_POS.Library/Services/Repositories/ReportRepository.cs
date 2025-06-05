@@ -1102,7 +1102,7 @@ namespace EBISX_POS.API.Services.Repositories
                     SubTotal = subTotal,
                     AmountDue = amountDue,
                     GrossSales = grossSales,
-                    Returns = returns,
+                    Returns = 0m,
                     NetOfReturns = Math.Round(grossSales - returns, 2),
                     LessDiscount = lessDiscount,
                     NetOfSales = netOfSales,
@@ -1157,12 +1157,12 @@ namespace EBISX_POS.API.Services.Repositories
                         DiscType = discType,
                         Percent = order.DiscountPercent?.ToString() ?? "",
                         SubTotal = Math.Round(-returns, 2),
-                        AmountDue = Math.Round(-returns, 2),
-                        GrossSales = Math.Round(-returns, 2),
+                        AmountDue = 0m,
+                        GrossSales = 0m,
                         Returns = returns,
                         NetOfReturns = 0m,
                         LessDiscount = 0m, // No discount on refunds
-                        NetOfSales = Math.Round(-returns, 2),
+                        NetOfSales = -returns,
                         Vatable = Math.Round(-vatable * (returns / grossSales), 2),
                         ZeroRated = 0m,
                         Exempt = Math.Round(-exempt * (returns / grossSales), 2),
@@ -1306,8 +1306,8 @@ namespace EBISX_POS.API.Services.Repositories
                         MenuName = item.Menu.MenuName,
                         BaseUnit = item.Menu.BaseUnit ?? "",
                         Quantity = item.ItemQTY ?? 0,
-                        Cost = item.Menu.MenuCost, // Cost remains the same whether sold or returned
-                        Price = item.ItemPrice ?? 0m,
+                        Cost = item.IsRefund ? -item.Menu.MenuCost ?? 0m : item.Menu.MenuCost ?? 0m, // Cost remains the same whether sold or returned
+                        Price = item.IsRefund ? -item.ItemPrice ?? 0m:  item.ItemPrice ?? 0m,
                         ItemGroup = item.Menu.Category?.CtgryName ?? "",
                         Barcode = item.Menu.SearchId,
                         IsReturned = item.IsRefund, // Use item's IsRefund flag
