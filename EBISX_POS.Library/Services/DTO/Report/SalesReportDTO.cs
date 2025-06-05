@@ -19,7 +19,7 @@ namespace EBISX_POS.API.Services.DTO.Report
         
         // Adjust calculations based on return status
         public decimal TotalCost => Cost * Quantity * (IsReturned ? -1 : 1);
-        public decimal Revenue => Price * Quantity * (IsReturned ? -1 : 1);
+        public decimal Revenue => IsReturned ? -ReturnAmount : Price * Quantity;
         public decimal Profit => Revenue - TotalCost;
         
         // Helper property for display

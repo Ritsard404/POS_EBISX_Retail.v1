@@ -1288,52 +1288,32 @@ namespace EBISX_POS.API.Services.Repositories
                     // Skip if no menu item (shouldn't happen, but just in case)
                     if (item.Menu == null) continue;
 
-                    // Add the original sale
+                    // Calculate the return amount for this specific item if it was refunded
+                    decimal itemTotal = (item.ItemPrice ?? 0m) * (item.ItemQTY ?? 0);
+                    decimal returnAmount = 0m;
+                    if (item.IsRefund && order.ReturnedAmount.HasValue && order.TotalAmount > 0)
+                    {
+                        // Proportional calculation based on the item's contribution to the total order
+                        decimal returnRatio = itemTotal / order.TotalAmount;
+                        returnAmount = order.ReturnedAmount.Value * returnRatio;
+                    }
+
+                    // Create a single report entry for the item
                     salesReport.Add(new SalesReportDTO
                     {
-                        InvoiceDate = order.CreatedAt,
+                        InvoiceDate = item.IsRefund && order.StatusChangeDate.HasValue ? order.StatusChangeDate.Value : order.CreatedAt, // Use return date if refunded
                         InvoiceNumber = order.InvoiceNumber,
                         MenuName = item.Menu.MenuName,
                         BaseUnit = item.Menu.BaseUnit ?? "",
                         Quantity = item.ItemQTY ?? 0,
-                        Cost = item.Menu.MenuCost,
+                        Cost = item.Menu.MenuCost, // Cost remains the same whether sold or returned
                         Price = item.ItemPrice ?? 0m,
                         ItemGroup = item.Menu.Category?.CtgryName ?? "",
                         Barcode = item.Menu.SearchId,
-                        IsReturned = false,
-                        ReturnDate = null,
-                        ReturnAmount = 0m
+                        IsReturned = item.IsRefund, // Use item's IsRefund flag
+                        ReturnDate = item.IsRefund ? order.StatusChangeDate : null, // Include return date only if refunded
+                        ReturnAmount = returnAmount // Include calculated return amount
                     });
-
-                    // If the item was refunded, add a return entry
-                    if (item.IsRefund && order.StatusChangeDate.HasValue && order.ReturnedAmount.HasValue)
-                    {
-                        // Calculate the return amount for this specific item
-                        // This is a proportional calculation based on the item's contribution to the total order
-                        decimal itemTotal = (item.ItemPrice ?? 0m) * (item.ItemQTY ?? 0);
-                        decimal returnRatio = order.TotalAmount > 0 ? itemTotal / order.TotalAmount : 0;
-                        decimal itemReturnAmount = order.ReturnedAmount.Value * returnRatio;
-
-                        // Only add return entry if there's an actual return amount for this item
-                        if (itemReturnAmount > 0)
-                        {
-                            salesReport.Add(new SalesReportDTO
-                            {
-                                InvoiceDate = order.StatusChangeDate.Value,
-                                InvoiceNumber = order.InvoiceNumber,
-                                MenuName = item.Menu.MenuName,
-                                BaseUnit = item.Menu.BaseUnit ?? "",
-                                Quantity = item.ItemQTY ?? 0,
-                                Cost = item.Menu.MenuCost,
-                                Price = item.ItemPrice ?? 0m,
-                                ItemGroup = item.Menu.Category?.CtgryName ?? "",
-                                Barcode = item.Menu.SearchId,
-                                IsReturned = true,
-                                ReturnDate = order.StatusChangeDate,
-                                ReturnAmount = itemReturnAmount
-                            });
-                        }
-                    }
                 }
             }
 
