@@ -152,10 +152,14 @@ namespace EBISX_POS.API.Services.PDF
                     t.Exempt.ToString("N2", phCulture),
                     t.Vat.ToString("N2", phCulture)
                 };
+
+                // Determine text brush based on transaction source
+                var textBrush = t.Src == "REFUNDED" ? XBrushes.Red : XBrushes.Black;
+
                 for (int i = 0; i < values.Length; i++)
                 {
                     var rect = new XRect(x, y, colWidths[i], rowHeight);
-                    gfx.DrawString(values[i], smallFont, XBrushes.Black, rect, formats[i]);
+                    gfx.DrawString(values[i], smallFont, textBrush, rect, formats[i]);
                     x += colWidths[i];
                 }
                 y += rowHeight;
