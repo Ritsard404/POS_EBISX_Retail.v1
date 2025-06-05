@@ -623,7 +623,7 @@ namespace EBISX_POS.API.Services.Repositories
 
             decimal actualCash = openingFund + cashSales;
             decimal expectedCash = cashInDrawer + withdrawnAmount;
-            decimal shortOver = expectedCash - actualCash;
+            decimal shortOver = (expectedCash - actualCash) - totalReturns;
 
             var knownDiscountTypes = Enum.GetNames(typeof(DiscountTypeEnum)).ToList();
 
