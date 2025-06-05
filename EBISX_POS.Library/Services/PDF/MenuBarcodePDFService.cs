@@ -24,11 +24,14 @@ namespace EBISX_POS.API.Services.PDF
         private const double LABEL_HEIGHT = 70; // Height of each label in points
         private const double BARCODE_HEIGHT = 25; // Height of barcode in points
         private const double TEXT_SPACING = 5; // Spacing between elements in points
+        private const double CATEGORY_HEADER_HEIGHT = 30; // Height for category header
+        private const double CATEGORY_SPACING = 10; // Spacing between categories
 
         // Font settings
         private const string FONT_FAMILY = "Arial";
         private const double ID_FONT_SIZE = 12;
         private const double NAME_FONT_SIZE = 10;
+        private const double CATEGORY_FONT_SIZE = 14;
 
         private readonly BarcodeWriter<Bitmap> _barcodeWriter;
 
@@ -53,40 +56,100 @@ namespace EBISX_POS.API.Services.PDF
             var page = document.AddPage();
             var gfx = XGraphics.FromPdfPage(page);
 
+            // Group menus by category
+            var menusByCategory = menus
+                .Where(m => m.Category != null)
+                .GroupBy(m => m.Category.CtgryName)
+                .OrderBy(g => g.Key)
+                .ToList();
+
             // Calculate grid layout
             var pageWidth = page.Width - (MARGIN * 2);
             var pageHeight = page.Height - (MARGIN * 2);
             var columnsPerPage = (int)(pageWidth / LABEL_WIDTH);
-            var rowsPerPage = (int)(pageHeight / LABEL_HEIGHT);
+            var rowsPerPage = (int)((pageHeight - CATEGORY_HEADER_HEIGHT) / LABEL_HEIGHT);
 
-            int currentMenuIndex = 0;
-            while (currentMenuIndex < menus.Count)
+            double currentY = MARGIN;
+            int currentPage = 0;
+
+            foreach (var categoryGroup in menusByCategory)
             {
-                // Add new page if needed
-                if (currentMenuIndex > 0 && currentMenuIndex % (columnsPerPage * rowsPerPage) == 0)
+                var categoryName = categoryGroup.Key;
+                var categoryMenus = categoryGroup.ToList();
+
+                // Check if we need a new page for this category
+                if (currentY + CATEGORY_HEADER_HEIGHT + LABEL_HEIGHT > pageHeight - MARGIN)
                 {
                     page = document.AddPage();
                     gfx = XGraphics.FromPdfPage(page);
+                    currentY = MARGIN;
+                    currentPage++;
                 }
 
-                // Calculate position for current label
-                var position = currentMenuIndex % (columnsPerPage * rowsPerPage);
-                var row = position / columnsPerPage;
-                var column = position % columnsPerPage;
+                // Draw category header
+                DrawCategoryHeader(gfx, categoryName, MARGIN, currentY);
+                currentY += CATEGORY_HEADER_HEIGHT;
 
-                var x = MARGIN + (column * LABEL_WIDTH);
-                var y = MARGIN + (row * LABEL_HEIGHT);
+                int currentMenuIndex = 0;
+                while (currentMenuIndex < categoryMenus.Count)
+                {
+                    // Check if we need a new page
+                    if (currentY + LABEL_HEIGHT > pageHeight - MARGIN)
+                    {
+                        page = document.AddPage();
+                        gfx = XGraphics.FromPdfPage(page);
+                        currentY = MARGIN;
+                        currentPage++;
+                        
+                        // Redraw category header on new page
+                        DrawCategoryHeader(gfx, categoryName, MARGIN, currentY);
+                        currentY += CATEGORY_HEADER_HEIGHT;
+                    }
 
-                // Draw current label
-                DrawLabel(gfx, menus[currentMenuIndex], x, y);
+                    // Calculate position for current label
+                    var position = currentMenuIndex % columnsPerPage;
+                    var x = MARGIN + (position * LABEL_WIDTH);
 
-                currentMenuIndex++;
+                    // Draw current label
+                    DrawLabel(gfx, categoryMenus[currentMenuIndex], x, currentY);
+
+                    // Move to next row if we've filled a row
+                    if (position == columnsPerPage - 1)
+                    {
+                        currentY += LABEL_HEIGHT;
+                    }
+
+                    currentMenuIndex++;
+                }
+
+                // Add spacing between categories
+                currentY += CATEGORY_SPACING;
             }
 
             // Save to memory stream
             using var stream = new MemoryStream();
             document.Save(stream);
             return stream.ToArray();
+        }
+
+        private void DrawCategoryHeader(XGraphics gfx, string categoryName, double x, double y)
+        {
+            var categoryFont = new XFont(FONT_FAMILY, CATEGORY_FONT_SIZE, XFontStyle.Bold);
+            var categoryBrush = new XSolidBrush(XColor.FromArgb(0, 0, 102)); // Dark blue color
+            
+            // Draw category background
+            var headerRect = new XRect(x, y, gfx.PdfPage.Width - (MARGIN * 2), CATEGORY_HEADER_HEIGHT);
+            gfx.DrawRectangle(new XSolidBrush(XColor.FromArgb(230, 230, 255)), headerRect); // Light blue background
+            
+            // Draw category name
+            gfx.DrawString(categoryName, categoryFont, categoryBrush,
+                new XRect(x + 10, y + 5, headerRect.Width - 20, CATEGORY_HEADER_HEIGHT - 10),
+                XStringFormats.CenterLeft);
+            
+            // Draw bottom border
+            gfx.DrawLine(new XPen(XColor.FromArgb(0, 0, 102), 1), 
+                x, y + CATEGORY_HEADER_HEIGHT, 
+                x + headerRect.Width, y + CATEGORY_HEADER_HEIGHT);
         }
 
         private void DrawLabel(XGraphics gfx, Menu menu, double x, double y)
