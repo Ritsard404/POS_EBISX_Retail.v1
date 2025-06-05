@@ -438,7 +438,7 @@ namespace EBISX_POS.API.Services.Repositories
 
             decimal actualCash = openingFundDec + validOrdersTotal;
             decimal expectedCash = (ts?.CashOutDrawerAmount ?? defaultDecimal) + withdrawnAmount;
-            decimal shortOverDec = expectedCash - actualCash;
+            decimal shortOverDec = (expectedCash - actualCash) - refundDec;
 
             // Safe payment processing - Adjusted for ReturnedAmount
             var payments = new Payments
