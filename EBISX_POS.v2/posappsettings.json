@@ -20,7 +20,8 @@
     "TransactionLogs": "TransactionLogs",
     "TransactionLogsFolder": "C:\\Logs\\TransactionLogs",
     "AuditTrailFolder": "C:\\Logs\\AuditTrail",
-    "ProductBarcodesFolder": "C:\\Logs\\ProductBarcodes"
+    "ProductBarcodesFolder": "C:\\Logs\\ProductBarcodes",
+    "SalesLogsFolder": "C:\\Logs\\SalesLogs"
   },
   "Database": {
     "PosConnectionString": "Data Source=ebisx_pos.db",

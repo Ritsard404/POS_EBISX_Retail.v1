@@ -129,7 +129,7 @@
 			
 			<!-- Print Transaction List Button -->
 			<Button Command="{Binding PrintCommand}" Grid.Row="6" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,10" Content="Print TRANSACTION LIST" />
-
+			<Button Command="{Binding PrintSalesCommand}" Grid.Row="6" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,10" Content="Print SALES LIST" />
 
 		</Grid>
 	</Border>

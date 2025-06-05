@@ -13,7 +13,7 @@ using EBISX_POS.API.Services.PDF;
 
 namespace EBISX_POS.API.Services.Repositories
 {
-    public class ReportRepository(DataContext _dataContext, IAuth _auth, AuditTrailPDFService _auditTrailPDFService, TransactionListPDFService _transactionListPDFService) : IReport
+    public class ReportRepository(DataContext _dataContext, IAuth _auth, AuditTrailPDFService _auditTrailPDFService, TransactionListPDFService _transactionListPDFService, SalesReportPDFService _salesReportPDF) : IReport
     {
 
         private async Task InitializePDFServices()
@@ -34,6 +34,12 @@ namespace EBISX_POS.API.Services.Repositories
             );
 
             _transactionListPDFService.UpdateBusinessInfo(
+                posInfo.RegisteredName ?? "N/A",
+                posInfo.Address ?? "N/A",
+                posInfo.VatTinNumber ?? "N/A"
+            );
+
+            _salesReportPDF.UpdateBusinessInfo(
                 posInfo.RegisteredName ?? "N/A",
                 posInfo.Address ?? "N/A",
                 posInfo.VatTinNumber ?? "N/A"
@@ -1210,6 +1216,128 @@ namespace EBISX_POS.API.Services.Repositories
                 ActionDate = timestamp.ToLocalTime().ToString("MM/dd/yyyy hh:mm tt"),
                 SortActionDate = timestamp.ToLocalTime().DateTime
             });
+        }
+
+        public async Task<(List<SalesReportDTO> Data, string FilePath)> GetSalesReport(DateTime fromDate, DateTime toDate, string folderPath)
+        {
+            try
+            {
+                await InitializePDFServices();
+                // Get the sales report data
+                var salesData = await GetSalesReportData(fromDate, toDate);
+
+                // Generate PDF
+                var pdfBytes = _salesReportPDF.GenerateSalesReportPDF(salesData, fromDate, toDate);
+
+                // BASE name (no suffix):
+                var baseName = $"SalesReport_{fromDate:yyyyMMdd}_to_{toDate:yyyyMMdd}";
+
+                // Append a timestamp so it's always unique
+                var uniqueSuffix = DateTime.Now.ToString("yyyyMMddHHmmssfff");
+                var fileName = $"{baseName}_{uniqueSuffix}.pdf";
+
+                // Ensure directory exists
+                if (!Directory.Exists(folderPath))
+                    Directory.CreateDirectory(folderPath);
+
+                var filePath = Path.Combine(folderPath, fileName);
+                // Save PDF file
+                await File.WriteAllBytesAsync(filePath, pdfBytes);
+
+                return (salesData, filePath);
+            }
+            catch (Exception ex)
+            {
+                // Log the error appropriately
+                throw new Exception($"Error generating sales report: {ex.Message}", ex);
+            }
+        }
+
+        private async Task<List<SalesReportDTO>> GetSalesReportData(DateTime fromDate, DateTime toDate)
+        {
+            // Convert DateTime to DateTimeOffset for proper comparison
+            var startDate = new DateTimeOffset(fromDate.Date);
+            var endDate = new DateTimeOffset(toDate.Date.AddDays(1).AddTicks(-1));
+
+            var isTrainMode = await _auth.IsTrainMode();
+
+            // Get all orders with necessary includes and switch to client evaluation
+            var orders = await _dataContext.Order
+                .Include(o => o.Items)
+                    .ThenInclude(i => i.Menu)
+                        .ThenInclude(m => m.Category)
+                .ToListAsync(); // First get all data from database
+
+            // Then filter and sort in memory
+            var filteredOrders = orders
+                .Where(o => o.IsTrainMode == isTrainMode &&
+                           o.CreatedAt >= startDate &&
+                           o.CreatedAt <= endDate)
+                .OrderBy(o => o.InvoiceNumber)
+                .ToList();
+
+            var salesReport = new List<SalesReportDTO>();
+
+            foreach (var order in filteredOrders)
+            {
+                // Skip cancelled orders entirely
+                if (order.IsCancelled) continue;
+
+                foreach (var item in order.Items.Where(i => !i.IsVoid)) // Exclude voided items
+                {
+                    // Skip if no menu item (shouldn't happen, but just in case)
+                    if (item.Menu == null) continue;
+
+                    // Add the original sale
+                    salesReport.Add(new SalesReportDTO
+                    {
+                        InvoiceDate = order.CreatedAt,
+                        InvoiceNumber = order.InvoiceNumber,
+                        MenuName = item.Menu.MenuName,
+                        BaseUnit = item.Menu.BaseUnit ?? "",
+                        Quantity = item.ItemQTY ?? 0,
+                        Cost = item.Menu.MenuCost,
+                        Price = item.ItemPrice ?? 0m,
+                        ItemGroup = item.Menu.Category?.CtgryName ?? "",
+                        Barcode = item.Menu.SearchId,
+                        IsReturned = false,
+                        ReturnDate = null,
+                        ReturnAmount = 0m
+                    });
+
+                    // If the order was returned, add a return entry
+                    if (order.IsReturned && order.StatusChangeDate.HasValue && order.ReturnedAmount.HasValue)
+                    {
+                        // Calculate the return amount for this specific item
+                        // This is a proportional calculation based on the item's contribution to the total order
+                        decimal itemTotal = (item.ItemPrice ?? 0m) * (item.ItemQTY ?? 0);
+                        decimal returnRatio = order.TotalAmount > 0 ? itemTotal / order.TotalAmount : 0;
+                        decimal itemReturnAmount = order.ReturnedAmount.Value * returnRatio;
+
+                        // Only add return entry if there's an actual return amount for this item
+                        if (itemReturnAmount > 0)
+                        {
+                            salesReport.Add(new SalesReportDTO
+                            {
+                                InvoiceDate = order.StatusChangeDate.Value,
+                                InvoiceNumber = order.InvoiceNumber,
+                                MenuName = item.Menu.MenuName,
+                                BaseUnit = item.Menu.BaseUnit ?? "",
+                                Quantity = item.ItemQTY ?? 0,
+                                Cost = item.Menu.MenuCost,
+                                Price = item.ItemPrice ?? 0m,
+                                ItemGroup = item.Menu.Category?.CtgryName ?? "",
+                                Barcode = item.Menu.SearchId,
+                                IsReturned = true,
+                                ReturnDate = order.StatusChangeDate,
+                                ReturnAmount = itemReturnAmount
+                            });
+                        }
+                    }
+                }
+            }
+
+            return salesReport;
         }
     }
 }

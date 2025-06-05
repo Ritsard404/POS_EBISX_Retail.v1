@@ -31,6 +31,7 @@ namespace EBISX_POS.ViewModels.Manager
 
         public IRelayCommand FilterCommand { get; }
         public IRelayCommand PrintCommand { get; }
+        public IRelayCommand PrintSalesCommand { get; }
 
         private readonly List<InvoiceDTO> allSalesHistory; 
         
@@ -65,6 +66,7 @@ namespace EBISX_POS.ViewModels.Manager
 
             FilterCommand = new RelayCommand(async () => await FilterByDateRange());
             PrintCommand = new RelayCommand(async () => await PrintTranxList());
+            PrintSalesCommand = new RelayCommand(async () => await PrintSalesList());
             NextPageCommand = new RelayCommand(GoToNextPage, CanGoToNextPage);
             PreviousPageCommand = new RelayCommand(GoToPreviousPage, CanGoToPreviousPage);
 
@@ -144,6 +146,32 @@ namespace EBISX_POS.ViewModels.Manager
                     ButtonDefinitions = ButtonEnum.Ok,
                     ContentTitle = "Transaction List Saved",
                     ContentMessage = $"Your transaction list was saved to:\n{tranxPath}",
+                    Icon = Icon.Success
+                });
+
+            await msgBox.ShowAsPopupAsync(_window);
+
+            IsLoading = false;
+        }
+
+        private async Task PrintSalesList()
+        {
+            IsLoading = true;
+
+            var reportService = App.Current.Services.GetRequiredService<IReport>();
+            var reportOptions = App.Current.Services.GetRequiredService<IOptions<SalesReport>>();
+
+            var salesPath = reportOptions.Value.SalesLogsFolder;
+
+            await reportService.GetSalesReport(fromDate: FromDate.Date, toDate: ToDate.Date, salesPath);
+
+
+            var msgBox = MessageBoxManager
+                .GetMessageBoxStandard(new MessageBoxStandardParams
+                {
+                    ButtonDefinitions = ButtonEnum.Ok,
+                    ContentTitle = "Sales List Saved",
+                    ContentMessage = $"Your sales list was saved to:\n{salesPath}",
                     Icon = Icon.Success
                 });
 
