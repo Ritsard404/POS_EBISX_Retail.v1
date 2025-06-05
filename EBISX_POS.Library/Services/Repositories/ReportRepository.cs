@@ -1305,8 +1305,8 @@ namespace EBISX_POS.API.Services.Repositories
                         ReturnAmount = 0m
                     });
 
-                    // If the order was returned, add a return entry
-                    if (order.IsReturned && order.StatusChangeDate.HasValue && order.ReturnedAmount.HasValue)
+                    // If the item was refunded, add a return entry
+                    if (item.IsRefund && order.StatusChangeDate.HasValue && order.ReturnedAmount.HasValue)
                     {
                         // Calculate the return amount for this specific item
                         // This is a proportional calculation based on the item's contribution to the total order
