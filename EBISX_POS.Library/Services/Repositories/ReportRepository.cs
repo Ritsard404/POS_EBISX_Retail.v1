@@ -1158,7 +1158,7 @@ namespace EBISX_POS.API.Services.Repositories
                         Percent = order.DiscountPercent?.ToString() ?? "",
                         SubTotal = Math.Round(-returns, 2),
                         AmountDue = 0m,
-                        GrossSales = 0m,
+                        GrossSales = -returns,
                         Returns = returns,
                         NetOfReturns = -returns,
                         LessDiscount = 0m, // No discount on refunds
