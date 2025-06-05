@@ -132,6 +132,36 @@ namespace EBISX_POS.API.Services.PDF
             // Table rows
             foreach (var t in transactions)
             {
+                // Check if adding the next row will exceed the page height (with a bottom margin)
+                if (y + rowHeight > page.Height - margin)
+                {
+                    // Add a new page
+                    page = document.AddPage();
+                    page.Orientation = PdfSharp.PageOrientation.Landscape;
+                    page.Width = XUnit.FromInch(13.0);
+                    page.Height = XUnit.FromInch(8.5);
+                    gfx = XGraphics.FromPdfPage(page);
+                    y = margin; // Reset y position for the new page
+
+                    // Redraw table header on the new page
+                    double currentHeaderY = y; // Use a different variable name
+                    double currentX = margin; // Use a different variable name
+                    for (int i = 0; i < columns.Length; i++)
+                    {
+                        var rect = new XRect(currentX, currentHeaderY, colWidths[i], headerRowHeight);
+                        gfx.DrawRectangle(XBrushes.LightGray, rect);
+                        var headerLines = columns[i].Item1.Split('\n');
+                        double lineHeight = headerRowHeight / headerLines.Length;
+                        for (int j = 0; j < headerLines.Length; j++)
+                        {
+                            var lineRect = new XRect(currentX, currentHeaderY + j * lineHeight, colWidths[i], lineHeight);
+                            gfx.DrawString(headerLines[j], smallFont, XBrushes.Black, lineRect, formats[i]);
+                        }
+                        currentX += colWidths[i];
+                    }
+                    y += headerRowHeight;
+                }
+
                 x = margin;
                 var values = new[]
                 {
