@@ -126,6 +126,36 @@ namespace EBISX_POS.API.Services.PDF
             // Table rows
             foreach (var sale in sales)
             {
+                // Check if adding the next row will exceed the page height (with a bottom margin)
+                if (y + rowHeight > page.Height - margin)
+                {
+                    // Add a new page
+                    page = document.AddPage();
+                    page.Orientation = PdfSharp.PageOrientation.Landscape;
+                    page.Width = XUnit.FromInch(13.0);
+                    page.Height = XUnit.FromInch(8.5);
+                    gfx = XGraphics.FromPdfPage(page);
+                    y = margin; // Reset y position for the new page
+
+                    // Redraw table header on the new page
+                    double currentHeaderY = y;
+                    double currentX = margin;
+                    for (int i = 0; i < columns.Length; i++)
+                    {
+                        var rect = new XRect(currentX, currentHeaderY, colWidths[i], headerRowHeight);
+                        gfx.DrawRectangle(XBrushes.LightGray, rect);
+                        var headerLines = columns[i].Item1.Split('\n');
+                        double lineHeight = headerRowHeight / headerLines.Length;
+                        for (int j = 0; j < headerLines.Length; j++)
+                        {
+                            var lineRect = new XRect(currentX, currentHeaderY + j * lineHeight, colWidths[i], lineHeight);
+                            gfx.DrawString(headerLines[j], smallFont, XBrushes.Black, lineRect, formats[i]);
+                        }
+                        currentX += colWidths[i];
+                    }
+                    y += headerRowHeight;
+                }
+
                 x = margin;
                 
                 // Truncate long text with ellipsis
@@ -169,6 +199,18 @@ namespace EBISX_POS.API.Services.PDF
             }
 
             // Totals row
+            // Check if adding the totals row will exceed the page height (with a bottom margin)
+            if (y + rowHeight > page.Height - margin)
+            {
+                 // Add a new page for totals
+                page = document.AddPage();
+                page.Orientation = PdfSharp.PageOrientation.Landscape;
+                page.Width = XUnit.FromInch(13.0);
+                page.Height = XUnit.FromInch(8.5);
+                gfx = XGraphics.FromPdfPage(page);
+                y = margin; // Reset y position for the new page
+            }
+
             x = margin;
             var totals = new[]
             {
@@ -200,6 +242,7 @@ namespace EBISX_POS.API.Services.PDF
                 gfx.DrawString(totals[i], totals[i] == "TOTALS:" ? headerFont : smallFont, XBrushes.Black, rect, formats[i]);
                 x += colWidths[i];
             }
+            y += rowHeight;
 
             // Save to memory stream
             using var stream = new MemoryStream();
