@@ -73,7 +73,7 @@ namespace EBISX_POS.API.Services.Repositories
                     o.CreatedAt >= tsIn &&
                     o.CashTendered != null &&
                     o.TotalAmount != 0)
-                .Sum(o => o.CashTendered!.Value - o.ChangeAmount!.Value - o.ReturnedAmount!.Value);
+                .Sum(o => o.CashTendered ?? 0m - o.ChangeAmount ?? 0m - o.ReturnedAmount ?? 0m);
 
             // Get withdrawals
             var withdrawals = await _dataContext.UserLog
@@ -432,8 +432,8 @@ namespace EBISX_POS.API.Services.Repositories
 
             // Calculate valid orders total in memory - Now considering ReturnedAmount
             decimal validOrdersTotal = orders.Where(o => !o.IsCancelled)
-                                           .Sum(o => (o?.CashTendered ?? defaultDecimal) - 
-                                                   (o?.ChangeAmount ?? defaultDecimal) - 
+                                           .Sum(o => (o?.CashTendered ?? defaultDecimal) -
+                                                   (o?.ChangeAmount ?? defaultDecimal) -
                                                    (o?.ReturnedAmount ?? defaultDecimal));
 
             decimal actualCash = openingFundDec + validOrdersTotal;
@@ -443,8 +443,8 @@ namespace EBISX_POS.API.Services.Repositories
             // Safe payment processing - Adjusted for ReturnedAmount
             var payments = new Payments
             {
-                Cash = orders.Sum(o => (o?.CashTendered ?? defaultDecimal) - 
-                                      (o?.ChangeAmount ?? defaultDecimal) - 
+                Cash = orders.Sum(o => (o?.CashTendered ?? defaultDecimal) -
+                                      (o?.ChangeAmount ?? defaultDecimal) -
                                       (o?.ReturnedAmount ?? defaultDecimal)),
                 OtherPayments = orders
                     .SelectMany(o => o.AlternativePayments ?? new List<AlternativePayments>())
@@ -452,7 +452,7 @@ namespace EBISX_POS.API.Services.Repositories
                     .Select(g => new PaymentDetail
                     {
                         Name = g.Key + $" ({g.Count()}) :",
-                        Amount = g.Sum(x => x.Amount * (1 - ((x.Order?.ReturnedAmount ?? defaultDecimal) / 
+                        Amount = g.Sum(x => x.Amount * (1 - ((x.Order?.ReturnedAmount ?? defaultDecimal) /
                             (x.Order?.TotalAmount > 0 ? x.Order.TotalAmount : 1m)))),
                     }).ToList()
             };
@@ -588,26 +588,26 @@ namespace EBISX_POS.API.Services.Repositories
             decimal totalVoid = voidOrders.Sum(o => o?.TotalAmount ?? defaultDecimal);
             decimal totalReturns = returnOrders.Sum(o => o?.ReturnedAmount ?? defaultDecimal);
             decimal totalDiscounts = regularOrders.Sum(o => o?.DiscountAmount ?? defaultDecimal);
-            decimal cashSales = regularOrders.Sum(o => 
-                (o?.CashTendered ?? defaultDecimal) - 
-                (o?.ChangeAmount ?? defaultDecimal) - 
+            decimal cashSales = regularOrders.Sum(o =>
+                (o?.CashTendered ?? defaultDecimal) -
+                (o?.ChangeAmount ?? defaultDecimal) -
                 (o?.ReturnedAmount ?? defaultDecimal));
 
             decimal netAmount = grossSales - totalReturns - totalVoid - totalDiscounts;
 
             // VAT calculations with defaults - Adjusted for ReturnedAmount
-            decimal vatableSales = regularOrders.Sum(v => 
-                (v?.VatSales ?? defaultDecimal) * 
+            decimal vatableSales = regularOrders.Sum(v =>
+                (v?.VatSales ?? defaultDecimal) *
                 (1 - ((v?.ReturnedAmount ?? defaultDecimal) / (v?.TotalAmount ?? 1m))));
-            
-            decimal vatAmount = regularOrders.Sum(o => 
-                (o?.VatAmount ?? defaultDecimal) * 
+
+            decimal vatAmount = regularOrders.Sum(o =>
+                (o?.VatAmount ?? defaultDecimal) *
                 (1 - ((o?.ReturnedAmount ?? defaultDecimal) / (o?.TotalAmount ?? 1m))));
-            
-            decimal vatExempt = regularOrders.Sum(o => 
-                (o?.VatExempt ?? defaultDecimal) * 
+
+            decimal vatExempt = regularOrders.Sum(o =>
+                (o?.VatExempt ?? defaultDecimal) *
                 (1 - ((o?.ReturnedAmount ?? defaultDecimal) / (o?.TotalAmount ?? 1m))));
-            
+
             decimal zeroRated = 0m;
 
             // Cash in Drawer
@@ -630,7 +630,7 @@ namespace EBISX_POS.API.Services.Repositories
             // Discount calculations adjusted for ReturnedAmount
             decimal seniorDiscount = regularOrders
                 .Where(s => s.DiscountType == DiscountTypeEnum.Senior.ToString() || s.DiscountType == "s-" + DiscountTypeEnum.Senior.ToString())
-                .Sum(s => (s.DiscountAmount ?? 0m) * 
+                .Sum(s => (s.DiscountAmount ?? 0m) *
                     (1 - ((s.ReturnedAmount ?? 0m) / (s.TotalAmount > 0 ? s.TotalAmount : 1m))));
 
             string seniorCount = regularOrders
@@ -640,7 +640,7 @@ namespace EBISX_POS.API.Services.Repositories
 
             decimal pwdDiscount = regularOrders
                 .Where(s => s.DiscountType == DiscountTypeEnum.Pwd.ToString() || s.DiscountType == "s-" + DiscountTypeEnum.Pwd.ToString())
-                .Sum(s => (s.DiscountAmount ?? 0m) * 
+                .Sum(s => (s.DiscountAmount ?? 0m) *
                     (1 - ((s.ReturnedAmount ?? 0m) / (s.TotalAmount > 0 ? s.TotalAmount : 1m))));
 
             string pwdCount = regularOrders
@@ -649,10 +649,10 @@ namespace EBISX_POS.API.Services.Repositories
                 .ToString();
 
             decimal otherDiscount = regularOrders
-                .Where(s => s.DiscountType != null && !knownDiscountTypes.Contains(s.DiscountType) && 
-                    s.DiscountType != "s-" + DiscountTypeEnum.Pwd.ToString() && 
+                .Where(s => s.DiscountType != null && !knownDiscountTypes.Contains(s.DiscountType) &&
+                    s.DiscountType != "s-" + DiscountTypeEnum.Pwd.ToString() &&
                     s.DiscountType != "s-" + DiscountTypeEnum.Senior.ToString())
-                .Sum(s => (s.DiscountAmount ?? 0m) * 
+                .Sum(s => (s.DiscountAmount ?? 0m) *
                     (1 - ((s.ReturnedAmount ?? 0m) / (s.TotalAmount > 0 ? s.TotalAmount : 1m))));
 
             string otherCount = regularOrders
@@ -1171,9 +1171,9 @@ namespace EBISX_POS.API.Services.Repositories
                     transactionList.Add(returnedTransaction);
 
                     // Update totals for return
-                    UpdateTotals(totalTransactionList, -returns, returns, 0m, -returns, 
-                        -vatable * (returns / grossSales), 
-                        -exempt * (returns / grossSales), 
+                    UpdateTotals(totalTransactionList, -returns, returns, 0m, -returns,
+                        -vatable * (returns / grossSales),
+                        -exempt * (returns / grossSales),
                         -vat * (returns / grossSales));
                 }
             }
@@ -1181,7 +1181,7 @@ namespace EBISX_POS.API.Services.Repositories
             return (transactionList.OrderBy(t => t.InvoiceNum).ToList(), totalTransactionList);
         }
 
-        private void UpdateTotals(TotalTransactionListDTO totals, decimal grossSales, decimal returns, 
+        private void UpdateTotals(TotalTransactionListDTO totals, decimal grossSales, decimal returns,
             decimal lessDiscount, decimal netOfSales, decimal vatable, decimal exempt, decimal vat)
         {
             totals.TotalGrossSales = Math.Round(totals.TotalGrossSales + grossSales, 2);

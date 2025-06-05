@@ -65,23 +65,24 @@ namespace EBISX_POS.API.Services.PDF
             y += 18;
             tableTop = y;
 
-            // Table columns
+            // Table columns - Adjusted widths to sum up to 1.00
             var columns = new[]
             {
-                ("DATE", 0.07),
-                ("INVOICE", 0.08),
-                ("MENU NAME", 0.13),
-                ("UNIT", 0.05),
-                ("QTY", 0.04),
-                ("COST", 0.05),
-                ("PRICE", 0.07),
-                ("GROUP", 0.10),
-                ("BARCODE", 0.12),
-                ("STATUS", 0.08),
-                ("TOTAL\nCOST", 0.07),
-                ("REVENUE", 0.07),
-                ("PROFIT", 0.07)
+                ("DATE", 0.055),     // Reduced from 0.06
+                ("INVOICE", 0.073),  // Reduced from 0.08
+                ("MENU NAME", 0.184), // Reduced from 0.20
+                ("UNIT", 0.046),     // Reduced from 0.05
+                ("QTY", 0.037),      // Reduced from 0.04
+                ("COST", 0.046),     // Reduced from 0.05
+                ("PRICE", 0.064),    // Reduced from 0.07
+                ("GROUP", 0.138),    // Reduced from 0.15
+                ("BARCODE", 0.092),  // Reduced from 0.10
+                ("STATUS", 0.073),   // Reduced from 0.08
+                ("TOTAL\nCOST", 0.064), // Reduced from 0.07
+                ("REVENUE", 0.064),  // Reduced from 0.07
+                ("PROFIT", 0.064)    // Reduced from 0.07
             };
+            // Total: 1.000 (100%)
 
             double[] colWidths = columns.Select(c => c.Item2 * pageWidth).ToArray();
             double headerRowHeight = 30;
@@ -126,16 +127,21 @@ namespace EBISX_POS.API.Services.PDF
             foreach (var sale in sales)
             {
                 x = margin;
+                
+                // Truncate long text with ellipsis
+                var menuName = TruncateWithEllipsis(sale.MenuName, 30);
+                var itemGroup = TruncateWithEllipsis(sale.ItemGroup, 25);
+
                 var values = new[]
                 {
                     sale.InvoiceDate.ToString("MM/dd/yyyy", phCulture),
                     sale.InvoiceNumber.ToString("D12"),
-                    sale.MenuName,
+                    menuName,
                     sale.BaseUnit,
                     sale.Quantity.ToString(),
                     sale.Cost.ToString("N2", phCulture),
                     sale.Price.ToString("N2", phCulture),
-                    sale.ItemGroup,
+                    itemGroup,
                     sale.Barcode.ToString(),
                     sale.Status,
                     sale.TotalCost.ToString("N2", phCulture),
@@ -199,6 +205,12 @@ namespace EBISX_POS.API.Services.PDF
             using var stream = new MemoryStream();
             document.Save(stream);
             return stream.ToArray();
+        }
+
+        private string TruncateWithEllipsis(string text, int maxLength)
+        {
+            if (string.IsNullOrEmpty(text)) return "";
+            return text.Length <= maxLength ? text : text.Substring(0, maxLength - 3) + "...";
         }
     }
 } 

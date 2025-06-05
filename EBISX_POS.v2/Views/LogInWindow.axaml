@@ -87,7 +87,8 @@
 						VerticalContentAlignment="Center"
 						CornerRadius="5"
 						Command="{Binding LogInCommand}"
-						IsEnabled="{Binding !IsLoading}"/>
+						IsEnabled="{Binding !IsLoading}"
+						IsDefault="True"/>
 
 				<TextBlock
 				Text="{Binding ErrorMessage}"
