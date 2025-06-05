@@ -995,7 +995,7 @@ namespace EBISX_POS.API.Services.Repositories
                                          DrinkId = i.Drink?.Id,
                                          AddOnId = i.AddOn?.Id,
                                          // Fallback: use Menu name first, then Drink, then AddOn.
-                                         Name = i.Menu?.MenuName ?? i.Drink?.MenuName ?? i.AddOn?.MenuName ?? "Unknown",
+                                         Name = (i.Menu?.MenuName ?? i.Drink?.MenuName ?? i.AddOn?.MenuName ?? "Unknown") + " \n@" + i.Menu?.BaseUnit,
                                          Size = i.Menu?.Size ?? i.Drink?.Size ?? i.AddOn?.Size,
                                          ItemPrice = i.ItemPrice ?? 0m,
                                          Quantity = i.ItemQTY ?? 1,

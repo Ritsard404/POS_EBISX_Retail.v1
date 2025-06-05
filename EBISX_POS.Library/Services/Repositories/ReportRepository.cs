@@ -64,11 +64,10 @@ namespace EBISX_POS.API.Services.Repositories
                     o.Cashier.UserEmail == cashierEmail &&
                     !o.IsCancelled &&
                     !o.IsPending &&
-                    !o.IsReturned &&
                     o.CreatedAt >= tsIn &&
                     o.CashTendered != null &&
                     o.TotalAmount != 0)
-                .Sum(o => o.CashTendered!.Value - o.ChangeAmount!.Value);
+                .Sum(o => o.CashTendered!.Value - o.ChangeAmount!.Value - o.ReturnedAmount!.Value);
 
             // Get withdrawals
             var withdrawals = await _dataContext.UserLog
