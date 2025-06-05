@@ -1160,7 +1160,7 @@ namespace EBISX_POS.API.Services.Repositories
                         AmountDue = 0m,
                         GrossSales = 0m,
                         Returns = returns,
-                        NetOfReturns = 0m,
+                        NetOfReturns = -returns,
                         LessDiscount = 0m, // No discount on refunds
                         NetOfSales = -returns,
                         Vatable = Math.Round(-vatable * (returns / grossSales), 2),
