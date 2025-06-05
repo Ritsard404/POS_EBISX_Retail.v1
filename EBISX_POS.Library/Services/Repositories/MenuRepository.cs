@@ -721,11 +721,12 @@ namespace EBISX_POS.API.Services.Repositories
                 }
 
                 // Check existence of product
-                var productExist = await _dataContext.Menu.AnyAsync(i => i.SearchId == menu.SearchId);
+                var productExist = await _dataContext.Menu.AnyAsync(i => i.SearchId == menu.SearchId || i.PrivateId.Equals(menu.PrivateId, StringComparison.OrdinalIgnoreCase));
                 if (productExist)
                 {
                     return (false, "Product already exist!");
                 }
+                menu.PrivateId = menu.MenuName;
 
                 // Add menu
                 await _dataContext.Menu.AddAsync(menu);
@@ -833,7 +834,8 @@ namespace EBISX_POS.API.Services.Repositories
                     }
                 }
 
-                var productExist = await _dataContext.Menu.AnyAsync(i => i.SearchId == menu.SearchId && i.Id != menu.Id);
+                var productExist = await _dataContext.Menu.AnyAsync(i => i.SearchId == menu.SearchId && i.Id != menu.Id && i.PrivateId.Equals(menu.PrivateId, StringComparison.OrdinalIgnoreCase)
+);
                 if (productExist)
                 {
                     return (false, "Product already exist!");

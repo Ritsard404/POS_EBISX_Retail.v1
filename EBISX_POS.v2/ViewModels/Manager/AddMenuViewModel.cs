@@ -98,7 +98,8 @@ namespace EBISX_POS.ViewModels.Manager
                 Category = new Category { Id = 0, CtgryName = "" },
                 DrinkType = new DrinkType { Id = 0, DrinkTypeName = "" },
                 AddOnType = new AddOnType { Id = 0, AddOnTypeName = "" },
-                MenuCost = 0
+                MenuCost = 0,
+                PrivateId = string.Empty,
             };
 
             // Set edit mode if menuToEdit is provided
@@ -369,6 +370,7 @@ namespace EBISX_POS.ViewModels.Manager
                     MenuImagePath = MenuDetails.MenuImagePath,
                     MenuIsAvailable = MenuDetails.MenuIsAvailable,
                     MenuCost = MenuDetails.MenuCost,
+                    PrivateId = MenuDetails.MenuName,
                     //Qty = MenuDetails.Qty
                 };
 

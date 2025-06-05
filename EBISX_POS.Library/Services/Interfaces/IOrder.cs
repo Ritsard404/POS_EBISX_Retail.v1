@@ -1,4 +1,5 @@
-﻿using EBISX_POS.API.Services.DTO.Order;
+﻿using EBISX_POS.API.Models;
+using EBISX_POS.API.Services.DTO.Order;
 using System.Collections.ObjectModel;
 
 namespace EBISX_POS.API.Services.Interfaces
@@ -19,6 +20,8 @@ namespace EBISX_POS.API.Services.Interfaces
 
         Task<(bool, string)> CancelCurrentOrder(string cashierEmail, string managerEmail);
         Task<(bool, string)> RefundOrder(string managerEmail, long invoiceNumber);
+        Task<(bool IsSuccess, string Message)> RefundItemOrder(string managerEmail, long invoiceNumber, List<Item> items);
+        Task<List<Item>> GetItems(long invoiceNumber);
 
         Task<(bool, string)> PromoDiscount(string cashierEmail, string managerEmail, string promoCode);
         Task<(bool, string)> AvailCoupon(string cashierEmail, string managerEmail, string couponCode);

@@ -10,6 +10,7 @@ namespace EBISX_POS.API.Models
         [Key]
         public int Id { get; set; }
         public long SearchId { get; set; }
+        public required string PrivateId { get; set; }
         public required string MenuName { get; set; }
         public required decimal MenuCost { get; set; }
         public required decimal MenuPrice { get; set; }

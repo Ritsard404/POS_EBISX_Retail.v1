@@ -14,6 +14,7 @@ namespace EBISX_POS.API.Models
         public bool IsPwdDiscounted { get; set; } = false;
         public bool IsSeniorDiscounted { get; set; } = false;
         public bool IsTrainingMode { get; set; } = false;
+        public bool IsRefund { get; set; } = false;
 
         public Menu? Menu { get; set; }
         public Menu? Drink { get; set; }

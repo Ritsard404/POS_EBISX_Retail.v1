@@ -146,9 +146,16 @@
 					</StackPanel>-->
 				</StackPanel>
 
-				<!-- Row 3: Add-On & Drink Type --><!--
+				 <!--Row 3: Add-On & Drink Type--> 
 				<StackPanel Orientation="Horizontal" Spacing="10">
 					<StackPanel>
+						<TextBlock Text="Unit" Margin="0,0,0,5"/>
+						<TextBox
+						  Width="200"
+						  Watermark="Unit"
+						  Text="{Binding MenuDetails.BaseUnit, UpdateSourceTrigger=PropertyChanged}"/>
+					</StackPanel>
+					<!--<StackPanel>
 						<TextBlock Text="Add-On Type" Margin="0,0,0,5"/>
 						<ComboBox
 						  Width="200"
@@ -157,8 +164,8 @@
 						  SelectedItem="{Binding MenuDetails.AddOnType}"
 						  PlaceholderText="Select Add-On Type"
 						  MaxDropDownHeight="100"/>
-					</StackPanel>
-					<StackPanel>
+					</StackPanel>-->
+					<!--<StackPanel>
 						<TextBlock Text="Drink Type" Margin="0,0,0,5"/>
 						<ComboBox
 						  Width="200"
@@ -167,8 +174,8 @@
 						  SelectedItem="{Binding MenuDetails.DrinkType}"
 						  PlaceholderText="Select Drink Type"
 						  MaxDropDownHeight="100"/>
-					</StackPanel>
-				</StackPanel>-->
+					</StackPanel>-->
+				</StackPanel>
 
 				<!-- Row 4: Flags --><!--
 				<StackPanel Orientation="Horizontal" Spacing="10">

@@ -25,6 +25,7 @@ namespace EBISX_POS.API.Models
 
         public bool IsCancelled { get; set; } = false;
         public bool IsReturned { get; set; } = false;
+        public decimal? ReturnedAmount { get; set; }
         public bool IsRead { get; set; } = false;
         public bool IsTrainMode { get; set; } = false;
         public bool IsPending { get; set; } = true;

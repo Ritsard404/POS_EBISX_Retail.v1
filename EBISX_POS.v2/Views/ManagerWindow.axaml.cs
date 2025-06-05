@@ -291,8 +291,11 @@ namespace EBISX_POS.Views
 
         private async void Refund_Click(object? sender, RoutedEventArgs e)
         {
-            var refundOrder = new SetCashDrawerWindow("Returned");
-            await refundOrder.ShowDialog(this);
+            //var refundOrder = new SetCashDrawerWindow("Returned");
+            //await refundOrder.ShowDialog(this);
+
+            var refundItems = new RefundItemWindow();
+            await refundItems.ShowDialog(this);
         }
 
         private async void LogOut_Button(object? sender, RoutedEventArgs e)

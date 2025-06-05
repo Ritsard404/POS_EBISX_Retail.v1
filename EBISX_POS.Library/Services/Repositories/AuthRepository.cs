@@ -22,11 +22,11 @@ namespace EBISX_POS.API.Services.Repositories
             // Use SHA256 to generate a hash
             using var sha256 = SHA256.Create();
             var hashBytes = sha256.ComputeHash(System.Text.Encoding.UTF8.GetBytes(text));
-            
+
             // Take first 8 bytes and convert to long
             // We use absolute value to ensure positive number
             var numericHash = Math.Abs(BitConverter.ToInt64(hashBytes, 0));
-            
+
             // Ensure it's not too large for our database
             return numericHash % 1000000000000; // 12 digits max
         }
@@ -62,20 +62,6 @@ namespace EBISX_POS.API.Services.Repositories
                 return (false, "No active session or drawer amount not set.");
 
             var tsIn = timestamp.TsIn;
-
-            //decimal totalCashInDrawer = await _dataContext.Order
-            //        .Where(o =>
-            //            o.Cashier.UserEmail == cashierEmail &&
-            //            !o.IsCancelled &&
-            //            !o.IsPending &&
-            //            !o.IsReturned &&
-            //            o.CreatedAt >= tsIn &&
-            //            o.CashTendered != null &&
-            //            o.TotalAmount != 0
-            //        )
-            //        .SumAsync(o =>
-            //            o.CashTendered!.Value - o.ChangeAmount!.Value
-            //        );
 
             // First get all valid orders for the cashier
             var orders = await _dataContext.Order
@@ -228,7 +214,7 @@ namespace EBISX_POS.API.Services.Repositories
             try
             {
                 var response = await _httpClient.GetFromJsonAsync<MenuResponseDTO>("asspos/mobileloaditems.php?db_name=arseneso_barandog&usecenter=MAIN");
-                
+
                 if (response?.AllUsers == null || !response.AllUsers.Any())
                 {
                     return (false, "No menu items found in the API response.");
@@ -258,7 +244,7 @@ namespace EBISX_POS.API.Services.Repositories
                 foreach (var item in response.AllUsers)
                 {
                     var category = dbCategories.First(c => c.CtgryName == item.ItemGroup);
-                    
+
                     // Check if menu item already exists
                     var existingMenu = await _dataContext.Menu
                         .FirstOrDefaultAsync(m => m.MenuName == item.ItemId);
@@ -295,7 +281,8 @@ namespace EBISX_POS.API.Services.Repositories
                             MenuIsAvailable = true,
                             IsVatExempt = item.VatType.Contains("EXEMPT", StringComparison.OrdinalIgnoreCase),
                             Category = category,
-                            SearchId = searchId
+                            SearchId = searchId,
+                            PrivateId = item.ItemId
                         };
 
                         await _dataContext.Menu.AddAsync(menu);
@@ -311,6 +298,7 @@ namespace EBISX_POS.API.Services.Repositories
                         existingMenu.IsVatExempt = item.VatType.Contains("EXEMPT", StringComparison.OrdinalIgnoreCase);
                         existingMenu.Category = category;
                         existingMenu.SearchId = searchId;
+                        existingMenu.PrivateId = item.ItemId;
                     }
                 }
 
@@ -347,7 +335,7 @@ namespace EBISX_POS.API.Services.Repositories
                         u.UserRole == "Cashier" &&
                         u.IsActive);
             }
-            var hasMenu = await _dataContext.Menu.AnyAsync(i=>i.MenuIsAvailable);
+            var hasMenu = await _dataContext.Menu.AnyAsync(i => i.MenuIsAvailable);
 
 
             // If neither found, fail

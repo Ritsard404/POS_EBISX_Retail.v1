@@ -1426,5 +1426,79 @@ namespace EBISX_POS.API.Services.Repositories
             return (true, "Order Refunded.");
         }
 
+        public async Task<(bool IsSuccess, string Message)> RefundItemOrder(string managerEmail, long invoiceNumber, List<Item> items)
+        {
+            var manager = await _dataContext.User
+                .FirstOrDefaultAsync(u => u.UserEmail == managerEmail && u.IsActive);
+
+            // Validate credentials
+            if (manager == null)
+            {
+                return (false, "Invalid Credential.");
+            }
+
+            var currentTrainMode = await _auth.IsTrainMode();
+
+            // Retrieve the order by invoice number
+            var orderToRefund = await _dataContext.Order
+                .Include(o => o.Cashier)
+                .Include(o => o.Items)
+                .FirstOrDefaultAsync(o => o.InvoiceNumber == invoiceNumber && o.IsTrainMode == currentTrainMode);
+
+            if (orderToRefund == null)
+                return (false, "Invoice not found.");
+
+
+            if (orderToRefund.IsReturned)
+                return (false, "Invoice has already been returned.");
+
+
+            if (orderToRefund.IsCancelled)
+                return (false, "Invoice refund a cancelled Invoice.");
+
+            if (DateTimeOffset.Now - orderToRefund.CreatedAt > TimeSpan.FromDays(5))
+                return (false, "Refund period has expired (more than 5 days since purchase).");
+
+            decimal refundAmount = 0;
+
+            foreach (var item in orderToRefund.Items)
+            {
+                if (items.Any(r => r.EntryId == item.EntryId))
+                {
+                    item.IsRefund = true; // Set your desired flag
+                    refundAmount += item.ItemPrice ?? 0m;
+                }
+            }
+
+
+            orderToRefund.ReturnedAmount = refundAmount;
+            orderToRefund.IsReturned = true;
+            orderToRefund.StatusChangeDate = DateTime.Now;
+            orderToRefund.UserLog ??= new List<UserLog>();
+            orderToRefund.UserLog.Add(new UserLog
+            {
+                Manager = manager,
+                Action = $"Invoice Returned: {invoiceNumber} ({(orderToRefund.IsTrainMode ? "Training" : "Live")} Mode)",
+            });
+
+            //await _auth.CashWithdrawDrawer(orderToRefund.Cashier.UserEmail, managerEmail, refundAmount);
+
+            await _dataContext.SaveChangesAsync();
+
+            // Use the order's ID for journal entries (internal tracking)
+            await _journal.AddItemsJournal(orderToRefund.Id);
+            await _journal.AddTendersJournal(orderToRefund.Id);
+            await _journal.AddTotalsJournal(orderToRefund.Id);
+            await _journal.AddPwdScJournal(orderToRefund.Id);
+
+            return (true, "Invoice Refunded.");
+        }
+
+        public async Task<List<Item>> GetItems(long invoiceNumber)
+        {
+            return await _dataContext.Item
+                .Where(i => i.Order.InvoiceNumber == invoiceNumber && !i.IsVoid && !i.IsRefund)
+                .ToListAsync();
+        }
     }
 }
