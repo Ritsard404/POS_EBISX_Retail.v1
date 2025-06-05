@@ -16,6 +16,10 @@
 		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
 		<SelfContained>true</SelfContained>
 		<PublishReadyToRun>false</PublishReadyToRun>
+		<PackageIcon>logo.png</PackageIcon>
+		<AssemblyName></AssemblyName>
+		<RootNamespace></RootNamespace>
+		<ApplicationIcon>logo.ico</ApplicationIcon>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -37,6 +41,10 @@
 
 	<ItemGroup>
 		<AvaloniaXaml Remove="Assets\Icons.axaml" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Include="logo.ico" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -90,6 +98,13 @@
 		<Folder Include="Converter\" />
 		<Folder Include="Services\API\" />
 		<Folder Include="Services\API\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="..\..\..\..\Downloads\logo.png">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
 	</ItemGroup>
 
 	<ItemGroup>
