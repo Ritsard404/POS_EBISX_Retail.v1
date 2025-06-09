@@ -157,7 +157,7 @@ namespace EBISX_POS.API.Services.PDF
                 }
 
                 x = margin;
-                
+
                 // Truncate long text with ellipsis
                 var menuName = TruncateWithEllipsis(sale.MenuName, 30);
                 var itemGroup = TruncateWithEllipsis(sale.ItemGroup, 25);
@@ -202,7 +202,7 @@ namespace EBISX_POS.API.Services.PDF
             // Check if adding the totals row will exceed the page height (with a bottom margin)
             if (y + rowHeight > page.Height - margin)
             {
-                 // Add a new page for totals
+                // Add a new page for totals
                 page = document.AddPage();
                 page.Orientation = PdfSharp.PageOrientation.Landscape;
                 page.Width = XUnit.FromInch(13.0);
@@ -219,14 +219,14 @@ namespace EBISX_POS.API.Services.PDF
                 "TOTALS:", // MENU NAME
                 "", // UNIT
                 "", // QTY
-                sales.Sum(s => s.Cost).ToString("N2", phCulture), // COST
-                sales.Sum(s => s.Price).ToString("N2", phCulture), // PRICE
+                sales.Where(s => !s.IsReturned).Sum(s => s.Cost).ToString("N2", phCulture), // COST
+                sales.Where(s => !s.IsReturned).Sum(s => s.Price).ToString("N2", phCulture), // PRICE
                 "", // GROUP
                 "", // BARCODE
                 "", // STATUS
-                sales.Sum(s => s.TotalCost).ToString("N2", phCulture), // TOTAL COST
-                sales.Sum(s => s.Revenue).ToString("N2", phCulture), // REVENUE
-                sales.Sum(s => s.Profit).ToString("N2", phCulture) // PROFIT
+                sales.Where(s => !s.IsReturned).Sum(s => s.TotalCost).ToString("N2", phCulture), // TOTAL COST
+                sales.Where(s => ! s.IsReturned).Sum(s => s.Revenue).ToString("N2", phCulture), // REVENUE
+                sales.Where(s => !s.IsReturned).Sum(s => s.Profit).ToString("N2", phCulture) // PROFIT
             };
 
             // Verify totals array length
@@ -256,4 +256,4 @@ namespace EBISX_POS.API.Services.PDF
             return text.Length <= maxLength ? text : text.Substring(0, maxLength - 3) + "...";
         }
     }
-} 
+}

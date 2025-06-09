@@ -1306,8 +1306,8 @@ namespace EBISX_POS.API.Services.Repositories
                         MenuName = item.Menu.MenuName,
                         BaseUnit = item.Menu.BaseUnit ?? "",
                         Quantity = item.ItemQTY ?? 0,
-                        Cost = item.IsRefund ? -item.Menu.MenuCost : item.Menu.MenuCost , // Cost remains the same whether sold or returned
-                        Price = item.IsRefund ? -item.ItemPrice ?? 0m:  item.ItemPrice ?? 0m,
+                        Cost = item.Menu.MenuCost, // Cost remains the same whether sold or returned
+                        Price = item.ItemPrice ?? 0m,
                         ItemGroup = item.Menu.Category?.CtgryName ?? "",
                         Barcode = item.Menu.SearchId,
                         IsReturned = item.IsRefund, // Use item's IsRefund flag

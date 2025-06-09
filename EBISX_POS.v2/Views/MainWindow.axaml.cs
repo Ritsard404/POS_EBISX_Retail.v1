@@ -1,4 +1,4 @@
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
@@ -54,6 +54,7 @@ namespace EBISX_POS.Views
         private DateTime _lastKeyPress = DateTime.MinValue;
         private const int BARCODE_TIMEOUT_MS = 100; // Timeout between keypresses for barcode scanner
         private bool _isBarcodeMode = false; // Flag to track if we're in barcode scanning mode
+        private bool _isPriceCheck = false; // Flag to track if we're in barcode scanning mode
 
         public MainWindow()
         {
@@ -76,6 +77,9 @@ namespace EBISX_POS.Views
             {
                 BarcodeModeToggle.IsChecked = _isBarcodeMode;
             }
+
+            PriceCheckToggle.AddHandler(ToggleButton.IsCheckedChangedEvent, OnPriceCheckToggled);
+
 
             // When the window is opened, load the first category's menus.
             this.Opened += async (s, e) =>
@@ -446,8 +450,10 @@ namespace EBISX_POS.Views
             }
         }
 
-        private void OnGlobalKeyDown(object? sender, KeyEventArgs e)
+        private async void OnGlobalKeyDown(object? sender, KeyEventArgs e)
         {
+            
+
             // If we're not in barcode mode, let the event propagate normally
             if (!_isBarcodeMode)
             {
@@ -480,7 +486,8 @@ namespace EBISX_POS.Views
 
                 if (!string.IsNullOrWhiteSpace(barcode))
                 {
-                    Debug.WriteLine($"Processing barcode: {barcode}");
+                    Debug.WriteLine($"Processing barcode: {barcode}"); 
+                    
                     _ = ProcessBarcode(barcode);
                 }
                 e.Handled = true;
@@ -506,8 +513,36 @@ namespace EBISX_POS.Views
                 e.Handled = true;
             }
         }
+        private void OnPriceCheckToggled(object? sender, RoutedEventArgs e)
+        {
+            if (sender is ToggleButton toggle)
+            {
+                _isPriceCheck = toggle.IsChecked ?? false;
+
+                if (_isPriceCheck)
+                {
+                    // Toggled ON logic
+                    Debug.WriteLine("Price check enabled.");
+                }
+                else
+                {
+                    // Toggled OFF logic
+                    Debug.WriteLine("Price check disabled.");
+                }
+            }
+        }
 
         private void BarcodeModeToggle_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is ToggleButton toggleButton)
+            {
+                bool isChecked = toggleButton.IsChecked ?? false;
+                ToggleBarcodeMode(isChecked);
+
+            }
+        }
+
+        private void PriceCheckToggle_Click(object sender, RoutedEventArgs e)
         {
             if (sender is ToggleButton toggleButton)
             {
@@ -545,10 +580,27 @@ namespace EBISX_POS.Views
                 {
                     var product = await _menu.GetProduct(prodId);
 
+                  
+
                     if (product != null)
                     {
                         Debug.WriteLine($"======>Product found: {product.MenuName}<======");
 
+                        if (_isPriceCheck)
+                        {
+                            var box = MessageBoxManager.GetMessageBoxStandard(
+                                new MessageBoxStandardParams
+                                {
+                                    ContentHeader = "Price check",
+                                    ContentMessage = $"Product: {product.MenuName}\nPrice: ₱{product.MenuPrice:N2}",
+                                    ButtonDefinitions = ButtonEnum.Ok,
+                                    Icon = MsBox.Avalonia.Enums.Icon.Error,
+                                    WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                                });
+                            await box.ShowAsPopupAsync(this);
+
+                            return;
+                        }
 
                         if (OrderState.CurrentOrderItem.Quantity < 1)
                         {
