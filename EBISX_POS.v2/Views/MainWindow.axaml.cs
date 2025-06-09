@@ -452,7 +452,7 @@ namespace EBISX_POS.Views
 
         private async void OnGlobalKeyDown(object? sender, KeyEventArgs e)
         {
-            
+
 
             // If we're not in barcode mode, let the event propagate normally
             if (!_isBarcodeMode)
@@ -486,8 +486,8 @@ namespace EBISX_POS.Views
 
                 if (!string.IsNullOrWhiteSpace(barcode))
                 {
-                    Debug.WriteLine($"Processing barcode: {barcode}"); 
-                    
+                    Debug.WriteLine($"Processing barcode: {barcode}");
+
                     _ = ProcessBarcode(barcode);
                 }
                 e.Handled = true;
@@ -580,7 +580,7 @@ namespace EBISX_POS.Views
                 {
                     var product = await _menu.GetProduct(prodId);
 
-                  
+
 
                     if (product != null)
                     {
@@ -592,10 +592,11 @@ namespace EBISX_POS.Views
                                 new MessageBoxStandardParams
                                 {
                                     ContentHeader = "Price check",
-                                    ContentMessage = $"Product: {product.MenuName}\nPrice: ₱{product.MenuPrice:N2}",
+                                    ContentMessage = $"Product: {product.MenuName}\nCategory: {product.Category.CtgryName}\nPrice: ₱{product.MenuPrice:N2}",
                                     ButtonDefinitions = ButtonEnum.Ok,
-                                    Icon = MsBox.Avalonia.Enums.Icon.Error,
+                                    Icon = MsBox.Avalonia.Enums.Icon.Info,
                                     WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                                    Width = 400
                                 });
                             await box.ShowAsPopupAsync(this);
 
