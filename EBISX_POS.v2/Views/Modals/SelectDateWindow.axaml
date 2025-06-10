@@ -1,0 +1,45 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        x:Class="EBISX_POS.Views.SelectDateWindow"
+        Title="Select Date"
+        WindowStartupLocation="CenterScreen"
+        Width="400" Height="200"
+        CornerRadius="10"
+        ExtendClientAreaToDecorationsHint="True"
+        SystemDecorations="None">
+
+	<Border BorderThickness="2" CornerRadius="10" Padding="20" BorderBrush="Orange">
+		<Grid>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto"/>
+				<RowDefinition Height="Auto"/>
+				<RowDefinition Height="*"/>
+			</Grid.RowDefinitions>
+
+			<TextBlock Grid.Row="0"
+                       Text="Select Date"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       HorizontalAlignment="Center"
+                       Margin="0,0,0,20"/>
+
+			<DatePicker Grid.Row="1"
+                        x:Name="DatePickerControl"
+                        HorizontalAlignment="Center"
+                        Margin="0,0,0,20"/>
+
+			<StackPanel Grid.Row="2"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Center"
+                        Spacing="10">
+				<Button x:Name="SelectButton"
+                        Content="Select Date"
+                        Width="100"
+                        Click="OnSelectButtonClick"/>
+			</StackPanel>
+		</Grid>
+	</Border>
+</Window>

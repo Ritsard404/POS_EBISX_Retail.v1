@@ -257,68 +257,13 @@ namespace EBISX_POS.Views
                     return;  // loader will be hidden, window stays open
                 }
 
-                // Show date picker dialog - Date selection is now mandatory
-                var datePickerResult = await MessageBoxManager
-                    .GetMessageBoxStandard(new MessageBoxStandardParams
-                    {
-                        ContentHeader = "Select Date",
-                        ContentMessage = "Date selection is required for data push.\n\nPlease select a specific date to push data for that day only.",
-                        ButtonDefinitions = ButtonEnum.OkCancel,
-                        WindowStartupLocation = WindowStartupLocation.CenterOwner,
-                        CanResize = false,
-                        SizeToContent = SizeToContent.WidthAndHeight,
-                        Width = 400,
-                        ShowInCenter = true,
-                    })
-                    .ShowAsPopupAsync(this);
-
-                if (datePickerResult != ButtonResult.Ok)
-                {
-                    ShowLoader(false);
-                    return; // User cancelled
-                }
-
                 // Get today's date as default
                 var today = DateTime.Today;
-                var selectedDate = today;
+                var selectDateWindow = new SelectDateWindow();
+                var selectedDate = await selectDateWindow.ShowDialogAsync(this, today);
 
-                // Show confirmation with today's date
-                var confirmResult = await MessageBoxManager
-                    .GetMessageBoxStandard(new MessageBoxStandardParams
-                    {
-                        ContentHeader = "Confirm Date",
-                        ContentMessage = $"Do you want to push data for today ({today:yyyy-MM-dd})?\n\nNote: You can only push data once per day.",
-                        ButtonDefinitions = ButtonEnum.YesNo,
-                        WindowStartupLocation = WindowStartupLocation.CenterOwner,
-                        CanResize = false,
-                        SizeToContent = SizeToContent.WidthAndHeight,
-                        Width = 400,
-                        ShowInCenter = true,
-                    })
-                    .ShowAsPopupAsync(this);
-
-                if (confirmResult != ButtonResult.Yes)
-                {
-                    ShowLoader(false);
-                    return; // User cancelled
-                }
-
-                // Check if data for this date has already been pushed
-                var checkResult = await MessageBoxManager
-                    .GetMessageBoxStandard(new MessageBoxStandardParams
-                    {
-                        ContentHeader = "Confirm Push",
-                        ContentMessage = $"Are you sure you want to push data for {selectedDate:yyyy-MM-dd}?\n\nThis action cannot be undone and you can only push once per day.",
-                        ButtonDefinitions = ButtonEnum.YesNo,
-                        WindowStartupLocation = WindowStartupLocation.CenterOwner,
-                        CanResize = false,
-                        SizeToContent = SizeToContent.WidthAndHeight,
-                        Width = 400,
-                        ShowInCenter = true,
-                    })
-                    .ShowAsPopupAsync(this);
-
-                if (checkResult != ButtonResult.Yes)
+                // Check if user cancelled the date selection
+                if (!selectedDate.HasValue)
                 {
                     ShowLoader(false);
                     return; // User cancelled
@@ -334,12 +279,12 @@ namespace EBISX_POS.Views
                         {
                             // Calculate percentage
                             var percentage = (double)update.current / update.total * 100;
-                            
+
                             // Update progress bar
                             LoadingProgressBar.IsIndeterminate = false;
                             LoadingProgressBar.Value = percentage;
                             LoadingProgressBar.Maximum = 100;
-                            
+
                             // Update status text
                             LoadingStatusText.Text = $"{update.status} ({percentage:F1}%)";
                         }
@@ -352,7 +297,7 @@ namespace EBISX_POS.Views
                     });
                 });
 
-                var (isSuccess, message) = await _journalService.PushAccountJournals(selectedDate, progress);
+                var (isSuccess, message) = await _journalService.PushAccountJournals(selectedDate.Value, progress);
                 if (!isSuccess)
                 {
                     await ShowMessageAsync("Push Failed",
@@ -362,7 +307,7 @@ namespace EBISX_POS.Views
                     return;
                 }
                 Debug.WriteLine("Data pushed successfully to the server: " + message);
-                await ShowMessageAsync("Success", $"Data for {selectedDate:yyyy-MM-dd} pushed to the server successfully!");
+                await ShowMessageAsync("Success", $"Data for {selectedDate.Value:yyyy-MM-dd} pushed to the server successfully!");
             }
             catch (Exception ex)
             {
@@ -426,7 +371,8 @@ namespace EBISX_POS.Views
                     CanResize = false,
                     SizeToContent = SizeToContent.WidthAndHeight,
                     Width = 400,
-                    ShowInCenter = true
+                    ShowInCenter = true,
+                    SystemDecorations = SystemDecorations.None
                 })
                 .ShowWindowDialogAsync(this);
 

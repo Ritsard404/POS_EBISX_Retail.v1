@@ -201,12 +201,13 @@ namespace EBISX_POS.API.Services.Repositories
                     var journal = new AccountJournal
                     {
                         EntryNo = order.InvoiceNumber,
+                        Reference = order.InvoiceNumber.ToString("D12") ?? "",
                         EntryLineNo = 5,
                         Status = journalDTO.Status ?? "Posted",
                         AccountName = pwdOrSc.Name,
-                        Reference = pwdOrSc.OscaNum,
                         EntryDate = journalDTO.EntryDate,
-                        EntryName = journalDTO.IsPWD ? "PWD" : "Senior",
+                        EntryName = "1",
+                        Description = journalDTO.IsPWD ? "PWD" : "Senior",
                         Cashier = order.Cashier?.UserEmail ?? "Unknown Cashier"
                     };
 
@@ -290,11 +291,11 @@ namespace EBISX_POS.API.Services.Repositories
                 var journal = new AccountJournal
                 {
                     EntryNo = order.InvoiceNumber,
+                    Reference = order.InvoiceNumber.ToString("D12") ?? "",
                     EntryLineNo = lineNo++,
                     Status = order.IsCancelled ? "Unposted" : "Posted",
                     AccountName = name,
-                    Reference = osca,
-                    EntryName = order.DiscountType ?? "",
+                    EntryName = "1",
                     EntryDate = order.CreatedAt.DateTime,
                     Cashier = order.Cashier?.UserEmail ?? "Unknown Cashier"
                 };
@@ -351,9 +352,10 @@ namespace EBISX_POS.API.Services.Repositories
                 journals.Add(new AccountJournal
                 {
                     EntryNo = order.InvoiceNumber,
+                    Reference = order.InvoiceNumber.ToString("D12") ?? "",
                     EntryLineNo = 0,
                     Status = order.IsCancelled ? "Unposted" : order.IsReturned ? "Returned" : "Posted",
-                    EntryName = "Cash Tendered",
+                    EntryName = "1",
                     AccountName = "Cash",
                     Description = "Cash Tendered",
                     Debit = order.IsReturned ? 0 : Convert.ToDouble(order.CashTendered),
@@ -371,12 +373,12 @@ namespace EBISX_POS.API.Services.Repositories
                     var journal = new AccountJournal
                     {
                         EntryNo = order.InvoiceNumber,
+                        Reference = order.InvoiceNumber.ToString("D12") ?? "",
                         EntryLineNo = 0,
                         Status = order.IsCancelled ? "Unposted" : order.IsReturned ? "Returned" : "Posted",
-                        EntryName = tender.SaleType.Name,
+                        EntryName = "1",
                         AccountName = tender.SaleType.Account,
                         Description = tender.SaleType.Type,
-                        Reference = tender.Reference,
                         Debit = order.IsReturned ? 0 : Convert.ToDouble(tender.Amount),
                         Credit = order.IsReturned ? Convert.ToDouble(tender.Amount) : 0,
                         EntryDate = order.CreatedAt.DateTime
@@ -440,7 +442,8 @@ namespace EBISX_POS.API.Services.Repositories
                 {
                     EntryNo = order.InvoiceNumber,
                     EntryLineNo = 10,
-                    EntryName = "Discount Amount",
+                    EntryName = "1",
+                    Reference = order.InvoiceNumber.ToString("D12") ?? "",
                     Status = order.IsCancelled ? "Unposted" : order.IsReturned ? "Returned" : "Posted",
                     AccountName = discountAccount,
                     Description = "Discount",
@@ -455,11 +458,12 @@ namespace EBISX_POS.API.Services.Repositories
             journals.Add(new AccountJournal
             {
                 EntryNo = order.InvoiceNumber,
+                Reference = order.InvoiceNumber.ToString("D12") ?? "",
                 EntryLineNo = 10,
-                EntryName = "Total Amount",
+                EntryName = "1",
                 Status = order.IsCancelled ? "Unposted" : order.IsReturned ? "Returned" : "Posted",
                 AccountName = "Sales",
-                Description = "Order Total",
+                Description = "Total Amount",
                 Debit = order.IsReturned ? 0 : Convert.ToDouble(order.TotalAmount),
                 Credit = order.IsReturned ? Convert.ToDouble(order.TotalAmount) : 0,
                 EntryDate = order.CreatedAt.DateTime,
@@ -469,11 +473,12 @@ namespace EBISX_POS.API.Services.Repositories
             journals.Add(new AccountJournal
             {
                 EntryNo = order.InvoiceNumber,
+                Reference = order.InvoiceNumber.ToString("D12") ?? "",
                 EntryLineNo = 10,
-                EntryName = "VAT Amount",
+                EntryName = "1",
                 Status = order.IsCancelled ? "Unposted" : order.IsReturned ? "Returned" : "Posted",
                 AccountName = "VAT",
-                Description = "Order VAT",
+                Description = "VAT Amount",
                 Vatable = Convert.ToDouble(order.VatAmount),
                 EntryDate = order.CreatedAt.DateTime,
                 Cashier = order.Cashier?.UserEmail ?? "Unknown Cashier"
@@ -482,11 +487,12 @@ namespace EBISX_POS.API.Services.Repositories
             journals.Add(new AccountJournal
             {
                 EntryNo = order.InvoiceNumber,
+                Reference = order.InvoiceNumber.ToString("D12") ?? "",
                 EntryLineNo = 10,
-                EntryName = "VAT Exempt Amount",
+                EntryName = "1",
                 Status = order.IsCancelled ? "Unposted" : order.IsReturned ? "Returned" : "Posted",
                 AccountName = "VAT Exempt",
-                Description = "Order VAT Exempt",
+                Description = "VAT Exempt Amount",
                 Vatable = Convert.ToDouble(order.VatExempt),
                 EntryDate = order.CreatedAt.DateTime,
                 Cashier = order.Cashier?.UserEmail ?? "Unknown Cashier"
@@ -495,8 +501,9 @@ namespace EBISX_POS.API.Services.Repositories
             journals.Add(new AccountJournal
             {
                 EntryNo = order.InvoiceNumber,
+                Reference = order.InvoiceNumber.ToString("D12") ?? "",
                 EntryLineNo = 10,
-                EntryName = "Sub Total",
+                EntryName = "1",
                 Status = order.IsCancelled ? "Unposted" : order.IsReturned ? "Returned" : "Posted",
                 AccountName = "SubTotal",
                 Description = "Order SubTotal",
@@ -687,8 +694,8 @@ namespace EBISX_POS.API.Services.Repositories
                         // Wait 10 seconds between requests (except for the last one)
                         if (i < journals.Count - 1)
                         {
-                            progress?.Report((i + 1, totalCount, "Waiting 10 seconds before next request..."));
-                            await Task.Delay(10000); // 10 seconds
+                            progress?.Report((i + 1, totalCount, "Waiting 5 seconds before next request..."));
+                            await Task.Delay(5000); // 10 seconds
                         }
                     }
                     catch (OperationCanceledException)
