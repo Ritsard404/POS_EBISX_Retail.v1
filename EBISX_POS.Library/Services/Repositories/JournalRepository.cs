@@ -124,6 +124,7 @@ namespace EBISX_POS.API.Services.Repositories
                     var journal = new AccountJournal
                     {
                         EntryNo = order.InvoiceNumber,
+                        Reference = order.InvoiceNumber.ToString("D12") ?? "",
                         EntryLineNo = 3, // Adjust if needed
                         Status = item.IsVoid ? "Unposted" : order.IsReturned ? "Returned" : "Posted",
                         EntryName = item.EntryId ?? "",
@@ -522,31 +523,60 @@ namespace EBISX_POS.API.Services.Repositories
             }
         }
 
-        public async Task<(bool isSuccess, string message)> PushAccountJournals()
+        public async Task<(bool isSuccess, string message)> PushAccountJournals(DateTime selectedDate, IProgress<(int current, int total, string status)>? progress = null)
         {
             try
             {
-                // Get all posted journal entries that haven't been pushed yet
-                var journals = await _journal.AccountJournal
-                    .ToListAsync();
+                // Check if data for this date has already been pushed
+                var alreadyPushedQuery = _journal.AccountJournal.AsQueryable();
+                var startOfDay = selectedDate.Date;
+                var endOfDay = startOfDay.AddDays(1);
+                alreadyPushedQuery = alreadyPushedQuery.Where(j => j.EntryDate >= startOfDay && j.EntryDate < endOfDay);
+                alreadyPushedQuery = alreadyPushedQuery.Where(j => j.Cleared == "Y");
+                
+                var alreadyPushedCount = await alreadyPushedQuery.CountAsync();
+                if (alreadyPushedCount > 0)
+                {
+                    return (false, $"Data for {selectedDate:yyyy-MM-dd} has already been pushed. You can only push data once per day.");
+                }
+
+                // Get all posted journal entries that haven't been pushed yet (Cleared != "Y")
+                var query = _journal.AccountJournal.AsQueryable();
+
+                // Filter by selected date (now required)
+                query = query.Where(j => j.EntryDate >= startOfDay && j.EntryDate < endOfDay);
+
+                // Only get entries that haven't been pushed yet (Cleared != "Y")
+                query = query.Where(j => j.Cleared != "Y");
+
+                var journals = await query.ToListAsync();
 
                 if (!journals.Any())
                 {
-                    return (true, "No journal entries to push.");
+                    return (true, $"No journal entries to push for {selectedDate:yyyy-MM-dd}. All entries may have already been pushed.");
                 }
 
                 var successCount = 0;
                 var errorCount = 0;
                 var errors = new List<string>();
+                var totalCount = journals.Count;
 
-                foreach (var journal in journals)
+                // Report initial progress
+                progress?.Report((0, totalCount, $"Found {totalCount} entries to push for {selectedDate:yyyy-MM-dd}. Starting push process..."));
+
+                for (int i = 0; i < journals.Count; i++)
                 {
+                    var journal = journals[i];
+                    
                     try
                     {
+                        // Report progress before each request
+                        progress?.Report((i, totalCount, $"Pushing journal {journal.UniqueId} ({i + 1}/{totalCount})..."));
+
                         // Map AccountJournal to PushAccountJournalDTO
                         var pushDto = new PushAccountJournalDTO
                         {
-                            Entry_Type = journal.EntryType ?? "INVOICE",
+                            Entry_Type = "INVOICE",
                             Entry_No = journal.EntryNo?.ToString() ?? "",
                             Entry_Line_No = journal.EntryLineNo?.ToString() ?? "0",
                             Entry_Date = journal.EntryDate.ToString("yyyy-MM-dd"),
@@ -577,7 +607,7 @@ namespace EBISX_POS.API.Services.Repositories
                             SubTotal = journal.SubTotal?.ToString() ?? "0.00",
                             TotalTax = journal.TaxTotal?.ToString() ?? "0.00",
                             GrossTotal = journal.TotalPrice?.ToString() ?? "0.00",
-                            Discount_Type = journal.EntryName ?? "",
+                            Discount_Type = journal.EntryName ?? "", //
                             Discount_Amount = journal.DiscAmt?.ToString() ?? "0.00",
                             NetPayable = journal.TotalPrice?.ToString() ?? "0.00",
                             Status = journal.Status,
@@ -632,23 +662,46 @@ namespace EBISX_POS.API.Services.Repositories
                         var queryString = string.Join("&", queryParams);
                         var url = $"asspos/mobilepostransactions.php?{queryString}";
 
-                        // Make the GET request
-                        var response = await _httpClient.GetAsync(url);
-
+                        // Make the GET request with timeout
+                        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30)); // 30 second timeout per request
+                        var response = await _httpClient.GetAsync(url, cts.Token);
+                        
                         if (response.IsSuccessStatusCode)
                         {
                             successCount++;
+                            // Mark as pushed by setting Cleared to "Y"
+                            journal.Cleared = "Y";
+                            
+                            // Report success progress
+                            progress?.Report((i + 1, totalCount, $"Successfully pushed journal {journal.UniqueId}"));
                         }
                         else
                         {
                             errorCount++;
                             errors.Add($"Failed to push journal {journal.UniqueId}: {response.StatusCode} - {response.ReasonPhrase}");
+                            
+                            // Report error progress
+                            progress?.Report((i + 1, totalCount, $"Failed to push journal {journal.UniqueId}: {response.StatusCode}"));
                         }
+
+                        // Wait 10 seconds between requests (except for the last one)
+                        if (i < journals.Count - 1)
+                        {
+                            progress?.Report((i + 1, totalCount, "Waiting 10 seconds before next request..."));
+                            await Task.Delay(10000); // 10 seconds
+                        }
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        errorCount++;
+                        errors.Add($"Timeout pushing journal {journal.UniqueId}: Request timed out after 30 seconds");
+                        progress?.Report((i + 1, totalCount, $"Timeout pushing journal {journal.UniqueId}"));
                     }
                     catch (Exception ex)
                     {
                         errorCount++;
                         errors.Add($"Error pushing journal {journal.UniqueId}: {ex.Message}");
+                        progress?.Report((i + 1, totalCount, $"Error pushing journal {journal.UniqueId}: {ex.Message}"));
                     }
                 }
 
@@ -659,10 +712,11 @@ namespace EBISX_POS.API.Services.Repositories
                 }
 
                 // Create push data file after pushing is finished
-                var dataFileResult = await CreatePushDataFile();
+                progress?.Report((totalCount, totalCount, "Creating data file..."));
+                var dataFileResult = await CreatePushDataFile(selectedDate);
                 var dataFileMessage = dataFileResult.isSuccess ? $" Data file created: {dataFileResult.message}" : $" Failed to create data file: {dataFileResult.message}";
 
-                var message = $"Pushed {successCount} journal entries successfully.{dataFileMessage}";
+                var message = $"Pushed {successCount} journal entries successfully for {selectedDate:yyyy-MM-dd}.{dataFileMessage}";
                 if (errorCount > 0)
                 {
                     message += $" Failed to push {errorCount} entries. Errors: {string.Join("; ", errors.Take(5))}";
@@ -672,11 +726,14 @@ namespace EBISX_POS.API.Services.Repositories
                     }
                 }
 
+                // Report final progress
+                progress?.Report((totalCount, totalCount, $"Push completed for {selectedDate:yyyy-MM-dd}. {successCount} successful, {errorCount} failed."));
+
                 return (successCount > 0, message);
             }
             catch (Exception ex)
             {
-                return (false, $"An error occurred while pushing journal entries: {ex.Message}");
+                return (false, $"An error occurred while pushing journal entries for {selectedDate:yyyy-MM-dd}: {ex.Message}");
             }
         }
 
@@ -839,15 +896,31 @@ namespace EBISX_POS.API.Services.Repositories
             return (true, "Success");
         }
 
-        public async Task<(bool isSuccess, string message)> CreatePushDataFile()
+        public async Task<(bool isSuccess, string message)> CreatePushDataFile(DateTime? selectedDate = null)
         {
             try
             {
-                // Get all posted journal entries
-                var journals = await _journal.AccountJournal.ToListAsync();
+                // Get all posted journal entries that haven't been pushed yet (Cleared != "Y")
+                var query = _journal.AccountJournal.AsQueryable();
+
+                // Filter by selected date if provided
+                if (selectedDate.HasValue)
+                {
+                    var startOfDay = selectedDate.Value.Date;
+                    var endOfDay = startOfDay.AddDays(1);
+                    query = query.Where(j => j.EntryDate >= startOfDay && j.EntryDate < endOfDay);
+                }
+
+                // Only get entries that haven't been pushed yet (Cleared != "Y")
+                query = query.Where(j => j.Cleared != "Y");
+
+                var journals = await query.ToListAsync();
 
                 if (!journals.Any())
-                    return (false, "No journal entries found.");
+                {
+                    var dateMsg1 = selectedDate.HasValue ? $" for {selectedDate.Value:yyyy-MM-dd}" : "";
+                    return (false, $"No journal entries found{dateMsg1}.");
+                }
 
                 // Map to PushAccountJournalDTO list
                 var pushList = journals.OrderBy(j => j.EntryNo).ThenBy(j => j.EntryLineNo).Select(journal => new PushAccountJournalDTO
@@ -896,9 +969,10 @@ namespace EBISX_POS.API.Services.Repositories
                 var dataDirectory = Path.Combine("C:\\Data", "Journal");
                 Directory.CreateDirectory(dataDirectory);
 
-                // Create timestamped filename
+                // Create timestamped filename with date filter
                 var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-                var dataFileName = $"PushData_{timestamp}.json";
+                var dateSuffix = selectedDate.HasValue ? $"_{selectedDate.Value:yyyyMMdd}" : "";
+                var dataFileName = $"PushData{dateSuffix}_{timestamp}.json";
                 var dataFilePath = Path.Combine(dataDirectory, dataFileName);
 
                 // Serialize to JSON with formatting
@@ -911,7 +985,8 @@ namespace EBISX_POS.API.Services.Repositories
                 var json = JsonSerializer.Serialize(pushList, options);
                 await File.WriteAllTextAsync(dataFilePath, json);
 
-                return (true, $"Data file created successfully: {dataFileName}");
+                var dateMsg2 = selectedDate.HasValue ? $" for {selectedDate.Value:yyyy-MM-dd}" : "";
+                return (true, $"Data file created successfully{dateMsg2}: {dataFileName}");
             }
             catch (Exception ex)
             {

@@ -294,14 +294,13 @@ namespace EBISX_POS.Util
             // Header
             content.AppendLine(new string('=', ReceiptWidth));
             //content.AppendLine(CenterText("INVOICE"));
-            content.AppendLine(CenterText("Acknowledgment Reciept"));
+            content.AppendLine(CenterText("Acknowledgment Receipt"));
             content.AppendLine(new string('=', ReceiptWidth));
             //content.AppendLine(CenterText(finalizeOrder.RegisteredName));
             //content.AppendLine(CenterText(finalizeOrder.Address));
             //content.AppendLine(CenterText($"TIN: {finalizeOrder.VatTinNumber}"));
             //content.AppendLine(CenterText($"MIN: {finalizeOrder.MinNumber}"));
             //content.AppendLine(new string('-', ReceiptWidth));
-            content.AppendLine(CenterText("Acknowledgment Reciept"));
             content.AppendLine();
 
             // Invoice details
@@ -471,7 +470,7 @@ namespace EBISX_POS.Util
 
             // Header
             content.AppendLine(new string('=', ReceiptWidth));
-            content.AppendLine(CenterText("Acknowledgment Reciept"));
+            content.AppendLine(CenterText("Acknowledgment Receipt"));
             content.AppendLine();
             var invoiceTitle = "INVOICE" + (status != "Paid" ? $" {status.ToUpper()}" : "");
             content.AppendLine(CenterText(invoiceTitle));
@@ -480,7 +479,6 @@ namespace EBISX_POS.Util
             //content.AppendLine(CenterText(invoice.Address));
             //content.AppendLine(CenterText($"TIN: {invoice.VatTinNumber}"));
             //content.AppendLine(CenterText($"MIN: {invoice.MinNumber}"));
-            content.AppendLine(CenterText("Acknowledgment Reciept"));
             content.AppendLine(new string('-', ReceiptWidth));
             content.AppendLine();
 

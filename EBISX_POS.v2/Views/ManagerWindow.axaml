@@ -338,11 +338,21 @@
 					  Background="#80000000"
 			  
 				  >
-			<ProgressBar Width="100"
-					  IsIndeterminate="True"
-						  Foreground="White"
-						  HorizontalAlignment="Center"
-						  VerticalAlignment="Center"/>
+			<StackPanel HorizontalAlignment="Center"
+						VerticalAlignment="Center"
+						Spacing="10">
+				<ProgressBar Width="300"
+							Height="20"
+							IsIndeterminate="True"
+							Foreground="White"
+							x:Name="LoadingProgressBar"/>
+				<TextBlock x:Name="LoadingStatusText"
+						   Text="Loading..."
+						   Foreground="White"
+						   FontSize="16"
+						   HorizontalAlignment="Center"
+						   FontFamily="{StaticResource NunitoFont}"/>
+			</StackPanel>
 		</Grid>
 	</Grid>
 </Window>

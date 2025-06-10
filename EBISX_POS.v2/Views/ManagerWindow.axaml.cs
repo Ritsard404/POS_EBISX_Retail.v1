@@ -23,6 +23,7 @@ using Avalonia.Interactivity;
 using EBISX_POS.v2.Views;
 using EBISX_POS.Helper;
 using EBISX_POS.API.Services.Interfaces;
+using Avalonia.Threading;
 
 namespace EBISX_POS.Views
 {
@@ -70,7 +71,7 @@ namespace EBISX_POS.Views
 
             DataLayout.IsVisible = hasManager || !(hasManager || hasCashier);
 
-            // disable LogOut for managers (since they’d go back to login instead)
+            // disable LogOut for managers (since they'd go back to login instead)
             LogOut.IsEnabled = !hasManager;
 
             PosInfo.IsEnabled = CashierState.ManagerEmail == "EBISX@POS.com";
@@ -84,6 +85,13 @@ namespace EBISX_POS.Views
         private void ShowLoader(bool show)
         {
             LoadingOverlay.IsVisible = show;
+            if (show)
+            {
+                // Reset progress bar to indeterminate state
+                LoadingProgressBar.IsIndeterminate = true;
+                LoadingProgressBar.Value = 0;
+                LoadingStatusText.Text = "Loading...";
+            }
         }
 
         private void SalesReport_Button(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
@@ -143,8 +151,8 @@ namespace EBISX_POS.Views
             Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
 
             string cashierEmail = CashierState.CashierEmail;
-            string thermalPrinter = "POS";   // the exact name of your 58 mm printer
-            string archiveFolder = _cashTrackReportPath; // or null/"" if you don’t need archiving
+            string thermalPrinter = "POS";   // the exact name of your 58 mm printer
+            string archiveFolder = _cashTrackReportPath; // or null/"" if you don't need archiving
 
             //CashTrackPrinter.PrintCashTrackReport(
             //    cashierEmail,
@@ -249,7 +257,102 @@ namespace EBISX_POS.Views
                     return;  // loader will be hidden, window stays open
                 }
 
-                var (isSuccess, message) = await _journalService.PushAccountJournals();
+                // Show date picker dialog - Date selection is now mandatory
+                var datePickerResult = await MessageBoxManager
+                    .GetMessageBoxStandard(new MessageBoxStandardParams
+                    {
+                        ContentHeader = "Select Date",
+                        ContentMessage = "Date selection is required for data push.\n\nPlease select a specific date to push data for that day only.",
+                        ButtonDefinitions = ButtonEnum.OkCancel,
+                        WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                        CanResize = false,
+                        SizeToContent = SizeToContent.WidthAndHeight,
+                        Width = 400,
+                        ShowInCenter = true,
+                    })
+                    .ShowAsPopupAsync(this);
+
+                if (datePickerResult != ButtonResult.Ok)
+                {
+                    ShowLoader(false);
+                    return; // User cancelled
+                }
+
+                // Get today's date as default
+                var today = DateTime.Today;
+                var selectedDate = today;
+
+                // Show confirmation with today's date
+                var confirmResult = await MessageBoxManager
+                    .GetMessageBoxStandard(new MessageBoxStandardParams
+                    {
+                        ContentHeader = "Confirm Date",
+                        ContentMessage = $"Do you want to push data for today ({today:yyyy-MM-dd})?\n\nNote: You can only push data once per day.",
+                        ButtonDefinitions = ButtonEnum.YesNo,
+                        WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                        CanResize = false,
+                        SizeToContent = SizeToContent.WidthAndHeight,
+                        Width = 400,
+                        ShowInCenter = true,
+                    })
+                    .ShowAsPopupAsync(this);
+
+                if (confirmResult != ButtonResult.Yes)
+                {
+                    ShowLoader(false);
+                    return; // User cancelled
+                }
+
+                // Check if data for this date has already been pushed
+                var checkResult = await MessageBoxManager
+                    .GetMessageBoxStandard(new MessageBoxStandardParams
+                    {
+                        ContentHeader = "Confirm Push",
+                        ContentMessage = $"Are you sure you want to push data for {selectedDate:yyyy-MM-dd}?\n\nThis action cannot be undone and you can only push once per day.",
+                        ButtonDefinitions = ButtonEnum.YesNo,
+                        WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                        CanResize = false,
+                        SizeToContent = SizeToContent.WidthAndHeight,
+                        Width = 400,
+                        ShowInCenter = true,
+                    })
+                    .ShowAsPopupAsync(this);
+
+                if (checkResult != ButtonResult.Yes)
+                {
+                    ShowLoader(false);
+                    return; // User cancelled
+                }
+
+                // Create progress reporter
+                var progress = new Progress<(int current, int total, string status)>(update =>
+                {
+                    // Update UI on the UI thread
+                    Dispatcher.UIThread.Post(() =>
+                    {
+                        if (update.total > 0)
+                        {
+                            // Calculate percentage
+                            var percentage = (double)update.current / update.total * 100;
+                            
+                            // Update progress bar
+                            LoadingProgressBar.IsIndeterminate = false;
+                            LoadingProgressBar.Value = percentage;
+                            LoadingProgressBar.Maximum = 100;
+                            
+                            // Update status text
+                            LoadingStatusText.Text = $"{update.status} ({percentage:F1}%)";
+                        }
+                        else
+                        {
+                            // Fallback to indeterminate if no total
+                            LoadingProgressBar.IsIndeterminate = true;
+                            LoadingStatusText.Text = update.status;
+                        }
+                    });
+                });
+
+                var (isSuccess, message) = await _journalService.PushAccountJournals(selectedDate, progress);
                 if (!isSuccess)
                 {
                     await ShowMessageAsync("Push Failed",
@@ -259,7 +362,7 @@ namespace EBISX_POS.Views
                     return;
                 }
                 Debug.WriteLine("Data pushed successfully to the server: " + message);
-                await ShowMessageAsync("Success", "Data pushed to the server successfully!");
+                await ShowMessageAsync("Success", $"Data for {selectedDate:yyyy-MM-dd} pushed to the server successfully!");
             }
             catch (Exception ex)
             {
