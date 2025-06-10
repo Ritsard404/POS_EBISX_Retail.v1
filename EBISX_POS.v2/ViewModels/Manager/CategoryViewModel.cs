@@ -60,28 +60,28 @@ namespace EBISX_POS.ViewModels.Manager
             }
         }
 
-        private async void SaveCategoryChanges(Category category)
-        {
-            if (category == null) return;
+        //private async void SaveCategoryChanges(Category category)
+        //{
+        //    if (category == null) return;
 
-            try
-            {
-                var (isSuccess, message) = await _menuService.UpdateCategory(category, CashierState.ManagerEmail!);
+        //    try
+        //    {
+        //        var (isSuccess, message) = await _menuService.UpdateCategory(category, CashierState.ManagerEmail!);
 
-                if (isSuccess)
-                {
-                    await LoadCategories();
-                    //await ShowSuccess(message);
-                    return;
-                }
-                ShowError(message);
-                return;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Error saving user changes: {ex}");
-            }
-        }
+        //        if (isSuccess)
+        //        {
+        //            await LoadCategories();
+        //            //await ShowSuccess(message);
+        //            return;
+        //        }
+        //        ShowError(message);
+        //        return;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Debug.WriteLine($"Error saving user changes: {ex}");
+        //    }
+        //}
 
         [RelayCommand]
         private async Task AddCategory()
@@ -89,14 +89,30 @@ namespace EBISX_POS.ViewModels.Manager
             try
             {
                 var addCategoryWindow = new AddCategoryWindow();
-                addCategoryWindow.DataContext = new AddCategoryViewModel(_menuService, addCategoryWindow);
+                addCategoryWindow.DataContext = new AddCategoryViewModel(_menuService, addCategoryWindow, null);
 
                 await addCategoryWindow.ShowDialog(_window);
                 await LoadCategories();
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error opening add user window: {ex}");
+                Debug.WriteLine($"Error opening add category window: {ex}");
+            }
+        }
+
+        public async Task EditCategory(Category category)
+        {
+            try
+            {
+                var addCategoryWindow = new AddCategoryWindow();
+                addCategoryWindow.DataContext = new AddCategoryViewModel(_menuService, addCategoryWindow, category);
+
+                await addCategoryWindow.ShowDialog(_window);
+                await LoadCategories();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error opening edit category window: {ex}");
             }
         }
 
@@ -119,7 +135,7 @@ namespace EBISX_POS.ViewModels.Manager
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error saving user changes: {ex}");
+                Debug.WriteLine($"Error removing category: {ex}");
             }
         }
 
@@ -129,13 +145,13 @@ namespace EBISX_POS.ViewModels.Manager
             _window.Close();
         }
 
-        partial void OnSelectedCategoryChanged(Category? value)
-        {
-            if (value != null)
-            {
-                SaveCategoryChanges(value);
-            }
-        }
+        //partial void OnSelectedCategoryChanged(Category? value)
+        //{
+        //    if (value != null)
+        //    {
+        //        SaveCategoryChanges(value);
+        //    }
+        //}
 
         private async void ShowError(string message)
         {

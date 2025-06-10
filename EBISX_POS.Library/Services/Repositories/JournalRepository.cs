@@ -1,11 +1,12 @@
 ﻿using EBISX_POS.API.Data;
-using EBISX_POS.API.Models;
 using EBISX_POS.API.Models.Journal;
 using EBISX_POS.API.Services.DTO.Journal;
 using EBISX_POS.API.Services.Interfaces;
 using EBISX_POS.Library.Services.DTO.Journal;
 using Microsoft.EntityFrameworkCore;
-using System.Net.Http.Json;
+using System.Text;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace EBISX_POS.API.Services.Repositories
 {
@@ -623,9 +624,6 @@ namespace EBISX_POS.API.Services.Repositories
                         
                         if (response.IsSuccessStatusCode)
                         {
-                            // Mark as cleared/pushed
-                            journal.Cleared = "Y";
-                            journal.ClearingRef = 1; // Indicate it has been pushed
                             successCount++;
                         }
                         else
@@ -647,7 +645,11 @@ namespace EBISX_POS.API.Services.Repositories
                     await _journal.SaveChangesAsync();
                 }
 
-                var message = $"Pushed {successCount} journal entries successfully.";
+                // Create push data file after pushing is finished
+                var dataFileResult = await CreatePushDataFile();
+                var dataFileMessage = dataFileResult.isSuccess ? $" Data file created: {dataFileResult.message}" : $" Failed to create data file: {dataFileResult.message}";
+
+                var message = $"Pushed {successCount} journal entries successfully.{dataFileMessage}";
                 if (errorCount > 0)
                 {
                     message += $" Failed to push {errorCount} entries. Errors: {string.Join("; ", errors.Take(5))}";
@@ -822,6 +824,86 @@ namespace EBISX_POS.API.Services.Repositories
             await _journal.SaveChangesAsync();
 
             return (true, "Success");
+        }
+
+        public async Task<(bool isSuccess, string message)> CreatePushDataFile()
+        {
+            try
+            {
+                // Get all posted journal entries
+                var journals = await _journal.AccountJournal.ToListAsync();
+
+                if (!journals.Any())
+                    return (false, "No journal entries found.");
+
+                // Map to PushAccountJournalDTO list
+                var pushList = journals.OrderBy(j => j.EntryNo).ThenBy(j => j.EntryLineNo).Select(journal => new PushAccountJournalDTO
+                {
+                    Entry_Type = journal.EntryType ?? "INVOICE",
+                    Entry_No = journal.EntryNo?.ToString() ?? "",
+                    Entry_Line_No = journal.EntryLineNo?.ToString() ?? "0",
+                    Entry_Date = journal.EntryDate.ToString("yyyy-MM-dd"),
+                    CostCenter = journal.CostCenter ?? "Store 1",
+                    ItemId = journal.ItemID ?? "",
+                    Unit = journal.Unit ?? "",
+                    Qty = journal.QtyOut?.ToString() ?? "0",
+                    Cost = journal.Cost?.ToString() ?? "0.00",
+                    Price = journal.Price?.ToString() ?? "0.00",
+                    TotalPrice = journal.TotalPrice?.ToString() ?? "0.00",
+                    Debit = journal.Debit?.ToString() ?? "0.00",
+                    Credit = journal.Credit?.ToString() ?? "0.00",
+                    AccountBalance = journal.AccountBalance?.ToString() ?? "0.00",
+                    Prev_Reading = journal.PrevReading.ToString(),
+                    Curr_Reading = journal.CurrReading.ToString(),
+                    Memo = journal.Memo ?? "",
+                    AccountName = journal.AccountName ?? "",
+                    Reference = journal.Reference ?? "",
+                    Entry_Name = journal.EntryName ?? "",
+                    Cashier = journal.Cashier ?? "",
+                    Count_Type = "",
+                    Deposited = "0",
+                    Deposit_Date = "",
+                    Deposit_Reference = "",
+                    Deposit_By = "",
+                    Deposit_Time = "00:00:00",
+                    CustomerName = journal.NameDesc ?? "",
+                    SubTotal = journal.SubTotal?.ToString() ?? "0.00",
+                    TotalTax = journal.TaxTotal?.ToString() ?? "0.00",
+                    GrossTotal = journal.TotalPrice?.ToString() ?? "0.00",
+                    Discount_Type = journal.EntryName ?? "",
+                    Discount_Amount = journal.DiscAmt?.ToString() ?? "0.00",
+                    NetPayable = journal.TotalPrice?.ToString() ?? "0.00",
+                    Status = journal.Status,
+                    User_Email = journal.Cashier ?? "",
+                    QtyPerBaseUnit = journal.QtyPerBaseUnit?.ToString() ?? "1",
+                    QtyBalanceInBaseUnit = journal.QtyBalanceInBaseUnit?.ToString() ?? "0"
+                }).ToList();
+
+                // Create data directory if it doesn't exist
+                var dataDirectory = Path.Combine("C:\\Data", "Journal");
+                Directory.CreateDirectory(dataDirectory);
+
+                // Create timestamped filename
+                var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+                var dataFileName = $"PushData_{timestamp}.json";
+                var dataFilePath = Path.Combine(dataDirectory, dataFileName);
+
+                // Serialize to JSON with formatting
+                var options = new JsonSerializerOptions
+                {
+                    WriteIndented = true,
+                    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+                };
+
+                var json = JsonSerializer.Serialize(pushList, options);
+                await File.WriteAllTextAsync(dataFilePath, json);
+
+                return (true, $"Data file created successfully: {dataFileName}");
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Failed to create data file: {ex.Message}");
+            }
         }
     }
 }

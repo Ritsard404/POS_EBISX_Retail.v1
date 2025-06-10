@@ -18,6 +18,7 @@ namespace EBISX_POS.ViewModels.Manager
     {
         private readonly IMenu _menuService;
         private readonly Window _window;
+        private readonly Category? _category;
 
         [ObservableProperty]
         private string _categoryName = string.Empty;
@@ -25,45 +26,80 @@ namespace EBISX_POS.ViewModels.Manager
         [ObservableProperty]
         private string? _errorMessage;
 
-        public AddCategoryViewModel(IMenu menuService, Window window)
+        [ObservableProperty]
+        private string _windowTitle = "Add New Category";
+
+        [ObservableProperty]
+        private string _buttonText = "Add Category";
+
+        public AddCategoryViewModel(IMenu menuService, Window window, Category? category)
         {
             _menuService = menuService;
             _window = window;
+            _category = category;
+
+            // If category is provided, we're editing
+            if (_category != null)
+            {
+                WindowTitle = "Edit Category";
+                ButtonText = "Update";
+                CategoryName = _category.CtgryName;
+            }
         }
 
         [RelayCommand]
         private async Task AddCategory()
         {
-            Debug.WriteLine("→ Add Category started");
+            Debug.WriteLine("→ Add/Edit Category started");
             if (string.IsNullOrWhiteSpace(CategoryName))
             {
-                ShowError("All fields are required");
+                ShowError("Category name is required");
                 return;
             }
 
             try
             {
-                var newCategory = new Category
+                if (_category == null)
                 {
-                    CtgryName = CategoryName,
-                };
+                    // Adding new category
+                    var newCategory = new Category
+                    {
+                        CtgryName = CategoryName,
+                    };
 
-                var (isSuccess, message, _) = await _menuService.AddCategory(newCategory, CashierState.ManagerEmail!);
-                
-                if (isSuccess)
-                {
-                    await ShowSuccess(message);
-                    _window.Close();
+                    var (isSuccess, message, _) = await _menuService.AddCategory(newCategory, CashierState.ManagerEmail!);
+                    
+                    if (isSuccess)
+                    {
+                        await ShowSuccess(message);
+                        _window.Close();
+                    }
+                    else
+                    {
+                        ShowError(message);
+                    }
                 }
                 else
                 {
-                    ShowError(message);
+                    // Editing existing category
+                    _category.CtgryName = CategoryName;
+                    var (isSuccess, message) = await _menuService.UpdateCategory(_category, CashierState.ManagerEmail!);
+                    
+                    if (isSuccess)
+                    {
+                        await ShowSuccess(message);
+                        _window.Close();
+                    }
+                    else
+                    {
+                        ShowError(message);
+                    }
                 }
             }
             catch (Exception ex)
             {
                 ShowError(ex.Message);
-                Debug.WriteLine($"❌ AddUser exception: {ex}");
+                Debug.WriteLine($"❌ Add/Edit Category exception: {ex}");
             }
         }
 

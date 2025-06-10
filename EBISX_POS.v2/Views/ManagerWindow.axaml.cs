@@ -258,7 +258,7 @@ namespace EBISX_POS.Views
                                                : message);
                     return;
                 }
-
+                Debug.WriteLine("Data pushed successfully to the server: " + message);
                 await ShowMessageAsync("Success", "Data pushed to the server successfully!");
             }
             catch (Exception ex)

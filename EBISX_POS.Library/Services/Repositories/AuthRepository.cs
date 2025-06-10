@@ -220,18 +220,26 @@ namespace EBISX_POS.API.Services.Repositories
                     return (false, "No menu items found in the API response.");
                 }
 
-                // Get unique categories from the API data
-                var categories = response.AllUsers
-                    .Select(x => x.ItemGroup)
-                    .Distinct()
-                    .Select(categoryName => new Category { CtgryName = categoryName })
+                // Get unique categories from the API data with case-insensitive deduplication
+                var uniqueCategories = response.AllUsers
+                    .Select(x => x.ItemGroup?.Trim())
+                    .Where(x => !string.IsNullOrWhiteSpace(x))
+                    .GroupBy(x => x.ToLower())
+                    .Select(g => g.First()) // Take the first occurrence of each case-insensitive group
                     .ToList();
 
-                // Add new categories to database
-                foreach (var category in categories)
+                // Add new categories to database with case-insensitive checking
+                foreach (var categoryName in uniqueCategories)
                 {
-                    if (!await _dataContext.Category.AnyAsync(c => c.CtgryName == category.CtgryName))
+                    var normalizedCategoryName = categoryName.Trim();
+                    
+                    // Use client-side evaluation for case-insensitive comparison
+                    var existingCategories = await _dataContext.Category.ToListAsync();
+                    var exists = existingCategories.Any(c => c.CtgryName.ToUpper() == normalizedCategoryName.ToUpper());
+                    
+                    if (!exists)
                     {
+                        var category = new Category { CtgryName = normalizedCategoryName.ToUpper() };
                         await _dataContext.Category.AddAsync(category);
                     }
                 }
@@ -243,7 +251,23 @@ namespace EBISX_POS.API.Services.Repositories
                 // Process menu items
                 foreach (var item in response.AllUsers)
                 {
-                    var category = dbCategories.First(c => c.CtgryName == item.ItemGroup);
+                    if (string.IsNullOrWhiteSpace(item.ItemGroup))
+                    {
+                        continue; // Skip items without category
+                    }
+
+                    // Find the category with case-insensitive comparison using client-side evaluation
+                    var category = dbCategories.FirstOrDefault(c => 
+                        c.CtgryName.ToLower() == item.ItemGroup.Trim().ToLower());
+                    
+                    if (category == null)
+                    {
+                        // This shouldn't happen, but if it does, create the category
+                        category = new Category { CtgryName = item.ItemGroup.Trim() };
+                        await _dataContext.Category.AddAsync(category);
+                        await _dataContext.SaveChangesAsync();
+                        dbCategories.Add(category);
+                    }
 
                     // Check if menu item already exists
                     var existingMenu = await _dataContext.Menu

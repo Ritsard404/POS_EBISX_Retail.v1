@@ -30,4 +30,12 @@ public partial class CategoryWindow : Window
             await ViewModel.RemoveCategory(category);
         }
     }
+
+    private async void EditButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        if (sender is Button button && button.Tag is Category category)
+        {
+            await ViewModel.EditCategory(category);
+        }
+    }
 }

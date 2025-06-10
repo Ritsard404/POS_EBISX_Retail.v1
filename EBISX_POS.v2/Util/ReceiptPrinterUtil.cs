@@ -292,14 +292,15 @@ namespace EBISX_POS.Util
             var content = new StringBuilder();
 
             // Header
-            content.AppendLine(new string('=', ReceiptWidth));
-            content.AppendLine(CenterText("INVOICE"));
-            content.AppendLine(new string('=', ReceiptWidth));
-            content.AppendLine(CenterText(finalizeOrder.RegisteredName));
-            content.AppendLine(CenterText(finalizeOrder.Address));
-            content.AppendLine(CenterText($"TIN: {finalizeOrder.VatTinNumber}"));
-            content.AppendLine(CenterText($"MIN: {finalizeOrder.MinNumber}"));
-            content.AppendLine(new string('-', ReceiptWidth));
+            //content.AppendLine(new string('=', ReceiptWidth));
+            //content.AppendLine(CenterText("INVOICE"));
+            //content.AppendLine(new string('=', ReceiptWidth));
+            //content.AppendLine(CenterText(finalizeOrder.RegisteredName));
+            //content.AppendLine(CenterText(finalizeOrder.Address));
+            //content.AppendLine(CenterText($"TIN: {finalizeOrder.VatTinNumber}"));
+            //content.AppendLine(CenterText($"MIN: {finalizeOrder.MinNumber}"));
+            //content.AppendLine(new string('-', ReceiptWidth));
+            content.AppendLine(CenterText("Acknowledgment of Payment Received"));
             content.AppendLine();
 
             // Invoice details
@@ -392,16 +393,16 @@ namespace EBISX_POS.Util
             }
 
             // Footer
-            content.AppendLine(CenterText("Sales Invoice"));
-            content.AppendLine(CenterText("Arsene Software"));
-            content.AppendLine(CenterText("Labangon, Cebu"));
-            content.AppendLine(CenterText($"TIN: {finalizeOrder.VatTinNumber}"));
-            content.AppendLine(CenterText($"Issued: {finalizeOrder.DateIssued:d}"));
-            content.AppendLine(CenterText($"Valid: {finalizeOrder.ValidUntil:d}"));
-            content.AppendLine();
-            content.AppendLine(new string('=', ReceiptWidth));
-            content.AppendLine(CenterText("Thank you!"));
-            content.AppendLine(new string('=', ReceiptWidth));
+            //content.AppendLine(CenterText("Sales Invoice"));
+            //content.AppendLine(CenterText("Arsene Software"));
+            //content.AppendLine(CenterText("Labangon, Cebu"));
+            //content.AppendLine(CenterText($"TIN: {finalizeOrder.VatTinNumber}"));
+            //content.AppendLine(CenterText($"Issued: {finalizeOrder.DateIssued:d}"));
+            //content.AppendLine(CenterText($"Valid: {finalizeOrder.ValidUntil:d}"));
+            //content.AppendLine();
+            //content.AppendLine(new string('=', ReceiptWidth));
+            //content.AppendLine(CenterText("Thank you!"));
+            //content.AppendLine(new string('=', ReceiptWidth));
             content.AppendLine();
 
             if (TenderState.tenderOrder.HasOrderDiscount || TenderState.ElligiblePWDSCDiscount?.Any() == true || TenderState.tenderOrder.HasOtherPayments)
@@ -471,11 +472,12 @@ namespace EBISX_POS.Util
             content.AppendLine(new string('=', ReceiptWidth));
             var invoiceTitle = "INVOICE" + (status != "Paid" ? $" {status.ToUpper()}" : "");
             content.AppendLine(CenterText(invoiceTitle));
-            content.AppendLine(new string('=', ReceiptWidth));
-            content.AppendLine(CenterText(invoice.RegisteredName));
-            content.AppendLine(CenterText(invoice.Address));
-            content.AppendLine(CenterText($"TIN: {invoice.VatTinNumber}"));
-            content.AppendLine(CenterText($"MIN: {invoice.MinNumber}"));
+            //content.AppendLine(new string('=', ReceiptWidth));
+            //content.AppendLine(CenterText(invoice.RegisteredName));
+            //content.AppendLine(CenterText(invoice.Address));
+            //content.AppendLine(CenterText($"TIN: {invoice.VatTinNumber}"));
+            //content.AppendLine(CenterText($"MIN: {invoice.MinNumber}"));
+            content.AppendLine(CenterText("Acknowledgment of Payment Received"));
             content.AppendLine(new string('-', ReceiptWidth));
             content.AppendLine();
 
@@ -558,13 +560,13 @@ namespace EBISX_POS.Util
             }
 
             // Footer
-            content.AppendLine(CenterText("Sales Invoice"));
-            content.AppendLine(CenterText("Arsene Software"));
-            content.AppendLine(CenterText("Labangon, Cebu"));
-            content.AppendLine(CenterText($"TIN: {invoice.VatTinNumber}"));
-            content.AppendLine(CenterText($"Issued: {invoice.DateIssued:d}"));
-            content.AppendLine(CenterText($"Valid: {invoice.ValidUntil:d}"));
-            content.AppendLine();
+            //content.AppendLine(CenterText("Sales Invoice"));
+            //content.AppendLine(CenterText("Arsene Software"));
+            //content.AppendLine(CenterText("Labangon, Cebu"));
+            //content.AppendLine(CenterText($"TIN: {invoice.VatTinNumber}"));
+            //content.AppendLine(CenterText($"Issued: {invoice.DateIssued:d}"));
+            //content.AppendLine(CenterText($"Valid: {invoice.ValidUntil:d}"));
+            //content.AppendLine();
             content.AppendLine(new string('=', ReceiptWidth));
             content.AppendLine(CenterText("Thank you!"));
             content.AppendLine(new string('=', ReceiptWidth));
