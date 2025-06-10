@@ -300,7 +300,7 @@ namespace EBISX_POS.Util
             //content.AppendLine(CenterText($"TIN: {finalizeOrder.VatTinNumber}"));
             //content.AppendLine(CenterText($"MIN: {finalizeOrder.MinNumber}"));
             //content.AppendLine(new string('-', ReceiptWidth));
-            content.AppendLine(CenterText("Acknowledgment of Payment Received"));
+            content.AppendLine(CenterText("Acknowledgment Reciept"));
             content.AppendLine();
 
             // Invoice details
@@ -477,7 +477,7 @@ namespace EBISX_POS.Util
             //content.AppendLine(CenterText(invoice.Address));
             //content.AppendLine(CenterText($"TIN: {invoice.VatTinNumber}"));
             //content.AppendLine(CenterText($"MIN: {invoice.MinNumber}"));
-            content.AppendLine(CenterText("Acknowledgment of Payment Received"));
+            content.AppendLine(CenterText("Acknowledgment Reciept"));
             content.AppendLine(new string('-', ReceiptWidth));
             content.AppendLine();
 
