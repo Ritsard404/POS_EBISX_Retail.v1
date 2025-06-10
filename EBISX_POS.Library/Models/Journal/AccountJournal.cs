@@ -160,6 +160,9 @@ namespace EBISX_POS.API.Models.Journal
         [Column("sub_total")]
         public double? SubTotal { get; set; } = 0;  // DEFAULT '0'
 
+        [Column("gross_total")]
+        public double? GrossTotal { get; set; } = 0;  // DEFAULT '0'
+
         [Column("serial")]
         public string? Serial { get; set; }  // TEXT, nullable
 

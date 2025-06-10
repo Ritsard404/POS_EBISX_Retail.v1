@@ -109,7 +109,7 @@ namespace EBISX_POS.API.Services.Repositories
                                    ?? item.AddOn?.MenuName
                                    ?? item.Meal?.Menu?.MenuName // if Meal points to another Item
                                    ?? "Unknown";
-                    
+
                     var description = item.Menu != null ? "Menu"
                                      : item.Drink != null ? "Drink"
                                      : item.AddOn != null ? "Add-On"
@@ -130,12 +130,12 @@ namespace EBISX_POS.API.Services.Repositories
                         EntryName = "1",
                         AccountName = accountName,
                         EntryDate = item.createdAt.DateTime,
-                        Description = "Product",
+                        Description = item.Menu?.PrivateId ?? "",
                         QtyOut = item.ItemQTY,
                         Price = Convert.ToDouble(item.ItemPrice),
                         Cashier = order.Cashier?.UserEmail ?? "Unknown Cashier",
-                        ItemID = item.Id.ToString(),
-                        QtyPerBaseUnit = item.ItemQTY,
+                        ItemID = item.Menu?.PrivateId ?? "",
+                        QtyPerBaseUnit = 1,
                         Unit = unit,
                     };
 
@@ -432,27 +432,27 @@ namespace EBISX_POS.API.Services.Repositories
             var journals = new List<AccountJournal>();
 
             // 1) Discount line (EntryLineNo = 9)
-            if (order.DiscountAmount > 0)
-            {
-                var discountAccount = !string.IsNullOrWhiteSpace(order.DiscountType)
-                    ? order.DiscountType
-                    : "Discount";
+            //if (order.DiscountAmount > 0)
+            //{
+            //    var discountAccount = !string.IsNullOrWhiteSpace(order.DiscountType)
+            //        ? order.DiscountType
+            //        : "Discount";
 
-                journals.Add(new AccountJournal
-                {
-                    EntryNo = order.InvoiceNumber,
-                    EntryLineNo = 10,
-                    EntryName = "1",
-                    Reference = order.InvoiceNumber.ToString("D12") ?? "",
-                    Status = order.IsCancelled ? "Unposted" : order.IsReturned ? "Returned" : "Posted",
-                    AccountName = discountAccount,
-                    Description = "Discount",
-                    Debit = order.IsReturned ? 0 : Convert.ToDouble(order.DiscountAmount),
-                    Credit = order.IsReturned ? Convert.ToDouble(order.DiscountAmount) : 0,
-                    EntryDate = order.CreatedAt.DateTime,
-                    Cashier = order.Cashier?.UserEmail ?? "Unknown Cashier"
-                });
-            }
+            //    journals.Add(new AccountJournal
+            //    {
+            //        EntryNo = order.InvoiceNumber,
+            //        EntryLineNo = 10,
+            //        EntryName = "1",
+            //        Reference = order.InvoiceNumber.ToString("D12") ?? "",
+            //        Status = order.IsCancelled ? "Unposted" : order.IsReturned ? "Returned" : "Posted",
+            //        AccountName = discountAccount,
+            //        Description = "Discount",
+            //        Debit = order.IsReturned ? 0 : Convert.ToDouble(order.DiscountAmount),
+            //        Credit = order.IsReturned ? Convert.ToDouble(order.DiscountAmount) : 0,
+            //        EntryDate = order.CreatedAt.DateTime,
+            //        Cashier = order.Cashier?.UserEmail ?? "Unknown Cashier"
+            //    });
+            //}
 
             // 2) Total line (EntryLineNo = 10)
             journals.Add(new AccountJournal
@@ -467,50 +467,58 @@ namespace EBISX_POS.API.Services.Repositories
                 Debit = order.IsReturned ? 0 : Convert.ToDouble(order.TotalAmount),
                 Credit = order.IsReturned ? Convert.ToDouble(order.TotalAmount) : 0,
                 EntryDate = order.CreatedAt.DateTime,
-                Cashier = order.Cashier?.UserEmail ?? "Unknown Cashier"
-            });
-
-            journals.Add(new AccountJournal
-            {
-                EntryNo = order.InvoiceNumber,
-                Reference = order.InvoiceNumber.ToString("D12") ?? "",
-                EntryLineNo = 10,
-                EntryName = "1",
-                Status = order.IsCancelled ? "Unposted" : order.IsReturned ? "Returned" : "Posted",
-                AccountName = "VAT",
-                Description = "VAT Amount",
-                Vatable = Convert.ToDouble(order.VatAmount),
-                EntryDate = order.CreatedAt.DateTime,
-                Cashier = order.Cashier?.UserEmail ?? "Unknown Cashier"
-            });
-
-            journals.Add(new AccountJournal
-            {
-                EntryNo = order.InvoiceNumber,
-                Reference = order.InvoiceNumber.ToString("D12") ?? "",
-                EntryLineNo = 10,
-                EntryName = "1",
-                Status = order.IsCancelled ? "Unposted" : order.IsReturned ? "Returned" : "Posted",
-                AccountName = "VAT Exempt",
-                Description = "VAT Exempt Amount",
-                Vatable = Convert.ToDouble(order.VatExempt),
-                EntryDate = order.CreatedAt.DateTime,
-                Cashier = order.Cashier?.UserEmail ?? "Unknown Cashier"
-            });
-
-            journals.Add(new AccountJournal
-            {
-                EntryNo = order.InvoiceNumber,
-                Reference = order.InvoiceNumber.ToString("D12") ?? "",
-                EntryLineNo = 10,
-                EntryName = "1",
-                Status = order.IsCancelled ? "Unposted" : order.IsReturned ? "Returned" : "Posted",
-                AccountName = "SubTotal",
-                Description = "Order SubTotal",
+                Cashier = order.Cashier?.UserEmail ?? "Unknown Cashier",
+                AccountBalance = (order.IsReturned ? 0 : Convert.ToDouble(order.TotalAmount)) - (order.IsReturned ? Convert.ToDouble(order.TotalAmount) : 0),
                 SubTotal = Convert.ToDouble(order.DueAmount),
-                EntryDate = order.CreatedAt.DateTime,
-                Cashier = order.Cashier?.UserEmail ?? "Unknown Cashier"
+                TaxTotal = Convert.ToDouble(order.VatAmount),
+                GrossTotal = Convert.ToDouble(order.TotalAmount),
+                DiscAmt = Convert.ToDouble(order.DiscountAmount),
+                
+                 
+
             });
+
+            //journals.Add(new AccountJournal
+            //{
+            //    EntryNo = order.InvoiceNumber,
+            //    Reference = order.InvoiceNumber.ToString("D12") ?? "",
+            //    EntryLineNo = 10,
+            //    EntryName = "1",
+            //    Status = order.IsCancelled ? "Unposted" : order.IsReturned ? "Returned" : "Posted",
+            //    AccountName = "VAT",
+            //    Description = "VAT Amount",
+            //    Vatable = Convert.ToDouble(order.VatAmount),
+            //    EntryDate = order.CreatedAt.DateTime,
+            //    Cashier = order.Cashier?.UserEmail ?? "Unknown Cashier"
+            //});
+
+            //journals.Add(new AccountJournal
+            //{
+            //    EntryNo = order.InvoiceNumber,
+            //    Reference = order.InvoiceNumber.ToString("D12") ?? "",
+            //    EntryLineNo = 10,
+            //    EntryName = "1",
+            //    Status = order.IsCancelled ? "Unposted" : order.IsReturned ? "Returned" : "Posted",
+            //    AccountName = "VAT Exempt",
+            //    Description = "VAT Exempt Amount",
+            //    Vatable = Convert.ToDouble(order.VatExempt),
+            //    EntryDate = order.CreatedAt.DateTime,
+            //    Cashier = order.Cashier?.UserEmail ?? "Unknown Cashier"
+            //});
+
+            //journals.Add(new AccountJournal
+            //{
+            //    EntryNo = order.InvoiceNumber,
+            //    Reference = order.InvoiceNumber.ToString("D12") ?? "",
+            //    EntryLineNo = 10,
+            //    EntryName = "1",
+            //    Status = order.IsCancelled ? "Unposted" : order.IsReturned ? "Returned" : "Posted",
+            //    AccountName = "SubTotal",
+            //    Description = "Order SubTotal",
+            //    SubTotal = Convert.ToDouble(order.DueAmount),
+            //    EntryDate = order.CreatedAt.DateTime,
+            //    Cashier = order.Cashier?.UserEmail ?? "Unknown Cashier"
+            //});
 
             if (!journals.Any())
             {
@@ -540,7 +548,7 @@ namespace EBISX_POS.API.Services.Repositories
                 var endOfDay = startOfDay.AddDays(1);
                 alreadyPushedQuery = alreadyPushedQuery.Where(j => j.EntryDate >= startOfDay && j.EntryDate < endOfDay);
                 alreadyPushedQuery = alreadyPushedQuery.Where(j => j.Cleared == "Y");
-                
+
                 var alreadyPushedCount = await alreadyPushedQuery.CountAsync();
                 if (alreadyPushedCount > 0)
                 {
@@ -574,7 +582,7 @@ namespace EBISX_POS.API.Services.Repositories
                 for (int i = 0; i < journals.Count; i++)
                 {
                     var journal = journals[i];
-                    
+
                     try
                     {
                         // Report progress before each request
@@ -613,10 +621,10 @@ namespace EBISX_POS.API.Services.Repositories
                             CustomerName = journal.NameDesc ?? "",
                             SubTotal = journal.SubTotal?.ToString() ?? "0.00",
                             TotalTax = journal.TaxTotal?.ToString() ?? "0.00",
-                            GrossTotal = journal.TotalPrice?.ToString() ?? "0.00",
+                            GrossTotal = journal.GrossTotal?.ToString() ?? "0.00",
                             Discount_Type = journal.EntryName ?? "", //
                             Discount_Amount = journal.DiscAmt?.ToString() ?? "0.00",
-                            NetPayable = journal.TotalPrice?.ToString() ?? "0.00",
+                            NetPayable = (journal.GrossTotal - journal.DiscAmt)?.ToString() ?? "0.00",
                             Status = journal.Status,
                             User_Email = journal.Cashier ?? "",
                             QtyPerBaseUnit = journal.QtyPerBaseUnit?.ToString() ?? "1",
@@ -672,13 +680,13 @@ namespace EBISX_POS.API.Services.Repositories
                         // Make the GET request with timeout
                         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30)); // 30 second timeout per request
                         var response = await _httpClient.GetAsync(url, cts.Token);
-                        
+
                         if (response.IsSuccessStatusCode)
                         {
                             successCount++;
                             // Mark as pushed by setting Cleared to "Y"
                             journal.Cleared = "Y";
-                            
+
                             // Report success progress
                             progress?.Report((i + 1, totalCount, $"Successfully pushed journal {journal.UniqueId}"));
                         }
@@ -686,16 +694,16 @@ namespace EBISX_POS.API.Services.Repositories
                         {
                             errorCount++;
                             errors.Add($"Failed to push journal {journal.UniqueId}: {response.StatusCode} - {response.ReasonPhrase}");
-                            
+
                             // Report error progress
                             progress?.Report((i + 1, totalCount, $"Failed to push journal {journal.UniqueId}: {response.StatusCode}"));
                         }
 
-                        // Wait 10 seconds between requests (except for the last one)
+                        // Wait 3 seconds between requests (except for the last one)
                         if (i < journals.Count - 1)
                         {
-                            progress?.Report((i + 1, totalCount, "Waiting 5 seconds before next request..."));
-                            await Task.Delay(5000); // 5 seconds
+                            progress?.Report((i + 1, totalCount, "Waiting 3 seconds before next request..."));
+                            await Task.Delay(3000); // 3 seconds
                         }
                     }
                     catch (OperationCanceledException)
