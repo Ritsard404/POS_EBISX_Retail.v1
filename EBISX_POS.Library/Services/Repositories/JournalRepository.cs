@@ -123,6 +123,7 @@ namespace EBISX_POS.API.Services.Repositories
                         Cashier = order.Cashier?.UserEmail ?? "Unknown Cashier",
                         ItemID = item.Id.ToString(),
                         QtyPerBaseUnit = item.ItemQTY,
+                        Unit = item.Menu?.BaseUnit?.ToString() ?? "",
                     };
 
                     journals.Add(journal);
@@ -621,7 +622,7 @@ namespace EBISX_POS.API.Services.Repositories
 
                         // Make the GET request
                         var response = await _httpClient.GetAsync(url);
-                        
+
                         if (response.IsSuccessStatusCode)
                         {
                             successCount++;
@@ -706,10 +707,10 @@ namespace EBISX_POS.API.Services.Repositories
                         await _journal.Database.ExecuteSqlRawAsync("DELETE FROM AccountJournal;");
                         await _journal.Database.ExecuteSqlRawAsync("DELETE FROM sqlite_sequence WHERE name = 'AccountJournal';");
                         await _journal.Database.ExecuteSqlRawAsync("PRAGMA foreign_keys = ON;");
-                        
+
                         await _journal.SaveChangesAsync();
                         await journalTrans.CommitAsync();
-                        
+
                     }
                     catch (Exception ex)
                     {
