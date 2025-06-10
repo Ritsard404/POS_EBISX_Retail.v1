@@ -127,7 +127,7 @@ namespace EBISX_POS.API.Services.Repositories
                         Reference = order.InvoiceNumber.ToString("D12") ?? "",
                         EntryLineNo = 3, // Adjust if needed
                         Status = item.IsVoid ? "Unposted" : order.IsReturned ? "Returned" : "Posted",
-                        EntryName = item.EntryId ?? "",
+                        EntryName = "1",
                         AccountName = accountName,
                         EntryDate = item.createdAt.DateTime,
                         Description = "Product",
@@ -695,7 +695,7 @@ namespace EBISX_POS.API.Services.Repositories
                         if (i < journals.Count - 1)
                         {
                             progress?.Report((i + 1, totalCount, "Waiting 5 seconds before next request..."));
-                            await Task.Delay(5000); // 10 seconds
+                            await Task.Delay(5000); // 5 seconds
                         }
                     }
                     catch (OperationCanceledException)
