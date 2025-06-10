@@ -103,11 +103,23 @@ namespace EBISX_POS.API.Services.Repositories
 
                 foreach (var item in order.Items)
                 {
-                    var accountName = item.Menu?.MenuName ?? item.Drink?.MenuName ?? item.AddOn?.MenuName ?? "Unknown";
+
+                    var accountName = item.Menu?.MenuName
+                                   ?? item.Drink?.MenuName
+                                   ?? item.AddOn?.MenuName
+                                   ?? item.Meal?.Menu?.MenuName // if Meal points to another Item
+                                   ?? "Unknown";
+                    
                     var description = item.Menu != null ? "Menu"
                                      : item.Drink != null ? "Drink"
                                      : item.AddOn != null ? "Add-On"
                                      : "Unknown";
+
+                    var unit = item.Menu?.BaseUnit
+                            ?? item.Drink?.BaseUnit
+                            ?? item.AddOn?.BaseUnit
+                            ?? item.Meal?.Menu?.BaseUnit // only if Meal wraps a Menu
+                            ?? "";
 
                     var journal = new AccountJournal
                     {
@@ -117,13 +129,13 @@ namespace EBISX_POS.API.Services.Repositories
                         EntryName = item.EntryId ?? "",
                         AccountName = accountName,
                         EntryDate = item.createdAt.DateTime,
-                        Description = description,
+                        Description = "Product",
                         QtyOut = item.ItemQTY,
                         Price = Convert.ToDouble(item.ItemPrice),
                         Cashier = order.Cashier?.UserEmail ?? "Unknown Cashier",
                         ItemID = item.Id.ToString(),
                         QtyPerBaseUnit = item.ItemQTY,
-                        Unit = item.Menu?.BaseUnit?.ToString() ?? "",
+                        Unit = unit,
                     };
 
                     journals.Add(journal);
