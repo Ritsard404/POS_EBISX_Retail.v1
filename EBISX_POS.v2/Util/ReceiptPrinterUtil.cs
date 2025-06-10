@@ -292,9 +292,10 @@ namespace EBISX_POS.Util
             var content = new StringBuilder();
 
             // Header
-            //content.AppendLine(new string('=', ReceiptWidth));
+            content.AppendLine(new string('=', ReceiptWidth));
             //content.AppendLine(CenterText("INVOICE"));
-            //content.AppendLine(new string('=', ReceiptWidth));
+            content.AppendLine(CenterText("Acknowledgment Reciept"));
+            content.AppendLine(new string('=', ReceiptWidth));
             //content.AppendLine(CenterText(finalizeOrder.RegisteredName));
             //content.AppendLine(CenterText(finalizeOrder.Address));
             //content.AppendLine(CenterText($"TIN: {finalizeOrder.VatTinNumber}"));
@@ -470,9 +471,11 @@ namespace EBISX_POS.Util
 
             // Header
             content.AppendLine(new string('=', ReceiptWidth));
+            content.AppendLine(CenterText("Acknowledgment Reciept"));
+            content.AppendLine();
             var invoiceTitle = "INVOICE" + (status != "Paid" ? $" {status.ToUpper()}" : "");
             content.AppendLine(CenterText(invoiceTitle));
-            //content.AppendLine(new string('=', ReceiptWidth));
+            content.AppendLine(new string('=', ReceiptWidth));
             //content.AppendLine(CenterText(invoice.RegisteredName));
             //content.AppendLine(CenterText(invoice.Address));
             //content.AppendLine(CenterText($"TIN: {invoice.VatTinNumber}"));
