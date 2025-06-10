@@ -308,6 +308,16 @@
 										<TextBlock FontSize="30" Text="Load Data"/>
 									</StackPanel>
 								</Button>
+								<Button Classes="myButton"
+										x:Name="PushDataButton"
+										Click="PushData_Click"
+										Grid.Column="1">
+									<StackPanel VerticalAlignment="Center"
+												Orientation="Vertical"
+												Spacing="5">
+										<TextBlock FontSize="30" Text="Push Data"/>
+									</StackPanel>
+								</Button>
 							</Grid>
 						</StackPanel>
 					</ScrollViewer>

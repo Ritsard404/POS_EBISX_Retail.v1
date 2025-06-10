@@ -439,5 +439,8 @@ namespace EBISX_POS.API.Models.Journal
         [Required]
         [Column("company_id")]
         public string CompanyId { get; set; } = "";  // NOT NULL, DEFAULT ''
+
+        [Column("cashier")]
+        public string Cashier { get; set; } = "";
     }
 }

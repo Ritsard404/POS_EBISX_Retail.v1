@@ -10,7 +10,7 @@ using System.Security.Cryptography;
 
 namespace EBISX_POS.API.Services.Repositories
 {
-    public class AuthRepository(DataContext _dataContext, IServiceProvider _services) : IAuth
+    public class AuthRepository(DataContext _dataContext) : IAuth
     {
         private static readonly HttpClient _httpClient = new()
         {

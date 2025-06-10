@@ -22,6 +22,7 @@ using Avalonia;
 using Avalonia.Interactivity;
 using EBISX_POS.v2.Views;
 using EBISX_POS.Helper;
+using EBISX_POS.API.Services.Interfaces;
 
 namespace EBISX_POS.Views
 {
@@ -32,6 +33,7 @@ namespace EBISX_POS.Views
         private readonly IServiceProvider? _serviceProvider;
         private readonly MenuService _menuService;
         private readonly AuthService _authService;
+        private readonly IJournal _journalService;
 
         // Constructor with IServiceProvider parameter
         public ManagerWindow(IServiceProvider serviceProvider)
@@ -42,6 +44,7 @@ namespace EBISX_POS.Views
             _serviceProvider = serviceProvider;
 
             // fetch only what we actually need
+            _journalService = serviceProvider.GetRequiredService<IJournal>();
             _menuService = serviceProvider.GetRequiredService<MenuService>();
             _authService = serviceProvider.GetRequiredService<AuthService>();
             _cashTrackReportPath = serviceProvider
@@ -72,6 +75,7 @@ namespace EBISX_POS.Views
 
             PosInfo.IsEnabled = CashierState.ManagerEmail == "EBISX@POS.com";
             LoadDataButton.IsEnabled = CashierState.ManagerEmail == "EBISX@POS.com";
+            PushDataButton.IsEnabled = CashierState.ManagerEmail == "EBISX@POS.com";
         }
         public ManagerWindow() : this(App.Current.Services.GetRequiredService<IServiceProvider>())
         { }
@@ -222,6 +226,40 @@ namespace EBISX_POS.Views
                 }
 
                 await PostLoadFlowAsync();
+            }
+            catch (Exception ex)
+            {
+                // log or report ex
+                await ShowMessageAsync("Error", "Sorry, something went wrong.");
+            }
+            finally
+            {
+                ShowLoader(false);
+            }
+        }
+        private async void PushData_Click(object? sender, RoutedEventArgs e)
+        {
+            ShowLoader(true);
+            try
+            {
+                if (!await NetworkHelper.IsOnlineAsync())
+                {
+                    await ShowMessageAsync("No Internet Connection",
+                                           "Please check your network and try again.");
+                    return;  // loader will be hidden, window stays open
+                }
+
+                var (isSuccess, message) = await _journalService.PushAccountJournals();
+                if (!isSuccess)
+                {
+                    await ShowMessageAsync("Push Failed",
+                                           string.IsNullOrWhiteSpace(message)
+                                               ? "An unknown error occurred."
+                                               : message);
+                    return;
+                }
+
+                await ShowMessageAsync("Success", "Data pushed to the server successfully!");
             }
             catch (Exception ex)
             {

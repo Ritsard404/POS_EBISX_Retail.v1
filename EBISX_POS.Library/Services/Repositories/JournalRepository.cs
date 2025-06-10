@@ -3,12 +3,19 @@ using EBISX_POS.API.Models;
 using EBISX_POS.API.Models.Journal;
 using EBISX_POS.API.Services.DTO.Journal;
 using EBISX_POS.API.Services.Interfaces;
+using EBISX_POS.Library.Services.DTO.Journal;
 using Microsoft.EntityFrameworkCore;
+using System.Net.Http.Json;
 
 namespace EBISX_POS.API.Services.Repositories
 {
     public class JournalRepository(JournalContext _journal, DataContext _dataContext) : IJournal
     {
+        private static readonly HttpClient _httpClient = new()
+        {
+            BaseAddress = new Uri("https://ebisx.com/")
+        };
+
         public async Task<List<AccountJournal>> AccountJournals()
         {
             return await _journal.AccountJournal.ToListAsync();
@@ -72,6 +79,7 @@ namespace EBISX_POS.API.Services.Repositories
                     .Include(o => o.Items)
                         .ThenInclude(i => i.Meal)
                     .Include(o => o.Coupon)
+                    .Include(o => o.Cashier)
                     .FirstOrDefaultAsync(o => o.Id == orderId);
 
                 if (order == null)
@@ -110,7 +118,10 @@ namespace EBISX_POS.API.Services.Repositories
                         EntryDate = item.createdAt.DateTime,
                         Description = description,
                         QtyOut = item.ItemQTY,
-                        Price = Convert.ToDouble(item.ItemPrice)
+                        Price = Convert.ToDouble(item.ItemPrice),
+                        Cashier = order.Cashier?.UserEmail ?? "Unknown Cashier",
+                        ItemID = item.Id.ToString(),
+                        QtyPerBaseUnit = item.ItemQTY,
                     };
 
                     journals.Add(journal);
@@ -180,7 +191,8 @@ namespace EBISX_POS.API.Services.Repositories
                         AccountName = pwdOrSc.Name,
                         Reference = pwdOrSc.OscaNum,
                         EntryDate = journalDTO.EntryDate,
-                        EntryName = journalDTO.IsPWD ? "PWD" : "Senior"
+                        EntryName = journalDTO.IsPWD ? "PWD" : "Senior",
+                        Cashier = order.Cashier?.UserEmail ?? "Unknown Cashier"
                     };
 
                     journals.Add(journal);
@@ -268,7 +280,8 @@ namespace EBISX_POS.API.Services.Repositories
                     AccountName = name,
                     Reference = osca,
                     EntryName = order.DiscountType ?? "",
-                    EntryDate = order.CreatedAt.DateTime
+                    EntryDate = order.CreatedAt.DateTime,
+                    Cashier = order.Cashier?.UserEmail ?? "Unknown Cashier"
                 };
 
                 journals.Add(journal);
@@ -330,7 +343,8 @@ namespace EBISX_POS.API.Services.Repositories
                     Description = "Cash Tendered",
                     Debit = order.IsReturned ? 0 : Convert.ToDouble(order.CashTendered),
                     Credit = order.IsReturned ? Convert.ToDouble(order.CashTendered) : 0,
-                    EntryDate = order.CreatedAt.DateTime
+                    EntryDate = order.CreatedAt.DateTime,
+                    Cashier = order.Cashier?.UserEmail ?? "Unknown Cashier"
                 });
             }
 
@@ -417,7 +431,8 @@ namespace EBISX_POS.API.Services.Repositories
                     Description = "Discount",
                     Debit = order.IsReturned ? 0 : Convert.ToDouble(order.DiscountAmount),
                     Credit = order.IsReturned ? Convert.ToDouble(order.DiscountAmount) : 0,
-                    EntryDate = order.CreatedAt.DateTime
+                    EntryDate = order.CreatedAt.DateTime,
+                    Cashier = order.Cashier?.UserEmail ?? "Unknown Cashier"
                 });
             }
 
@@ -432,7 +447,8 @@ namespace EBISX_POS.API.Services.Repositories
                 Description = "Order Total",
                 Debit = order.IsReturned ? 0 : Convert.ToDouble(order.TotalAmount),
                 Credit = order.IsReturned ? Convert.ToDouble(order.TotalAmount) : 0,
-                EntryDate = order.CreatedAt.DateTime
+                EntryDate = order.CreatedAt.DateTime,
+                Cashier = order.Cashier?.UserEmail ?? "Unknown Cashier"
             });
 
             journals.Add(new AccountJournal
@@ -444,7 +460,8 @@ namespace EBISX_POS.API.Services.Repositories
                 AccountName = "VAT",
                 Description = "Order VAT",
                 Vatable = Convert.ToDouble(order.VatAmount),
-                EntryDate = order.CreatedAt.DateTime
+                EntryDate = order.CreatedAt.DateTime,
+                Cashier = order.Cashier?.UserEmail ?? "Unknown Cashier"
             });
 
             journals.Add(new AccountJournal
@@ -456,7 +473,8 @@ namespace EBISX_POS.API.Services.Repositories
                 AccountName = "VAT Exempt",
                 Description = "Order VAT Exempt",
                 Vatable = Convert.ToDouble(order.VatExempt),
-                EntryDate = order.CreatedAt.DateTime
+                EntryDate = order.CreatedAt.DateTime,
+                Cashier = order.Cashier?.UserEmail ?? "Unknown Cashier"
             });
 
             journals.Add(new AccountJournal
@@ -468,7 +486,8 @@ namespace EBISX_POS.API.Services.Repositories
                 AccountName = "SubTotal",
                 Description = "Order SubTotal",
                 SubTotal = Convert.ToDouble(order.DueAmount),
-                EntryDate = order.CreatedAt.DateTime
+                EntryDate = order.CreatedAt.DateTime,
+                Cashier = order.Cashier?.UserEmail ?? "Unknown Cashier"
             });
 
             if (!journals.Any())
@@ -486,6 +505,163 @@ namespace EBISX_POS.API.Services.Repositories
             catch (Exception ex)
             {
                 return (false, $"An error occurred: {ex.Message}");
+            }
+        }
+
+        public async Task<(bool isSuccess, string message)> PushAccountJournals()
+        {
+            try
+            {
+                // Get all posted journal entries that haven't been pushed yet
+                var journals = await _journal.AccountJournal
+                    .ToListAsync();
+
+                if (!journals.Any())
+                {
+                    return (true, "No journal entries to push.");
+                }
+
+                var successCount = 0;
+                var errorCount = 0;
+                var errors = new List<string>();
+
+                foreach (var journal in journals)
+                {
+                    try
+                    {
+                        // Map AccountJournal to PushAccountJournalDTO
+                        var pushDto = new PushAccountJournalDTO
+                        {
+                            Entry_Type = journal.EntryType ?? "INVOICE",
+                            Entry_No = journal.EntryNo?.ToString() ?? "",
+                            Entry_Line_No = journal.EntryLineNo?.ToString() ?? "0",
+                            Entry_Date = journal.EntryDate.ToString("yyyy-MM-dd"),
+                            CostCenter = journal.CostCenter ?? "Store 1",
+                            ItemId = journal.ItemID ?? "",
+                            Unit = journal.Unit ?? "",
+                            Qty = journal.QtyOut?.ToString() ?? "0",
+                            Cost = journal.Cost?.ToString() ?? "0.00",
+                            Price = journal.Price?.ToString() ?? "0.00",
+                            TotalPrice = journal.TotalPrice?.ToString() ?? "0.00",
+                            Debit = journal.Debit?.ToString() ?? "0.00",
+                            Credit = journal.Credit?.ToString() ?? "0.00",
+                            AccountBalance = journal.AccountBalance?.ToString() ?? "0.00",
+                            Prev_Reading = journal.PrevReading.ToString(),
+                            Curr_Reading = journal.CurrReading.ToString(),
+                            Memo = journal.Memo ?? "",
+                            AccountName = journal.AccountName ?? "",
+                            Reference = journal.Reference ?? "",
+                            Entry_Name = journal.EntryName ?? "",
+                            Cashier = journal.Cashier ?? "",
+                            Count_Type = "", // Default value
+                            Deposited = "0", // Default value
+                            Deposit_Date = "",
+                            Deposit_Reference = "",
+                            Deposit_By = "",
+                            Deposit_Time = "00:00:00",
+                            CustomerName = journal.NameDesc ?? "",
+                            SubTotal = journal.SubTotal?.ToString() ?? "0.00",
+                            TotalTax = journal.TaxTotal?.ToString() ?? "0.00",
+                            GrossTotal = journal.TotalPrice?.ToString() ?? "0.00",
+                            Discount_Type = journal.EntryName ?? "",
+                            Discount_Amount = journal.DiscAmt?.ToString() ?? "0.00",
+                            NetPayable = journal.TotalPrice?.ToString() ?? "0.00",
+                            Status = journal.Status,
+                            User_Email = journal.Cashier ?? "",
+                            QtyPerBaseUnit = journal.QtyPerBaseUnit?.ToString() ?? "1",
+                            QtyBalanceInBaseUnit = journal.QtyBalanceInBaseUnit?.ToString() ?? "0"
+                        };
+
+                        // Build the query string
+                        var queryParams = new List<string>
+                        {
+                            $"entry_type={Uri.EscapeDataString(pushDto.Entry_Type)}",
+                            $"entry_no={Uri.EscapeDataString(pushDto.Entry_No)}",
+                            $"entry_line_no={Uri.EscapeDataString(pushDto.Entry_Line_No)}",
+                            $"entry_date={Uri.EscapeDataString(pushDto.Entry_Date)}",
+                            $"costcenter={Uri.EscapeDataString(pushDto.CostCenter)}",
+                            $"itemid={Uri.EscapeDataString(pushDto.ItemId)}",
+                            $"unit={Uri.EscapeDataString(pushDto.Unit)}",
+                            $"qty={Uri.EscapeDataString(pushDto.Qty)}",
+                            $"cost={Uri.EscapeDataString(pushDto.Cost)}",
+                            $"price={Uri.EscapeDataString(pushDto.Price)}",
+                            $"totalprice={Uri.EscapeDataString(pushDto.TotalPrice)}",
+                            $"debit={Uri.EscapeDataString(pushDto.Debit)}",
+                            $"credit={Uri.EscapeDataString(pushDto.Credit)}",
+                            $"accountbalance={Uri.EscapeDataString(pushDto.AccountBalance)}",
+                            $"prev_reading={Uri.EscapeDataString(pushDto.Prev_Reading)}",
+                            $"curr_reading={Uri.EscapeDataString(pushDto.Curr_Reading)}",
+                            $"memo={Uri.EscapeDataString(pushDto.Memo)}",
+                            $"accountname={Uri.EscapeDataString(pushDto.AccountName)}",
+                            $"reference={Uri.EscapeDataString(pushDto.Reference)}",
+                            $"entry_name={Uri.EscapeDataString(pushDto.Entry_Name)}",
+                            $"cashier={Uri.EscapeDataString(pushDto.Cashier)}",
+                            $"count_type={Uri.EscapeDataString(pushDto.Count_Type)}",
+                            $"deposited={Uri.EscapeDataString(pushDto.Deposited)}",
+                            $"deposit_date={Uri.EscapeDataString(pushDto.Deposit_Date)}",
+                            $"deposit_reference={Uri.EscapeDataString(pushDto.Deposit_Reference)}",
+                            $"deposit_by={Uri.EscapeDataString(pushDto.Deposit_By)}",
+                            $"deposit_time={Uri.EscapeDataString(pushDto.Deposit_Time)}",
+                            $"customername={Uri.EscapeDataString(pushDto.CustomerName)}",
+                            $"subtotal={Uri.EscapeDataString(pushDto.SubTotal)}",
+                            $"totaltax={Uri.EscapeDataString(pushDto.TotalTax)}",
+                            $"grosstotal={Uri.EscapeDataString(pushDto.GrossTotal)}",
+                            $"discount_type={Uri.EscapeDataString(pushDto.Discount_Type)}",
+                            $"discount_amount={Uri.EscapeDataString(pushDto.Discount_Amount)}",
+                            $"netpayable={Uri.EscapeDataString(pushDto.NetPayable)}",
+                            $"status={Uri.EscapeDataString(pushDto.Status)}",
+                            $"user_email={Uri.EscapeDataString(pushDto.User_Email)}",
+                            $"qtyperbaseunit={Uri.EscapeDataString(pushDto.QtyPerBaseUnit)}",
+                            $"qtybalanceinbaseunit={Uri.EscapeDataString(pushDto.QtyBalanceInBaseUnit)}"
+                        };
+
+                        var queryString = string.Join("&", queryParams);
+                        var url = $"asspos/mobilepostransactions.php?{queryString}";
+
+                        // Make the GET request
+                        var response = await _httpClient.GetAsync(url);
+                        
+                        if (response.IsSuccessStatusCode)
+                        {
+                            // Mark as cleared/pushed
+                            journal.Cleared = "Y";
+                            journal.ClearingRef = 1; // Indicate it has been pushed
+                            successCount++;
+                        }
+                        else
+                        {
+                            errorCount++;
+                            errors.Add($"Failed to push journal {journal.UniqueId}: {response.StatusCode} - {response.ReasonPhrase}");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        errorCount++;
+                        errors.Add($"Error pushing journal {journal.UniqueId}: {ex.Message}");
+                    }
+                }
+
+                // Save changes to mark successful pushes
+                if (successCount > 0)
+                {
+                    await _journal.SaveChangesAsync();
+                }
+
+                var message = $"Pushed {successCount} journal entries successfully.";
+                if (errorCount > 0)
+                {
+                    message += $" Failed to push {errorCount} entries. Errors: {string.Join("; ", errors.Take(5))}";
+                    if (errors.Count > 5)
+                    {
+                        message += $" and {errors.Count - 5} more...";
+                    }
+                }
+
+                return (successCount > 0, message);
+            }
+            catch (Exception ex)
+            {
+                return (false, $"An error occurred while pushing journal entries: {ex.Message}");
             }
         }
 

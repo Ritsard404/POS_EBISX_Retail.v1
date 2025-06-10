@@ -23,5 +23,6 @@ namespace EBISX_POS.API.Services.Interfaces
         Task<(bool isSuccess, string message)> TruncateOrders();
 
         Task<List<AccountJournal>> AccountJournals();
+        Task<(bool isSuccess, string message)> PushAccountJournals();
     }
 }
