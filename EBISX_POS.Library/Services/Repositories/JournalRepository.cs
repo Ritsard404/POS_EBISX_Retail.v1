@@ -469,7 +469,7 @@ namespace EBISX_POS.API.Services.Repositories
                 EntryDate = order.CreatedAt.DateTime,
                 Cashier = order.Cashier?.UserEmail ?? "Unknown Cashier",
                 AccountBalance = (order.IsReturned ? 0 : Convert.ToDouble(order.TotalAmount)) - (order.IsReturned ? Convert.ToDouble(order.TotalAmount) : 0),
-                SubTotal = Convert.ToDouble(order.DueAmount),
+                SubTotal = Convert.ToDouble(order.DueAmount - order.VatAmount),
                 TaxTotal = Convert.ToDouble(order.VatAmount),
                 GrossTotal = Convert.ToDouble(order.TotalAmount),
                 DiscAmt = Convert.ToDouble(order.DiscountAmount),
@@ -720,16 +720,17 @@ namespace EBISX_POS.API.Services.Repositories
                     }
                 }
 
+                // Create push data file after pushing is finished
+                progress?.Report((totalCount, totalCount, "Creating data file..."));
+                var dataFileResult = await CreatePushDataFile(selectedDate);
+                var dataFileMessage = dataFileResult.isSuccess ? $" Data file created: {dataFileResult.message}" : $" Failed to create data file: {dataFileResult.message}";
+
+
                 // Save changes to mark successful pushes
                 if (successCount > 0)
                 {
                     await _journal.SaveChangesAsync();
                 }
-
-                // Create push data file after pushing is finished
-                progress?.Report((totalCount, totalCount, "Creating data file..."));
-                var dataFileResult = await CreatePushDataFile(selectedDate);
-                var dataFileMessage = dataFileResult.isSuccess ? $" Data file created: {dataFileResult.message}" : $" Failed to create data file: {dataFileResult.message}";
 
                 var message = $"Pushed {successCount} journal entries successfully for {selectedDate:yyyy-MM-dd}.{dataFileMessage}";
                 if (errorCount > 0)
@@ -931,16 +932,16 @@ namespace EBISX_POS.API.Services.Repositories
 
                 var journals = await query.ToListAsync();
 
-                if (!journals.Any())
-                {
-                    var dateMsg1 = selectedDate.HasValue ? $" for {selectedDate.Value:yyyy-MM-dd}" : "";
-                    return (false, $"No journal entries found{dateMsg1}.");
-                }
+                //if (!journals.Any())
+                //{
+                //    var dateMsg1 = selectedDate.HasValue ? $" for {selectedDate.Value:yyyy-MM-dd}" : "";
+                //    return (false, $"No journal entries found{dateMsg1}.");
+                //}
 
                 // Map to PushAccountJournalDTO list
                 var pushList = journals.OrderBy(j => j.EntryNo).ThenBy(j => j.EntryLineNo).Select(journal => new PushAccountJournalDTO
                 {
-                    Entry_Type = journal.EntryType ?? "INVOICE",
+                    Entry_Type = "INVOICE",
                     Entry_No = journal.EntryNo?.ToString() ?? "",
                     Entry_Line_No = journal.EntryLineNo?.ToString() ?? "0",
                     Entry_Date = journal.EntryDate.ToString("yyyy-MM-dd"),
@@ -970,7 +971,7 @@ namespace EBISX_POS.API.Services.Repositories
                     CustomerName = journal.NameDesc ?? "",
                     SubTotal = journal.SubTotal?.ToString() ?? "0.00",
                     TotalTax = journal.TaxTotal?.ToString() ?? "0.00",
-                    GrossTotal = journal.TotalPrice?.ToString() ?? "0.00",
+                    GrossTotal = journal.GrossTotal?.ToString() ?? "0.00",
                     Discount_Type = journal.EntryName ?? "",
                     Discount_Amount = journal.DiscAmt?.ToString() ?? "0.00",
                     NetPayable = journal.TotalPrice?.ToString() ?? "0.00",

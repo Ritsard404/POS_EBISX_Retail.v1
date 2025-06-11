@@ -357,7 +357,7 @@ namespace EBISX_POS.Util
                 }
             }
             content.AppendLine(CenterText($"{"Cash:",-15}{TenderState.tenderOrder.CashTenderAmount.ToString("C", PesoCulture),17}"));
-            content.AppendLine(CenterText($"{"Total:",-15}{TenderState.tenderOrder.TenderAmount.ToString("C", PesoCulture),17}"));
+            content.AppendLine(CenterText($"{"Total Tender:",-15}{TenderState.tenderOrder.TenderAmount.ToString("C", PesoCulture),17}"));
             content.AppendLine(CenterText($"{"Change:",-15}{TenderState.tenderOrder.ChangeAmount.ToString("C", PesoCulture),17}"));
             content.AppendLine();
 
@@ -529,7 +529,7 @@ namespace EBISX_POS.Util
                 }
             }
             content.AppendLine(CenterText($"{"Cash:",-15}{FormatCurrency(invoice.CashTenderAmount),17}"));
-            content.AppendLine(CenterText($"{"Total:",-15}{FormatCurrency(invoice.TotalTenderAmount),17}"));
+            content.AppendLine(CenterText($"{"Total Tender:",-15}{FormatCurrency(invoice.TotalTenderAmount),17}"));
             content.AppendLine(CenterText($"{"Change:",-15}{FormatCurrency(invoice.ChangeAmount),17}"));
             content.AppendLine();
 

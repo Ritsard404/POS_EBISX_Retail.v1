@@ -19,7 +19,7 @@ namespace EBISX_POS.Views
 
         public async Task<DateTime?> ShowDialogAsync(Window owner, DateTime? defaultDate = null)
         {
-            // Do not create a new instance here — use 'this'
+            // Do not create a new instance here ï¿½ use 'this'
             if (defaultDate.HasValue)
             {
                 var picker = this.FindControl<DatePicker>("DatePickerControl");
