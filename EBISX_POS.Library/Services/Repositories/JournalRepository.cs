@@ -549,11 +549,11 @@ namespace EBISX_POS.API.Services.Repositories
                 alreadyPushedQuery = alreadyPushedQuery.Where(j => j.EntryDate >= startOfDay && j.EntryDate < endOfDay);
                 alreadyPushedQuery = alreadyPushedQuery.Where(j => j.Cleared == "Y");
 
-                var alreadyPushedCount = await alreadyPushedQuery.CountAsync();
-                if (alreadyPushedCount > 0)
-                {
-                    return (false, $"Data for {selectedDate:yyyy-MM-dd} has already been pushed. You can only push data once per day.");
-                }
+                //var alreadyPushedCount = await alreadyPushedQuery.CountAsync();
+                //if (alreadyPushedCount > 0)
+                //{
+                //    return (false, $"Data for {selectedDate:yyyy-MM-dd} has already been pushed. You can only push data once per day.");
+                //}
 
                 // Get all posted journal entries that haven't been pushed yet (Cleared != "Y")
                 var query = _journal.AccountJournal.AsQueryable();

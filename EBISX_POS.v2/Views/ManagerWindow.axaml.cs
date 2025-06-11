@@ -75,8 +75,8 @@ namespace EBISX_POS.Views
             LogOut.IsEnabled = !hasManager;
 
             PosInfo.IsEnabled = CashierState.ManagerEmail == "EBISX@POS.com";
-            LoadDataButton.IsEnabled = CashierState.ManagerEmail == "EBISX@POS.com";
-            PushDataButton.IsEnabled = CashierState.ManagerEmail == "EBISX@POS.com";
+            //LoadDataButton.IsEnabled = CashierState.ManagerEmail == "EBISX@POS.com";
+            //PushDataButton.IsEnabled = CashierState.ManagerEmail == "EBISX@POS.com";
         }
         public ManagerWindow() : this(App.Current.Services.GetRequiredService<IServiceProvider>())
         { }
