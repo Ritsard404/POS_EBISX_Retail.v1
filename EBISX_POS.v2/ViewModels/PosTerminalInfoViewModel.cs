@@ -61,6 +61,11 @@ namespace EBISX_POS.ViewModels
         private string _vatTinNumber = string.Empty;
 
         [ObservableProperty]
+        [NotifyDataErrorInfo]
+        [Required(ErrorMessage = "Store Code is required")]
+        private string _storeCode = string.Empty;
+
+        [ObservableProperty]
         private string _statusMessage = string.Empty;
 
         [ObservableProperty]
@@ -118,7 +123,8 @@ namespace EBISX_POS.ViewModels
                     RegisteredName = RegisteredName,
                     OperatedBy = OperatedBy,
                     Address = Address,
-                    VatTinNumber = VatTinNumber
+                    VatTinNumber = VatTinNumber,
+                    StoreCode = StoreCode
                 };
 
                 var (isSuccess, message) = await _apiService.SetPosTerminalInfo(terminalInfo);

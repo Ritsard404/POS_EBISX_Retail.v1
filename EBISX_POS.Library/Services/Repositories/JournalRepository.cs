@@ -10,12 +10,13 @@ using System.Text.Json;
 
 namespace EBISX_POS.API.Services.Repositories
 {
-    public class JournalRepository(JournalContext _journal, DataContext _dataContext) : IJournal
+    public class JournalRepository(JournalContext _journal, DataContext _dataContext, IPosTerminalValidationService _posInfo) : IJournal
     {
         private static readonly HttpClient _httpClient = new()
         {
             BaseAddress = new Uri("https://ebisx.com/")
         };
+
 
         public async Task<List<AccountJournal>> AccountJournals()
         {
@@ -83,6 +84,8 @@ namespace EBISX_POS.API.Services.Repositories
                     .Include(o => o.Cashier)
                     .FirstOrDefaultAsync(o => o.Id == orderId);
 
+                var posInfo = await _posInfo.GetTerminalInfo();
+
                 if (order == null)
                 {
                     return (false, "Order not found");
@@ -137,6 +140,8 @@ namespace EBISX_POS.API.Services.Repositories
                         ItemID = item.Menu?.PrivateId ?? "",
                         QtyPerBaseUnit = 1,
                         Unit = unit,
+                        CostCenter = posInfo?.StoreCode ?? "Store 1"
+
                     };
 
                     journals.Add(journal);
@@ -191,6 +196,8 @@ namespace EBISX_POS.API.Services.Repositories
                 // Prepare a list of valid journal entries
                 var journals = new List<AccountJournal>();
 
+                var posInfo = await _posInfo.GetTerminalInfo();
+
                 foreach (var pwdOrSc in journalDTO.PwdScInfo)
                 {
                     if (string.IsNullOrWhiteSpace(pwdOrSc.Name))
@@ -208,7 +215,8 @@ namespace EBISX_POS.API.Services.Repositories
                         EntryDate = journalDTO.EntryDate,
                         EntryName = "1",
                         Description = journalDTO.IsPWD ? "PWD" : "Senior",
-                        Cashier = order.Cashier?.UserEmail ?? "Unknown Cashier"
+                        Cashier = order.Cashier?.UserEmail ?? "Unknown Cashier",
+                        CostCenter = posInfo?.StoreCode ?? "Store 1"
                     };
 
                     journals.Add(journal);
@@ -283,6 +291,8 @@ namespace EBISX_POS.API.Services.Repositories
             var journals = new List<AccountJournal>();
             int lineNo = 5;  // starting line number for PWD/SC entries
 
+            var posInfo = await _posInfo.GetTerminalInfo();
+
             for (int i = 0; i < count; i++)
             {
                 var name = names[i];
@@ -297,7 +307,8 @@ namespace EBISX_POS.API.Services.Repositories
                     AccountName = name,
                     EntryName = "1",
                     EntryDate = order.CreatedAt.DateTime,
-                    Cashier = order.Cashier?.UserEmail ?? "Unknown Cashier"
+                    Cashier = order.Cashier?.UserEmail ?? "Unknown Cashier",
+                    CostCenter = posInfo?.StoreCode ?? "Store 1"
                 };
 
                 journals.Add(journal);
@@ -346,6 +357,8 @@ namespace EBISX_POS.API.Services.Repositories
 
             var journals = new List<AccountJournal>();
 
+            var posInfo = await _posInfo.GetTerminalInfo();
+
             // 1) Record the cash tendered on the order itself
             if (order.CashTendered > 0)
             {
@@ -361,7 +374,8 @@ namespace EBISX_POS.API.Services.Repositories
                     Debit = order.IsReturned ? 0 : Convert.ToDouble(order.CashTendered),
                     Credit = order.IsReturned ? Convert.ToDouble(order.CashTendered) : 0,
                     EntryDate = order.CreatedAt.DateTime,
-                    Cashier = order.Cashier?.UserEmail ?? "Unknown Cashier"
+                    Cashier = order.Cashier?.UserEmail ?? "Unknown Cashier",
+                    CostCenter = posInfo?.StoreCode ?? "Store 1"
                 });
             }
 
@@ -381,7 +395,9 @@ namespace EBISX_POS.API.Services.Repositories
                         Description = tender.SaleType.Type,
                         Debit = order.IsReturned ? 0 : Convert.ToDouble(tender.Amount),
                         Credit = order.IsReturned ? Convert.ToDouble(tender.Amount) : 0,
-                        EntryDate = order.CreatedAt.DateTime
+                        EntryDate = order.CreatedAt.DateTime,
+                        Cashier = order.Cashier?.UserEmail ?? "Unknown Cashier",
+                        CostCenter = posInfo?.StoreCode ?? "Store 1"
                     };
 
                     journals.Add(journal);
@@ -431,6 +447,8 @@ namespace EBISX_POS.API.Services.Repositories
 
             var journals = new List<AccountJournal>();
 
+            var posInfo = await _posInfo.GetTerminalInfo();
+
             // 1) Discount line (EntryLineNo = 9)
             //if (order.DiscountAmount > 0)
             //{
@@ -473,6 +491,7 @@ namespace EBISX_POS.API.Services.Repositories
                 TaxTotal = Convert.ToDouble(order.VatAmount),
                 GrossTotal = Convert.ToDouble(order.TotalAmount),
                 DiscAmt = Convert.ToDouble(order.DiscountAmount),
+                CostCenter = posInfo?.StoreCode ?? "Store 1"
                 
                  
 

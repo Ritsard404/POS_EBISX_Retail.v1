@@ -28,7 +28,7 @@
 							HorizontalAlignment="Right"/>
 				</Grid>
 
-				<Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="10" ColumnSpacing="20">
+				<Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="10" ColumnSpacing="20">
 					<!-- POS Details -->
 					<TextBlock Text="POS Details"
 							 Grid.Row="0"
@@ -84,6 +84,18 @@
 					<TextBlock Text="VAT TIN Number:" Grid.Row="11" VerticalAlignment="Center"/>
 					<TextBox Text="{Binding VatTinNumber, UpdateSourceTrigger=PropertyChanged}"
 							 Grid.Row="11" Grid.Column="1"/>
+
+					<!-- Store Details -->
+					<TextBlock Text="Store Info"
+							 Grid.Row="12"
+							 Grid.ColumnSpan="2"
+							 FontSize="18"
+							 FontWeight="SemiBold"
+							 Margin="0,20,0,10"/>
+
+					<TextBlock Text="Store Code:" Grid.Row="13" VerticalAlignment="Center"/>
+					<TextBox Text="{Binding StoreCode, UpdateSourceTrigger=PropertyChanged}"
+							 Grid.Row="13" Grid.Column="1"/>
 				</Grid>
 
 				<StackPanel Orientation="Horizontal"

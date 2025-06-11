@@ -187,7 +187,8 @@ namespace EBISX_POS.Services
                         RegisteredName = "EBISX Food Services",
                         OperatedBy = "EBISX Food, Inc.",
                         Address = "123 Main Street, Cebu City",
-                        VatTinNumber = "123-456-789-000"
+                        VatTinNumber = "123-456-789-000",
+                        StoreCode = "Store 1"
                     };
 
                     await _dataContext.PosTerminalInfo.AddAsync(terminal, cts.Token);

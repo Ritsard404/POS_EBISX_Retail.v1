@@ -548,7 +548,8 @@ namespace EBISX_POS.API.Services.Repositories
                 AccreditationNumber = "N/A",
                 DateIssued = DateTime.Now,
                 PtuNumber = "N/A",
-                ValidUntil = DateTime.Now
+                ValidUntil = DateTime.Now,
+                StoreCode = "N/A"
             };
 
             // Handle empty scenario for dates
