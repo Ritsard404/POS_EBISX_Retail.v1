@@ -162,6 +162,7 @@ namespace EBISX_POS.ViewModels
                     OperatedBy = terminalInfo.OperatedBy;
                     Address = terminalInfo.Address;
                     VatTinNumber = terminalInfo.VatTinNumber;
+                    StoreCode = terminalInfo.StoreCode;
                 }
             }
             catch (Exception ex)
