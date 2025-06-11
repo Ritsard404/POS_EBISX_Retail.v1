@@ -135,7 +135,7 @@ namespace EBISX_POS.API.Services.Repositories
                         Price = Convert.ToDouble(item.ItemPrice),
                         Cashier = order.Cashier?.UserEmail ?? "Unknown Cashier",
                         ItemID = item.Menu?.PrivateId ?? "",
-                        QtyPerBaseUnit = 1,
+                        QtyPerBaseUnit = item.Menu?.Category.Id,
                         Unit = unit,
                     };
 
