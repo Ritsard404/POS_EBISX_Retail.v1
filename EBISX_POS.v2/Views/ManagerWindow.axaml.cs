@@ -147,20 +147,20 @@ namespace EBISX_POS.Views
 
             reportContent = string.Join("\n", reportContent.Split("\n").Select(line => line.Trim()));
             File.WriteAllText(filePath, reportContent);
-
-            Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
+            s
+            //Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
 
             string cashierEmail = CashierState.CashierEmail;
             string thermalPrinter = "POS";   // the exact name of your 58 mm printer
             string archiveFolder = _cashTrackReportPath; // or null/"" if you don't need archiving
 
-            //CashTrackPrinter.PrintCashTrackReport(
-            //    cashierEmail,
-            //    CashInDrawer,
-            //    CurrentCashDrawer,
-            //    thermalPrinter,
-            //    archiveFolder
-            //);
+            CashTrackPrinter.PrintCashTrackReport(
+                cashierEmail,
+                CashInDrawer,
+                CurrentCashDrawer,
+                thermalPrinter,
+                archiveFolder
+            );
 
             ShowLoader(false);
         }

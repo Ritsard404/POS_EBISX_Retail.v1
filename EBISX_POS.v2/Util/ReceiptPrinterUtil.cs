@@ -72,15 +72,15 @@ namespace EBISX_POS.Util
             var content = new StringBuilder();
 
             // Header
-            content.AppendLine(CenterText(rpt.BusinessName));
-            content.AppendLine(CenterText($"Operated by: {rpt.OperatorName}"));
-            content.AppendLine();
-            content.AppendLine(CenterText(rpt.AddressLine));
-            content.AppendLine();
-            content.AppendLine(CenterText($"VAT REG TIN: {rpt.VatRegTin}"));
-            content.AppendLine(CenterText($"MIN: {rpt.Min}"));
-            content.AppendLine(CenterText($"S/N: {rpt.SerialNumber}"));
-            content.AppendLine();
+            //content.AppendLine(CenterText(rpt.BusinessName));
+            //content.AppendLine(CenterText($"Operated by: {rpt.OperatorName}"));
+            //content.AppendLine();
+            //content.AppendLine(CenterText(rpt.AddressLine));
+            //content.AppendLine();
+            //content.AppendLine(CenterText($"VAT REG TIN: {rpt.VatRegTin}"));
+            //content.AppendLine(CenterText($"MIN: {rpt.Min}"));
+            //content.AppendLine(CenterText($"S/N: {rpt.SerialNumber}"));
+            //content.AppendLine();
 
             // Title
             content.AppendLine(CenterText("X-READING REPORT"));
@@ -148,9 +148,9 @@ namespace EBISX_POS.Util
             File.WriteAllText(filePath, content.ToString());
 
             // Print to thermal printer
-            //PrintToPrinter(content);
+            PrintToPrinter(content);
 
-            Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
+            //Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
         }
 
         public static async void PrintZReading(IServiceProvider serviceProvider)
@@ -168,14 +168,14 @@ namespace EBISX_POS.Util
 
             var content = new StringBuilder();
 
-            // Header
-            content.AppendLine(CenterText(rpt.BusinessName));
-            content.AppendLine(CenterText($"Operated by: {rpt.OperatorName}"));
-            content.AppendLine(CenterText(rpt.AddressLine));
-            content.AppendLine(CenterText($"VAT REG TIN: {rpt.VatRegTin}"));
-            content.AppendLine(CenterText($"MIN: {rpt.Min}"));
-            content.AppendLine(CenterText($"S/N: {rpt.SerialNumber}"));
-            content.AppendLine();
+            //// Header
+            //content.AppendLine(CenterText(rpt.BusinessName));
+            //content.AppendLine(CenterText($"Operated by: {rpt.OperatorName}"));
+            //content.AppendLine(CenterText(rpt.AddressLine));
+            //content.AppendLine(CenterText($"VAT REG TIN: {rpt.VatRegTin}"));
+            //content.AppendLine(CenterText($"MIN: {rpt.Min}"));
+            //content.AppendLine(CenterText($"S/N: {rpt.SerialNumber}"));
+            //content.AppendLine();
 
             // Title
             content.AppendLine(CenterText("Z-READING REPORT"));
@@ -270,9 +270,9 @@ namespace EBISX_POS.Util
             File.WriteAllText(filePath, content.ToString());
 
             // Print to thermal printer
-            //PrintToPrinter(content);
+            PrintToPrinter(content);
 
-            Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
+            //Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
         }
 
         public static void PrintInvoice(string folderPath, string filePath, FinalizeOrderResponseDTO finalizeOrder)
@@ -444,10 +444,10 @@ namespace EBISX_POS.Util
 
                 // Save to file
                 File.WriteAllText(filePath, content.ToString());
-                Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
+                //Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
 
                 // Print to thermal printer
-                //PrintToPrinter(content);
+                PrintToPrinter(content);
             }
 
         }
@@ -574,11 +574,11 @@ namespace EBISX_POS.Util
             content.AppendLine(CenterText($"DUPLICATE COPY #{invoice.PrintCount}"));
 
             // Print to thermal printer
-            //PrintToPrinter(content);
+            PrintToPrinter(content);
 
             File.WriteAllText(filePath, content.ToString());
 
-            Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
+            //Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
         }
 
         private static string FormatCurrency(string value)
