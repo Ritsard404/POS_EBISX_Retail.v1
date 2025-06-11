@@ -127,7 +127,6 @@ namespace EBISX_POS.ViewModels
             catch (Exception ex)
             {
                 Debug.WriteLine($"Error in InitializeAsync: {ex.Message}");
-                NotificationService.NetworkIssueMessage();
             }
         }
 
@@ -151,7 +150,6 @@ namespace EBISX_POS.ViewModels
             catch (Exception ex)
             {
                 Debug.WriteLine($"Error loading cashiers: {ex.Message}");
-                NotificationService.NetworkIssueMessage();
             }
             finally
             {
@@ -188,7 +186,6 @@ namespace EBISX_POS.ViewModels
             catch (Exception ex)
             {
                 Debug.WriteLine($"Error in CheckData: {ex.Message}");
-                NotificationService.NetworkIssueMessage();
             }
             finally
             {
@@ -213,7 +210,6 @@ namespace EBISX_POS.ViewModels
             catch (Exception ex)
             {
                 Debug.WriteLine($"Error checking mode: {ex.Message}");
-                NotificationService.NetworkIssueMessage();
             }
             finally
             {
@@ -282,7 +278,7 @@ namespace EBISX_POS.ViewModels
                 IsLoading = true;
     
 
-                if (selectedCashier != null && string.IsNullOrEmpty(ManagerEmail))
+                if (SelectedCashier != null && string.IsNullOrEmpty(ManagerEmail))
                 {
                     ErrorMessage = "Invalid manager auth.";
                     OnPropertyChanged(nameof(HasError));
@@ -401,7 +397,6 @@ namespace EBISX_POS.ViewModels
                 Debug.WriteLine($"Log in error: {ex.Message}");
                 ErrorMessage = "An unexpected error occurred.";
                 OnPropertyChanged(nameof(HasError));
-                NotificationService.NetworkIssueMessage();
             }
             finally
             {
