@@ -433,10 +433,10 @@ namespace EBISX_POS.Util
                     var outPath = Path.Combine(folderPath, outName);
 
                     File.WriteAllText(outPath, contentWithLabel.ToString());
-                    Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
+                    //Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
 
                     // Print to thermal printer
-                    //PrintToPrinter(contentWithLabel);
+                    PrintToPrinter(contentWithLabel);
                 }
             }
             else

@@ -147,7 +147,7 @@ namespace EBISX_POS.Views
 
             reportContent = string.Join("\n", reportContent.Split("\n").Select(line => line.Trim()));
             File.WriteAllText(filePath, reportContent);
-            s
+
             //Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
 
             string cashierEmail = CashierState.CashierEmail;

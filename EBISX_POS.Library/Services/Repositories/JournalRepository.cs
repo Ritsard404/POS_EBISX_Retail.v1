@@ -10,7 +10,7 @@ using System.Text.Json;
 
 namespace EBISX_POS.API.Services.Repositories
 {
-    public class JournalRepository(JournalContext _journal, DataContext _dataContext, IPosTerminalValidationService _posInfo) : IJournal
+    public class JournalRepository(JournalContext _journal, DataContext _dataContext, IPosTerminalValidationService _posInfo, IAuth _auth) : IJournal
     {
         private static readonly HttpClient _httpClient = new()
         {
@@ -70,6 +70,7 @@ namespace EBISX_POS.API.Services.Repositories
         {
             try
             {
+                bool isTrainMode = await _auth.IsTrainMode();
 
                 var order = await _dataContext.Order
                     .Include(o => o.Items)
@@ -82,9 +83,10 @@ namespace EBISX_POS.API.Services.Repositories
                         .ThenInclude(i => i.Meal)
                     .Include(o => o.Coupon)
                     .Include(o => o.Cashier)
-                    .FirstOrDefaultAsync(o => o.Id == orderId);
+                    .FirstOrDefaultAsync(o => o.Id == orderId && o.IsTrainMode == isTrainMode);
 
                 var posInfo = await _posInfo.GetTerminalInfo();
+                var storeCode = isTrainMode ? "Store 1" : posInfo?.StoreCode ?? "";
 
                 if (order == null)
                 {
@@ -140,7 +142,7 @@ namespace EBISX_POS.API.Services.Repositories
                         ItemID = item.Menu?.PrivateId ?? "",
                         QtyPerBaseUnit = 1,
                         Unit = unit,
-                        CostCenter = posInfo?.StoreCode ?? "Store 1"
+                        CostCenter = storeCode
 
                     };
 
@@ -179,8 +181,9 @@ namespace EBISX_POS.API.Services.Repositories
             try
             {
                 // Get the order to check training mode and invoice number
+                bool isTrainMode = await _auth.IsTrainMode();
                 var order = await _dataContext.Order
-                    .FirstOrDefaultAsync(o => o.Id == journalDTO.OrderId);
+                    .FirstOrDefaultAsync(o => o.Id == journalDTO.OrderId && o.IsTrainMode == isTrainMode);
 
                 if (order == null)
                 {
@@ -197,6 +200,7 @@ namespace EBISX_POS.API.Services.Repositories
                 var journals = new List<AccountJournal>();
 
                 var posInfo = await _posInfo.GetTerminalInfo();
+                var storeCode = isTrainMode ? "Store 1" : posInfo?.StoreCode ?? "";
 
                 foreach (var pwdOrSc in journalDTO.PwdScInfo)
                 {
@@ -216,7 +220,7 @@ namespace EBISX_POS.API.Services.Repositories
                         EntryName = "1",
                         Description = journalDTO.IsPWD ? "PWD" : "Senior",
                         Cashier = order.Cashier?.UserEmail ?? "Unknown Cashier",
-                        CostCenter = posInfo?.StoreCode ?? "Store 1"
+                        CostCenter = storeCode
                     };
 
                     journals.Add(journal);
@@ -246,10 +250,11 @@ namespace EBISX_POS.API.Services.Repositories
             {
                 return (false, "Invalid order ID.");
             }
+            bool isTrainMode = await _auth.IsTrainMode();
 
             // 1) Load the order so we can read the PWD/SC fields
             var order = await _dataContext.Order
-                .FirstOrDefaultAsync(o => o.Id == orderId);
+                .FirstOrDefaultAsync(o => o.Id == orderId && o.IsTrainMode == isTrainMode);
 
             if (order == null)
             {
@@ -293,6 +298,8 @@ namespace EBISX_POS.API.Services.Repositories
 
             var posInfo = await _posInfo.GetTerminalInfo();
 
+            var storeCode = isTrainMode ? "Store 1" : posInfo?.StoreCode ?? "";
+
             for (int i = 0; i < count; i++)
             {
                 var name = names[i];
@@ -308,7 +315,7 @@ namespace EBISX_POS.API.Services.Repositories
                     EntryName = "1",
                     EntryDate = order.CreatedAt.DateTime,
                     Cashier = order.Cashier?.UserEmail ?? "Unknown Cashier",
-                    CostCenter = posInfo?.StoreCode ?? "Store 1"
+                    CostCenter = storeCode
                 };
 
                 journals.Add(journal);
@@ -338,11 +345,12 @@ namespace EBISX_POS.API.Services.Repositories
                 return (false, "Invalid order ID.");
             }
 
+            bool isTrainMode = await _auth.IsTrainMode();
             // Load the order plus any AlternativePayments
             var order = await _dataContext.Order
                 .Include(o => o.AlternativePayments)
                     .ThenInclude(t => t.SaleType)
-                .FirstOrDefaultAsync(o => o.Id == orderId);
+                .FirstOrDefaultAsync(o => o.Id == orderId && o.IsTrainMode == isTrainMode);
 
             if (order == null)
             {
@@ -358,6 +366,7 @@ namespace EBISX_POS.API.Services.Repositories
             var journals = new List<AccountJournal>();
 
             var posInfo = await _posInfo.GetTerminalInfo();
+            var storeCode = isTrainMode ? "Store 1" : posInfo?.StoreCode ?? "";
 
             // 1) Record the cash tendered on the order itself
             if (order.CashTendered > 0)
@@ -375,7 +384,7 @@ namespace EBISX_POS.API.Services.Repositories
                     Credit = order.IsReturned ? Convert.ToDouble(order.CashTendered) : 0,
                     EntryDate = order.CreatedAt.DateTime,
                     Cashier = order.Cashier?.UserEmail ?? "Unknown Cashier",
-                    CostCenter = posInfo?.StoreCode ?? "Store 1"
+                    CostCenter = storeCode
                 });
             }
 
@@ -397,7 +406,7 @@ namespace EBISX_POS.API.Services.Repositories
                         Credit = order.IsReturned ? Convert.ToDouble(tender.Amount) : 0,
                         EntryDate = order.CreatedAt.DateTime,
                         Cashier = order.Cashier?.UserEmail ?? "Unknown Cashier",
-                        CostCenter = posInfo?.StoreCode ?? "Store 1"
+                        CostCenter = storeCode
                     };
 
                     journals.Add(journal);
@@ -429,10 +438,11 @@ namespace EBISX_POS.API.Services.Repositories
             {
                 return (false, "Invalid order ID.");
             }
+            bool isTrainMode = await _auth.IsTrainMode();
 
             // Load just the Order so we can grab TotalAmount, DiscountType, DiscountAmount
             var order = await _dataContext.Order
-                .FirstOrDefaultAsync(o => o.Id == orderId);
+                .FirstOrDefaultAsync(o => o.Id == orderId && o.IsTrainMode == isTrainMode);
 
             if (order == null)
             {
@@ -448,6 +458,7 @@ namespace EBISX_POS.API.Services.Repositories
             var journals = new List<AccountJournal>();
 
             var posInfo = await _posInfo.GetTerminalInfo();
+            var storeCode = isTrainMode ? "Store 1" : posInfo?.StoreCode ?? "";
 
             // 1) Discount line (EntryLineNo = 9)
             //if (order.DiscountAmount > 0)
@@ -491,9 +502,9 @@ namespace EBISX_POS.API.Services.Repositories
                 TaxTotal = Convert.ToDouble(order.VatAmount),
                 GrossTotal = Convert.ToDouble(order.TotalAmount),
                 DiscAmt = Convert.ToDouble(order.DiscountAmount),
-                CostCenter = posInfo?.StoreCode ?? "Store 1"
-                
-                 
+                CostCenter = storeCode
+
+
 
             });
 
@@ -595,6 +606,8 @@ namespace EBISX_POS.API.Services.Repositories
                 var errors = new List<string>();
                 var totalCount = journals.Count;
 
+                bool isTrainMode = await _auth.IsTrainMode();
+
                 // Report initial progress
                 progress?.Report((0, totalCount, $"Found {totalCount} entries to push for {selectedDate:yyyy-MM-dd}. Starting push process..."));
 
@@ -614,7 +627,7 @@ namespace EBISX_POS.API.Services.Repositories
                             Entry_No = journal.EntryNo?.ToString() ?? "",
                             Entry_Line_No = journal.EntryLineNo?.ToString() ?? "0",
                             Entry_Date = journal.EntryDate.ToString("yyyy-MM-dd"),
-                            CostCenter = journal.CostCenter ?? "Store 1",
+                            CostCenter = isTrainMode ? journal.CostCenter ?? "Store 1" : "",
                             ItemId = journal.ItemID ?? "",
                             Unit = journal.Unit ?? "",
                             Qty = journal.QtyOut?.ToString() ?? "0",
@@ -919,8 +932,13 @@ namespace EBISX_POS.API.Services.Repositories
         }
         public async Task<(bool isSuccess, string message)> UnpostPwdScAccountJournal(long orderId, string oscaNum)
         {
+
+            bool isTrainMode = await _auth.IsTrainMode();
+            var posInfo = await _posInfo.GetTerminalInfo();
+            var storeCode = isTrainMode ? "Store 1" : posInfo?.StoreCode ?? "";
+
             var pwdOrSc = await _journal.AccountJournal
-                .FirstOrDefaultAsync(x => x.Reference == oscaNum && x.EntryNo == orderId);
+                .FirstOrDefaultAsync(x => x.Reference == oscaNum && x.EntryNo == orderId && x.CostCenter == storeCode);
 
             if (pwdOrSc == null)
                 return (false, "Not Found Pwd/Sc");
@@ -951,6 +969,10 @@ namespace EBISX_POS.API.Services.Repositories
 
                 var journals = await query.ToListAsync();
 
+                bool isTrainMode = await _auth.IsTrainMode();
+                var posInfo = await _posInfo.GetTerminalInfo();
+                var storeCode = isTrainMode ? "Store 1" : posInfo?.StoreCode ?? "";
+
                 //if (!journals.Any())
                 //{
                 //    var dateMsg1 = selectedDate.HasValue ? $" for {selectedDate.Value:yyyy-MM-dd}" : "";
@@ -964,7 +986,7 @@ namespace EBISX_POS.API.Services.Repositories
                     Entry_No = journal.EntryNo?.ToString() ?? "",
                     Entry_Line_No = journal.EntryLineNo?.ToString() ?? "0",
                     Entry_Date = journal.EntryDate.ToString("yyyy-MM-dd"),
-                    CostCenter = journal.CostCenter ?? "Store 1",
+                    CostCenter = storeCode,
                     ItemId = journal.ItemID ?? "",
                     Unit = journal.Unit ?? "",
                     Qty = journal.QtyOut?.ToString() ?? "0",
