@@ -28,23 +28,49 @@
 							VerticalAlignment="Top"
 							VerticalContentAlignment="Center"
 							HorizontalContentAlignment="Center"
-							Margin="0, 0, 0, 200"/>
+							Margin="0, 0, 0, 150"/>
 
-					<StackPanel IsVisible="{Binding OrderItem.IsEnableEdit}" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom">
+					<StackPanel IsVisible="{Binding OrderItem.IsEnableEdit}" Width="200" Grid.Row="2" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Bottom">
 						<Button Width="40"
 								FontSize="20"
+								IsVisible="False"
 								VerticalContentAlignment="Center"
 								HorizontalContentAlignment="Center"
 								FontWeight="Bold"
 								Content="-"
 								Command="{Binding EditQuantityCommand}"
 								CommandParameter="-1" />
+						<TextBlock 
+								 VerticalAlignment="Center"
+								 HorizontalAlignment="Left"
+								 Text="Total Price"
+								 FontSize="18"
+								 FontWeight="SemiBold"
+								 Margin="0, 0, 0, 5"/>
+						<TextBox Text="{Binding OrderItem.TotalPrice}"
+								 VerticalContentAlignment="Center"
+								 HorizontalContentAlignment="Center"
+								 Margin="10, 0, 10, 15"
+								 Height="40"
+								 FontSize="16"
+								 TextChanged="TotalPrice_TextChanged"></TextBox>
+						
+						<TextBlock 
+								 VerticalAlignment="Center"
+								 HorizontalAlignment="Left"
+								 Text="Quantity"
+								 FontSize="18"
+								 FontWeight="SemiBold"
+								 Margin="0, 0, 0, 5"/>
 						<TextBox Text="{Binding OrderItem.Quantity}"
 								 VerticalContentAlignment="Center"
 								 HorizontalContentAlignment="Center"
 								 Margin="10, 0, 10, 0"
-								 IsReadOnly="True" />
+								 Height="40"
+								 FontSize="16"
+								 TextChanged="Quantity_TextChanged"></TextBox>
 						<Button Width="40"
+								IsVisible="False"
 								FontSize="20"
 								VerticalContentAlignment="Center"
 								HorizontalContentAlignment="Center"

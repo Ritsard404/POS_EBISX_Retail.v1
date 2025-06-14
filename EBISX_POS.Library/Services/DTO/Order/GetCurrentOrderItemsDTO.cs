@@ -9,7 +9,7 @@ namespace EBISX_POS.API.Services.DTO.Order
         public List<CurrentOrderItemsSubOrder>? SubOrders { get; set; }
 
         // Additional properties to display order summary (if needed)
-        public int TotalQuantity => SubOrders?.FirstOrDefault()?.Quantity ?? 0;
+        public decimal TotalQuantity => SubOrders?.FirstOrDefault()?.Quantity ?? 0;
         public decimal TotalPrice => SubOrders?
             .Where(i => !(i.AddOnId == null && i.MenuId == null && i.DrinkId == null) || CouponCode != null)
             .Sum(s => s.ItemSubTotal) ?? 0;
@@ -36,7 +36,7 @@ namespace EBISX_POS.API.Services.DTO.Order
         public string Name { get; set; } = string.Empty;
         public string? Size { get; set; }
         public decimal ItemPrice { get; set; }
-        public int Quantity { get; set; }
+        public decimal Quantity { get; set; }
         public bool IsFirstItem { get; set; } = false;
         public bool IsOtherDisc { get; set; } = false;
 

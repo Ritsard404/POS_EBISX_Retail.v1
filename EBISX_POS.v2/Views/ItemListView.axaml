@@ -19,7 +19,18 @@
 				HorizontalAlignment="Left"
 				VerticalAlignment="Top"
 				Width="250"
-				Height="30"/>
+				Height="30"
+				KeyDown="OnSearchKeyDown"/>
+		
+		<Button Content="Search" 
+		        Command="{Binding SearchCommand}"
+		        Grid.Row="0"
+		        Margin="270,10,10,0"
+		        HorizontalAlignment="Left"
+		        VerticalAlignment="Top"
+		        Width="80"
+		        Height="30"/>
+		
         <!-- Center Content -->
         <ScrollViewer HorizontalAlignment="Left" Grid.Row="1" VerticalAlignment="Stretch">
             <ItemsControl x:Name="ItemsList" ItemsSource="{Binding FilteredMenuItems}" IsVisible="{Binding HasMenus}">

@@ -41,7 +41,7 @@
 
     public class ItemDTO
     {
-        public int Qty { get; set; } = 0; // Default to 0
+        public decimal Qty { get; set; } = 0; // Default to 0
         public List<ItemInfoDTO> itemInfos { get; set; } = new List<ItemInfoDTO>(); // Default to empty list
     }
 

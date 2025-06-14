@@ -84,7 +84,7 @@ namespace EBISX_POS.Services.DTO.Report
 
     public class ItemDTO
     {
-        public required int Qty { get; set; }
+        public required decimal Qty { get; set; }
         public List<ItemInfoDTO> itemInfos { get; set; } = new();
 
         public static ItemDTO CreateEmpty()

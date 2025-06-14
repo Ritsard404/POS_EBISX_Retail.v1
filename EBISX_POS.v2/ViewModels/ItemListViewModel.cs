@@ -29,10 +29,8 @@ namespace EBISX_POS.ViewModels
             get => _searchText;
             set
             {
-                if (SetProperty(ref _searchText, value))
-                {
-                    FilterItems();
-                }
+                // Only update the property, don't trigger filtering automatically
+                SetProperty(ref _searchText, value);
             }
         }
 
@@ -40,7 +38,7 @@ namespace EBISX_POS.ViewModels
         {
             _menuService = menuService;
             ItemClickCommand = new RelayCommand<ItemMenu>(OnItemClick);
-            SearchCommand = new RelayCommand<string>(OnSearch);
+            SearchCommand = new RelayCommand(PerformSearch);
         }
 
         // This property returns true if there are any menus.
@@ -57,9 +55,9 @@ namespace EBISX_POS.ViewModels
             OnPropertyChanged(nameof(HasMenus));
         }
 
-        private void OnSearch(string? searchText)
+        private void PerformSearch()
         {
-            SearchText = searchText ?? string.Empty;
+            FilterItems();
         }
 
         private void FilterItems()

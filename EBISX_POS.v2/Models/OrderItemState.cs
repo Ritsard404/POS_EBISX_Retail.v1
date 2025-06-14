@@ -14,7 +14,7 @@ namespace EBISX_POS.Models
         public string ID { get; set; }  // ID is set in constructor, no change notification needed
 
         [ObservableProperty]
-        private int quantity;
+        private decimal quantity;
 
         [ObservableProperty]
         private string? orderType;
@@ -79,7 +79,7 @@ namespace EBISX_POS.Models
             ID = $"{ticks}-{Guid.NewGuid().ToString()}-{count}";
         }
 
-        partial void OnQuantityChanged(int oldValue, int newValue)
+        partial void OnQuantityChanged(decimal oldValue, decimal newValue)
         {
             OnPropertyChanged(nameof(DisplaySubOrders));
             OnPropertyChanged(nameof(Quantity));
@@ -127,7 +127,7 @@ namespace EBISX_POS.Models
 
         public bool IsFirstItem { get; set; } = false;
         public bool IsOtherDisc { get; set; }
-        public int Quantity { get; set; } = 0; // Store Quantity for first item
+        public decimal Quantity { get; set; } = 0; // Store Quantity for first item
 
         public string DisplayName
         {

@@ -8,7 +8,7 @@ namespace EBISX_POS.API.Services.DTO.Report
         public long InvoiceNumber { get; set; }
         public string MenuName { get; set; } = string.Empty;
         public string BaseUnit { get; set; } = string.Empty;
-        public int Quantity { get; set; }
+        public decimal Quantity { get; set; }
         public decimal Cost { get; set; }
         public decimal Price { get; set; }
         public string ItemGroup { get; set; } = string.Empty;

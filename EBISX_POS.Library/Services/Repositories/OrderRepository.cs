@@ -765,6 +765,8 @@ namespace EBISX_POS.API.Services.Repositories
             // Update the main item's quantity
             item.ItemQTY = editOrder.qty;
 
+            item.ItemPrice = editOrder.price;
+
             // Update child items if this is a parent item
             if (item.Meal == null)
             {
@@ -998,7 +1000,7 @@ namespace EBISX_POS.API.Services.Repositories
                                          Name = (i.Menu?.MenuName ?? i.Drink?.MenuName ?? i.AddOn?.MenuName ?? "Unknown") + " \n@" + i.Menu?.BaseUnit,
                                          Size = i.Menu?.Size ?? i.Drink?.Size ?? i.AddOn?.Size,
                                          ItemPrice = i.ItemPrice ?? 0m,
-                                         Quantity = i.ItemQTY ?? 1,
+                                         Quantity = i.ItemQTY ?? 0m,
                                          IsFirstItem = i.Meal == null
                                      })
                                      .ToList()

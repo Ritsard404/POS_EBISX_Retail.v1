@@ -35,7 +35,48 @@ namespace EBISX_POS.Views
             if (DataContext is not OrderItemEditWindowViewModel viewModel)
                 return;
 
-            if (viewModel.OriginalQuantity == viewModel.OrderItem.Quantity)
+            // Validate the changes
+            if (!viewModel.IsQuantityValid())
+            {
+                var box = MessageBoxManager.GetMessageBoxStandard(
+                    new MessageBoxStandardParams
+                    {
+                        ContentHeader = "Invalid Quantity",
+                        ContentMessage = "Quantity must be greater than 0.",
+                        ButtonDefinitions = ButtonEnum.Ok,
+                        WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                        CanResize = false,
+                        SizeToContent = SizeToContent.WidthAndHeight,
+                        Width = 400,
+                        ShowInCenter = true,
+                        Icon = MsBox.Avalonia.Enums.Icon.Warning
+                    });
+                await box.ShowAsPopupAsync(this);
+                return;
+            }
+
+            if (!viewModel.IsTotalPriceValid())
+            {
+                var box = MessageBoxManager.GetMessageBoxStandard(
+                    new MessageBoxStandardParams
+                    {
+                        ContentHeader = "Invalid Total Price",
+                        ContentMessage = "Total price must be greater than 0.",
+                        ButtonDefinitions = ButtonEnum.Ok,
+                        WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                        CanResize = false,
+                        SizeToContent = SizeToContent.WidthAndHeight,
+                        Width = 400,
+                        ShowInCenter = true,
+                        Icon = MsBox.Avalonia.Enums.Icon.Warning
+                    });
+                await box.ShowAsPopupAsync(this);
+                return;
+            }
+
+            // Check if any changes were made
+            if (viewModel.OriginalQuantity == viewModel.OrderItem.Quantity && 
+                viewModel.OriginalTotalPrice == viewModel.OrderItem.TotalPrice)
             {
                 Close();
                 return;
@@ -48,11 +89,13 @@ namespace EBISX_POS.Views
             {
                 entryId = orderItem.ID,
                 qty = orderItem.Quantity,
+                price = viewModel.BaseItemPrice, // Use the calculated base item price
                 CashierEmail = CashierState.CashierEmail ?? ""
-
             };
-            
+
             await orderService.EditQtyOrderItem(newQty);
+
+            TenderState.tenderOrder.CalculateTotalAmount();
 
             // Close the current window
             Close();
@@ -104,6 +147,24 @@ namespace EBISX_POS.Views
             //    default:
             //        return;
             //}
+        }
+
+        private void TotalPrice_TextChanged(object? sender, TextChangedEventArgs e)
+        {
+            if (DataContext is not OrderItemEditWindowViewModel viewModel)
+                return;
+
+            // Use the ViewModel method to update base price from total
+            viewModel.UpdateBasePriceFromTotal();
+        }
+
+        private void Quantity_TextChanged(object? sender, TextChangedEventArgs e)
+        {
+            if (DataContext is not OrderItemEditWindowViewModel viewModel)
+                return;
+
+            // Use the ViewModel method to update total price from quantity
+            viewModel.UpdateTotalPriceFromQuantity();
         }
     }
 };

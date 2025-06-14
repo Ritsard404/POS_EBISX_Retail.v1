@@ -74,9 +74,9 @@
 		<Grid Grid.Row="1" ColumnDefinitions="Auto, *, Auto">
 
 			<!-- Menu Area -->
-			<Border BorderBrush="Orange" BorderThickness="0,0,3,0">
+			<Border IsVisible="False" BorderBrush="Orange" BorderThickness="0,0,3,0">
 				<Grid>
-					<!-- Underlying menu content -->
+					 <!--Underlying menu content--> 
 					<Grid Width="150" Name="IsCtgryAvail">
 						<ScrollViewer>
 							<Grid>
@@ -113,7 +113,7 @@
 						</ScrollViewer>
 					</Grid>
 
-					<!-- Loader overlay: centered both vertically and horizontally -->
+					 <!--Loader overlay: centered both vertically and horizontally--> 
 					<ProgressBar Name="IsLoadCtgry"
 								 IsIndeterminate="True"
 								 HorizontalAlignment="Center"

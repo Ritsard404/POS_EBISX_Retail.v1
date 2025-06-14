@@ -188,5 +188,17 @@ namespace EBISX_POS.Views
             await msg.ShowAsPopupAsync((Window)this.VisualRoot);
             return true;
         }
+
+        private void OnSearchKeyDown(object? sender, Avalonia.Input.KeyEventArgs e)
+        {
+            if (e.Key == Avalonia.Input.Key.Enter)
+            {
+                if (DataContext is ItemListViewModel viewModel)
+                {
+                    viewModel.SearchCommand.Execute(null);
+                }
+                e.Handled = true;
+            }
+        }
     }
 }

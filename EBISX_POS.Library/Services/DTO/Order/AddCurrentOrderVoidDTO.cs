@@ -4,7 +4,7 @@ namespace EBISX_POS.API.Services.DTO.Order
 {
     public class AddCurrentOrderVoidDTO
     {
-        public required int qty { get; set; }
+        public required decimal qty { get; set; }
         public int? menuId { get; set; }
         public int? drinkId { get; set; }
         public int? addOnId { get; set; }
