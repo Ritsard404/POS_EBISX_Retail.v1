@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using EBISX_POS.Models;
 using EBISX_POS.State;
+using System;
 using System.Diagnostics;
 using System.Linq;
 
@@ -68,7 +69,7 @@ namespace EBISX_POS.ViewModels
         {
             if (OrderItem.Quantity > 0)
             {
-                OrderItem.TotalPrice = BaseItemPrice * OrderItem.Quantity;
+                OrderItem.TotalPrice = Math.Round(BaseItemPrice * OrderItem.Quantity, 2);
                 OrderItem.RefreshDisplaySubOrders();
             }
         }

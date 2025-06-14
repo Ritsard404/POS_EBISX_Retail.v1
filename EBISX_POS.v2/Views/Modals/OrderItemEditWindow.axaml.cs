@@ -12,6 +12,7 @@ using EBISX_POS.Services;
 using Microsoft.Extensions.DependencyInjection;
 using EBISX_POS.API.Services.DTO.Order;
 using EBISX_POS.API.Models;
+using System;
 
 namespace EBISX_POS.Views
 {
@@ -34,6 +35,9 @@ namespace EBISX_POS.Views
             // Get the view model from DataContext
             if (DataContext is not OrderItemEditWindowViewModel viewModel)
                 return;
+
+            viewModel.UpdateBasePriceFromTotal();
+
 
             // Validate the changes
             if (!viewModel.IsQuantityValid())
@@ -89,7 +93,7 @@ namespace EBISX_POS.Views
             {
                 entryId = orderItem.ID,
                 qty = orderItem.Quantity,
-                price = viewModel.BaseItemPrice, // Use the calculated base item price
+                price = Math.Round(viewModel.BaseItemPrice, 2), // Use the calculated base item price
                 CashierEmail = CashierState.CashierEmail ?? ""
             };
 
@@ -155,7 +159,7 @@ namespace EBISX_POS.Views
                 return;
 
             // Use the ViewModel method to update base price from total
-            viewModel.UpdateBasePriceFromTotal();
+            //viewModel.UpdateBasePriceFromTotal();
         }
 
         private void Quantity_TextChanged(object? sender, TextChangedEventArgs e)
